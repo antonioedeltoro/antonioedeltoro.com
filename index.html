@@ -3,7 +3,36 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antonio del Toro — antonioedeltoro.com</title>
+<title>Antonio E. del Toro — IT Professional & Cybersecurity Student</title>
+
+<!-- Primary Meta -->
+<meta name="description" content="Antonio E. del Toro — Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
+<meta name="keywords" content="Antonio del Toro, IT support, cybersecurity, MERN developer, web development, Los Angeles, CompTIA, deltoro.codes">
+<meta name="author" content="Antonio E. del Toro">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.antonioedeltoro.com">
+
+<!-- Open Graph (Facebook, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.antonioedeltoro.com">
+<meta property="og:title" content="Antonio E. del Toro — IT Professional & Cybersecurity Student">
+<meta property="og:description" content="Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
+<meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta property="og:site_name" content="Antonio E. del Toro">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://www.antonioedeltoro.com">
+<meta name="twitter:title" content="Antonio E. del Toro — IT Professional & Cybersecurity Student">
+<meta name="twitter:description" content="Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
+<meta name="twitter:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta name="twitter:creator" content="@antonioedeltoro">
+
+<!-- Theme color (browser UI on mobile) -->
+<meta name="theme-color" content="#FF5F00">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
@@ -132,7 +161,8 @@
     text-decoration: none;
     font-family: var(--font-mono);
     letter-spacing: 0.02em;
-    transition: color 0.2s;
+    transition: color 0.2s, transform 0.1s;
+    display: inline-block;
   }
   .nav-links a:hover { color: var(--text); }
   .nav-links a.active { color: var(--orange); }
@@ -146,7 +176,7 @@
     cursor: pointer;
     color: var(--text3);
     font-size: 17px;
-    transition: color 0.2s, border-color 0.2s;
+    transition: color 0.2s, border-color 0.2s, transform 0.1s;
   }
   .mode-btn:hover { color: var(--text); border-color: var(--text3); }
 
@@ -157,6 +187,12 @@
   .hero {
     padding: 80px 0 72px;
     border-bottom: 0.5px solid var(--border);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 64px;
+    align-items: center;
   }
   .hero-tag {
     font-family: var(--font-mono);
@@ -178,7 +214,7 @@
   }
   .hero h1 {
     font-family: var(--font-display);
-    font-size: clamp(36px, 5vw, 56px);
+    font-size: clamp(32px, 4vw, 52px);
     font-weight: 700;
     line-height: 1.08;
     letter-spacing: -0.03em;
@@ -192,11 +228,85 @@
   .hero-sub {
     font-size: 16px;
     color: var(--text2);
-    max-width: 520px;
+    max-width: 480px;
     line-height: 1.75;
     margin-bottom: 36px;
   }
   .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+  /* ── PIXEL IMAGE ── */
+  .hero-image-wrap {
+    position: relative;
+    width: 300px;
+    height: 300px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 2px solid var(--orange);
+    box-shadow: 0 0 0 4px rgba(255,95,0,0.15), 0 0 40px rgba(255,95,0,0.25), 0 0 80px rgba(255,95,0,0.1);
+  }
+  .hero-image-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    image-rendering: pixelated;
+  }
+  /* static scanline grid */
+  .hero-image-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(0,0,0,0.18) 2px,
+      rgba(0,0,0,0.18) 4px
+    );
+    pointer-events: none;
+    z-index: 2;
+    border-radius: 50%;
+  }
+  /* moving scanline sweep — stronger */
+  .scanline {
+    position: absolute;
+    top: -60%;
+    left: 0;
+    width: 100%;
+    height: 60%;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(255, 95, 0, 0.08) 20%,
+      rgba(255, 95, 0, 0.28) 45%,
+      rgba(255, 255, 255, 0.08) 50%,
+      rgba(255, 95, 0, 0.28) 55%,
+      rgba(255, 95, 0, 0.08) 80%,
+      transparent 100%
+    );
+    animation: scanline-sweep 2.2s linear infinite;
+    pointer-events: none;
+    z-index: 3;
+  }
+  @keyframes scanline-sweep {
+    0%   { top: -60%; }
+    100% { top: 100%; }
+  }
+
+  /* mobile image slot — hidden on desktop */
+  .hero-image-mobile-wrap { display: none; }
+  .hero-image-mobile-wrap .hero-image-wrap {
+    width: 220px; height: 220px;
+    margin: 24px auto;
+  }
+
+  @media (max-width: 860px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-image-desktop-wrap { display: none; }
+    .hero-image-mobile-wrap { display: block; }
+    .hero-image-wrap { width: 220px; height: 220px; margin: 0 auto; }
+  }
   .btn-primary {
     background: var(--orange);
     color: #fff;
@@ -255,12 +365,22 @@
   }
   .section-link:hover { color: var(--blue-d); }
 
-  /* ── PROJECTS ── */
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 12px;
+  /* ── PROJECTS CAROUSEL ── */
+  .carousel-wrap {
+    position: relative;
   }
+  .carousel-track-outer {
+    overflow: hidden;
+  }
+  .projects-carousel {
+    display: flex;
+    gap: 12px;
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+    will-change: transform;
+    cursor: grab;
+    user-select: none;
+  }
+  .projects-carousel:active { cursor: grabbing; }
   .project-card {
     background: var(--bg2);
     border: 0.5px solid var(--border);
@@ -271,11 +391,50 @@
     flex-direction: column;
     transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
+    flex: 0 0 300px;
+    min-width: 0;
   }
   .project-card:hover {
     border-color: var(--orange);
     transform: translateY(-2px);
     box-shadow: 0 8px 32px rgba(255,95,0,0.08);
+  }
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  .carousel-btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    color: var(--text3);
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+  }
+  .carousel-btn:hover { color: var(--text); border-color: var(--orange); }
+  .carousel-btn:disabled { opacity: 0.3; cursor: default; }
+  .carousel-btn:disabled:hover { color: var(--text3); border-color: var(--border); }
+  .carousel-dots {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .carousel-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--bg3);
+    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+  }
+  .carousel-dot.active {
+    background: var(--orange);
+    transform: scale(1.3);
   }
   .project-tag {
     font-family: var(--font-mono);
@@ -362,46 +521,20 @@
   }
 
   /* ── CONTACT ── */
-  .contact-layout {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 48px;
-    align-items: start;
-  }
-  .contact-info {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 560px;
-    overflow-y: auto;
-    padding-right: 4px;
-  }
-  .contact-info::-webkit-scrollbar { width: 3px; }
-  .contact-info::-webkit-scrollbar-track { background: transparent; }
-  .contact-info::-webkit-scrollbar-thumb { background: var(--bg3); border-radius: 2px; }
-  .contact-item {
+  .contact-form-wrap { max-width: 600px; }
+  .social-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
     background: var(--bg2);
     border: 0.5px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    text-decoration: none;
-    transition: border-color 0.2s;
-  }
-  .contact-item:hover { border-color: var(--blue); }
-  .contact-icon {
-    width: 34px; height: 34px;
-    border-radius: 8px;
-    background: var(--bg3);
     display: flex; align-items: center; justify-content: center;
-    color: var(--text2);
-    font-size: 17px;
-    flex-shrink: 0;
+    color: var(--text3);
+    font-size: 18px;
+    text-decoration: none;
+    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.1s;
   }
-  .contact-lbl { font-size: 11px; color: var(--text3); font-family: var(--font-mono); }
-  .contact-val { font-size: 13px; font-weight: 500; color: var(--text); }
+  .social-icon:hover { color: var(--text); border-color: var(--text3); }
+  .social-icon:active { transform: scale(0.88); background: var(--bg3); }
 
   /* ── CONTACT FORM ── */
   .contact-form { display: flex; flex-direction: column; gap: 12px; }
@@ -475,7 +608,15 @@
   }
   .footer-links a:hover { color: var(--text); }
 
-  /* ── ANIMATIONS ── */
+  /* ── TACTILE FEEDBACK ── */
+  .nav-links a:active { transform: scale(0.92); }
+  .btn-primary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
+  .btn-secondary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
+  .social-icon:active { transform: scale(0.88); background: var(--bg3); }
+  .carousel-btn:active:not(:disabled) { transform: scale(0.88); }
+  .mode-btn:active { transform: scale(0.88); }
+  .hamburger:active { transform: scale(0.88); }
+  .project-card:active { transform: translateY(0px) scale(0.98) !important; box-shadow: none !important; }
   .fade-in {
     opacity: 0;
     transform: translateY(16px);
@@ -483,14 +624,51 @@
   }
   .fade-in.visible { opacity: 1; transform: none; }
 
+  /* ── HAMBURGER ── */
+  .hamburger {
+    display: none;
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 20px;
+    transition: color 0.2s;
+  }
+  .hamburger:hover { color: var(--text); }
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--border);
+    padding: 8px 20px 16px;
+    gap: 0;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text3);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    transition: color 0.2s;
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:hover, .mobile-menu a.active { color: var(--orange); }
+
   @media (max-width: 720px) {
     nav { padding: 0 20px; }
     .container { padding: 0 20px; }
     .nav-links { display: none; }
+    .hamburger { display: flex; }
     .hero { padding: 48px 0 40px; }
-    .about-grid, .contact-layout { grid-template-columns: 1fr; gap: 32px; }
+    .about-grid { grid-template-columns: 1fr; gap: 32px; }
     .form-row { grid-template-columns: 1fr; }
-    footer { flex-direction: column; gap: 16px; text-align: center; }
+    footer .container { flex-direction: column; gap: 16px; text-align: center; }
+    footer .container > div { justify-content: center; }
   }
 </style>
 </head>
@@ -502,7 +680,7 @@
 </div>
 
 <nav>
-  <a href="#" class="nav-logo">ADT<span>.</span></a>
+  <a href="#" class="nav-logo">Antonio E<span>.</span> del Toro</a>
   <ul class="nav-links">
     <li><a href="#work" class="active">work</a></li>
     <li><a href="#about">about</a></li>
@@ -512,19 +690,44 @@
     <button class="mode-btn" onclick="toggleMode()" id="mode-btn" aria-label="Toggle dark mode">
       <i class="ti ti-moon"></i>
     </button>
+    <button class="hamburger" onclick="toggleMenu()" id="hamburger-btn" aria-label="Toggle menu">
+      <i class="ti ti-menu-2"></i>
+    </button>
   </div>
 </nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a href="#work" onclick="closeMenu()">work</a>
+  <a href="#about" onclick="closeMenu()">about</a>
+  <a href="#contact" onclick="closeMenu()">contact</a>
+</div>
 
 <main>
   <!-- HERO -->
   <div class="hero">
     <div class="container">
-      <div class="hero-tag">IT Professional · Cybersecurity Student · MERN Developer</div>
-      <h1>Breaking things down,<br>then <em>building them better.</em></h1>
-      <p class="hero-sub">I'm Antonio — a bilingual IT professional and self-taught developer with a thing for how systems work under the hood. By day I keep things running at the service desk. Off the clock I'm studying cybersecurity and writing code.</p>
-      <div class="hero-actions">
-        <a href="#work" class="btn-primary">See my projects <i class="ti ti-arrow-down"></i></a>
-        <a href="mailto:antonio@deltoro.codes" class="btn-secondary">Get in touch <i class="ti ti-mail"></i></a>
+      <div class="hero-inner">
+        <div class="hero-text">
+          <div class="hero-tag">IT Professional · Cybersecurity Student · MERN Developer</div>
+          <h1>Breaking things down,<br>then <em>building them better.</em></h1>
+          <div class="hero-image-mobile-wrap">
+            <div class="hero-image-wrap">
+              <img src="data:image/png;base64,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" alt="Antonio del Toro — pixel art portrait">
+              <div class="scanline"></div>
+            </div>
+          </div>
+          <p class="hero-sub">I'm Antonio — a bilingual IT professional and self-taught developer with a thing for how systems work under the hood. By day I keep things running at the service desk. Off the clock I'm studying cybersecurity and writing code.</p>
+          <div class="hero-actions">
+            <a href="#work" class="btn-primary">See my projects <i class="ti ti-arrow-down"></i></a>
+            <a href="#contact" class="btn-secondary">Get in touch <i class="ti ti-arrow-down"></i></a>
+          </div>
+        </div>
+        <div class="hero-image-desktop-wrap">
+          <div class="hero-image-wrap">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAMgCAIAAABUEpE/AAAbOUlEQVR4nO3dT2pcWZrGYakxBAVagskVlGnjiSExIkceWBsRaAcGjwQ5qLmwlpAbUA48SoQwaCKy2jtIcgkCKcCDHlRSKIvuT84479E5N+J5ppcbceOP7B938Mb+/d3tHgAAOf81+gIAALaNwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhD0bfQHAjFZnh9XhLzfFwevfqlNff1cdbTn3ES9eFQfXJ5cNDw3wn9zBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACNu/v7sdfQ1AF/Ua+/VFtca+a1o24tfn/hUF/pM7WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGGW3GFq9Rr73pdqjf36t/DF/Fu9e14/7xLPrbWswO+9eFUcXJ9cNjw0MJI7WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGGW3GGw1fFBcXTONfbtM+e78chGvBV4mJg7WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGGW3KG7lq32JS6Mt1xVyyPv2ntVe/mzf9thJHewAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwiy5wx9WZ4ebn/zlpji4axviS7R971X9itbn/uWHvtzBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACLPkzlZZHR8UR+s97k+D1rrflovb9VXV5/bTsnvebzN91Br7El+RnXfozR0sAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMEvuTGd1dlgcPf1482RXst1GrcDPadQK/JzsvEM7d7AAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCLLkzwOr4oDh6etXreevt8k/lWnfLuS1GXXPLznvLKrpF9afR9BkdvSqOrk8uN7oi2DbuYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIRZcqeL1dlhcfT0482TXckMWlbR+XajVuB37XlrL3/2fwrs7bmDBQAQJ7AAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAEGbJnQ2N2mqvV9E/DVqvHrXVPueWN0vX8r16ffSqOLo+udzoimB53MECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIs+TOhlbHB8XR06snu5CYfmvsTbvYCzx3FNc8v5c/+x+HXeEOFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJgldzb0j79XS+6j1Gvsn8pd7JYl9yXurS/x3FGWeM39NH36R6+Ko+uTy42uCGbkDhYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAEDYs9EXwLxWZ4dDnrdljX3OrXYe6rfz3u/T9/k+1PRufLmJXQfMzR0sAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMEvu/L/WJ5fV4Y8HnZ633uNeopZ18u07t9bvkQGekjtYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYZbc2dCHN9XR06unuo6/omWdvJ9Rm+ktdu2aSanf55dPdBXwFNzBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACLPkzobW57fF0Q9nh9XJX26Kgy2b2p+2bo3dI++y+vv8tnyvWs4dZfXP8+Lo+r+Pn+xKoJ07WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGH793fVHjfMZnV8UBxtWQkftTDe73l37ZFbfgOg33ej5apq/X63YNTO++ujV8XR9cnlk10JtHMHCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIOzZ6AuAv+hFtfW899tNcfD0avOnrVezRy1fz7lcXz9yy/54v+3yFqN+A6B+5O37tsOyuIMFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQZsmdrTJq6bvleetd7FEr4f3W2Eep3+f6FX14k72Wb1b/bsGX6ncLgLHcwQIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAjbv7+7HX0NbKHV2WFx9PqiWqBe4kr4j79XP4rw/vnXjR+53h9vUa/Ab9+Sez/1Z9S0tl8vuZdG/ZW1fGNfH1Wvd31yuflDw5NzBwsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACDMkjtdrI4PiqN/+6naPa/Vq+gti+r91tjn1O/1eicf6vd6WzbT+y251+/GL99X78bLn/1/xPZwBwsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACDMkjsD/Pqu2nnvtzHdYtRGfMu59dL3qPd5ie9kPx/ebH7udfkJtny+Ld+c+tzX5dH1uf+P2B7uYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIRV08bQSb3m3LITPecKfIt6YfyRHfAXr6qjFzfFwR8+z7h73mLUNdff2Fq91V7/HdVHT6+qo01b7UfVt+66/Na9Pjssjq5PLqsnhsm4gwUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABBmyZ0R6oXxq2rruZ8ff++1XV6fWz/vL9/32h+vl773Pnd62mHv5BLX5x/5jOq/oy+b/x3122p/RMM1w2zcwQIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAjbv7+7HX0N8Cf/+PtBcbTemP70W/hi/q1lJbzl3Ec2teul71q5A376cdv29Ef58Kbh5G5b7dflX0rT96qb9bn/rVgSd7AAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCqtFkGKLeLh+lZUO8Zef97Xfl83Zb+h61mD/nVnv9Gf3y/ZjPaJQlrsDD03MHCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIMySO9Opl6BPr57qOv6s3vJu2Wqfc7u8/hT6LbnPqf6MHtkur7faW3bet24jHraJO1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhltyZzvr8tjj69t1BcbRlYXzU3vrbcgd8zpXwD3vVuaPW9vupP6Om93nQ3nr9l1J/6x75Trao30lYFHewAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwvbv76rVbJjN6uywOHp90WsXu16+fmTpu8Ejq9ktG+KDXDes7Q/7FI56beL3O7flfe641V6qf8UBlsUdLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgLBnoy8A/qKGdfJ6n7pevv7wZuOnfeSRm1azW3bAW3T7FPqd26TfVvuu6fedhMm4gwUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABBmyZ2t0rLVPmwlvJ85N8RH7Z63bIjXV9Vv573bu/Fp1/4W4Mm5gwUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABBmyZ2tssSt9vqa59T0Trbsnrc8csu5/dbYu+3a11vtb/v9LZSvaH1y2e2JYS7uYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIRZcmdhtm/3fNQr6rhrP2qNvdsqepNuV1V/c+qt9nrnvTbnLyLAbNzBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACLPkzsLMuYre8rwtm9q1esv79Grzcx/Z8q7XyVt23ltW0UftvA9akK+/Vy2f7/r8dpMLgh3jDhYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYJXcWpt9We/3Ij2yXl/pttf/4e/0n/HXjR66vuWUlfO+3atm8aSO+NufOe6nft73+BFu+7cC/uIMFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQZsmdhak3pk+vZnzkfn75vtpqb9lbH3Vuy3b5I/vjU261t2j5hYBH1vaBZu5gAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhFlyZ2nqPe6rzfe46w3xlu3yWr9N7ZZH7ndVLe9Vi9d7Y7baW7bp++3p10dfH5V/ZcA3cAcLACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgzJI7O6TfLnatZRX9dbdF9X5arrnePR+1At+yxl5reUX9vpPrk8vNHxrY29tzBwsAIE5gAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACDMkjsL88jG9MeDTs/bb429Xglv2RBved5RC/Kvj15Vhy9uOj1vv632OT3y+Z4dFgftvMO3cAcLACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgbP/+7nb0NUDM6rhacv/bT9VPF7x//nXj523Zea99mnJh/MOb0Vfwfzm9qo62fEZzfgq1+vU2rfyXa/t23uFf3MECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIq4atYXleVBvTez/9z1NdR0y9x91vYbzfNv0jn9GXm25PzAPlp/B6r/wUfEbwDdzBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACNu/v7sdfQ3wRH59d1Ac/eFz9cMG759/3fh5W1bRX5fnXpdL7vXOe31V9fOO0vJ6t88jn+DR5ov59fvc8t1Yn/sfh13hDhYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYJXd2yOrssDh6+rHatu6n3uNuWSfvtyBfq3fAW9hqf2jOtf0Wdt7ZJu5gAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhFlyhz+sjg+Ko3/76Vlx9P3zr+nL6a5lQb5lI762a1vttQ9vGk5+8ao4eH1R/W5BvRFfL/X325e3886yuIMFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQZskd/rA6OyyOnn6slq9rP/6+bSvwPNTy+fbbat/7Un1jR62x1x65qqPq9a5PLsNXA23cwQIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAiz5A5/+PXdwcbn/vDZVvuy9Vvbb9pqrw1ach+1At/0vOV7ZQWeHtzBAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACLPkzg5ZHVdb7adX1blvy53oT+XGdK3fhvj2aXmvWs6tP/1ay8J4vcbeot8a+xI34mvrc/9Lsgl3sAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMKqaWOY0OrssDh6fbH58nW/rfZav/3xOc+t9Vuu/+X7Xo/ccau94dw5V9H76fd661+AqD+j9cnl5k/MwrmDBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAEGbJnQEeWUYu1XvNLeqt9pad9/rc2tvvqv3xHz7PuNW+xDX2Wset9imNWoGvH7nlqjqeu1d9vlbgd5k7WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGH793e3o6+BRVqdHRZHry9mXK/ut9Veqx+5ZUWah/pteTfptvPe8t1oeb2TLqoP+vRHfa/W5/7vnp07WAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGHPRl8AI/VbY59znbxeVF+iUcvXtSVe1SNa1tjro+Uj9/sbrC1xb33UucOu6vigOlx+r9Ynl9W5hLiDBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAELZ/f3c7+hposmtr7LVP5VXVS+71uS1aFuTnXK9e4rkdNey816+o5ftc67fzPup5d+5bV2q6ZivwIe5gAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhD0bfQHs7T22xt6yBN1izq32Wsu2dT/99rh3TdNqdsPe+qit9tqoVfTa9q2i9/tNi37vVdMj71Xf59XxQXWyFfgH3MECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIs+T+ROqt9uuLckWab7Z9m+kta85LXM1u0rLVXqr/QlvW2Gst39hR35w5z23R7+9o1HvV8ZobVuDX57ebXdK03MECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAI27+/27bt1FHqjdp+K8N8u36L2/3UW96jVqQ76rfGXr7eOb8bLZ/+9u2Pz/mrBi3/tvf7K5vzr7vpqsp/GdYnl5tcUGfuYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIRZcv8LVmeHxdHri803pnmo3tSut637nTvKj78/K46+f/61OFq/3n5aNrVroz6jft+cls+o5dveYs7N9O1bgV/iVQ0z5c67O1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhltz/gl/fHYy+hMUYtW3dot9KeMsaO99uiUv9o665ft45V9FbfgOg1m/3vN/z1ubceZ9zuX593quC3MECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIs+T+J6uzw+Lo9cXNk13J/OqN6ZZ96pYl935XxUP9Pt/t+xSW+H0e9WsKtX4773Puj8+5xt7PsNd79Ko4uj653Ph53cECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIs+T+J6vjg+Joy1LwEvXbW5/zeX/4/Kw4+v75115PzDcbtV0+6pGd+9Ccm+mjVtGX+HoXuU3/YvOdd3ewAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwnZuyX11dlgcvb64ebIr2W6jtp5btKx1b585l83n1PKdHPVtn1O/Le85n7c2atl8zq32Fv1e0cufq4JyBwsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACDs2egLYF4tG9O22peu33vV75HnXJ9v+UsZZYkb4i2PXJtz2bzfgvwoc67AP/K8xwfFQXewAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMIEFABAmsAAAwnZvyf3LzegrWIx+G9P9drFb1n63b+d9icvmLVfV7xX1O3dOc25q1/otm/fbiK/1W5Dvp9+ufb+V/1rL87qDBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAIAwgQUAELZ/f3c7+hqe1K/vDjY+t2Wfetf0e69GPTIzGLUgP+dfd7/l69qoPe7aqKtq2Uz3er/9kUe9Vy2P7A4WAECYwAIACBNYAABhAgsAIExgAQCECSwAgDCBBQAQJrAAAMIEFgBA2LPRF5C3Ojvs9MhzrjnPqd97tWufQsv++PY9cr+1/Tm/V/02tfttW/cz54J8bc6r6meJW+0t59ZH3cECAAgTWAAAYQILACBMYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAI28Il9+0zat+25ZFrLbu69Zb3qD3uJW6XL/GRR+m3BN3yd9Si5W9/1Lsx5zXXlvjdGKXfonqt33fDHSwAgDCBBQAQJrAAAMIEFgBAmMACAAgTWAAAYQILACBMYAEAhAksAICwbVxy/3Iz+gqe1JxLwf2ed9RWe23Udnm/Bfnte+RRlrjHPeeyeb9HXuJS/5x7+qPeqzl/P8AdLACAMIEFABAmsAAAwgQWAECYwAIACBNYAABhAgsAIExgAQCECSwAgLBtXHJfoFFbwLWWq5pz+3jU3nqtZdm83yta4iPX+n2f+z1vi1Hr1bV+VzXnI/PQnBvx/X4/wB0sAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIQJLACAMEvuU5hz93zUenV97ulVdbReRW/ZTK/NucbeT793ck5L3PIetXy9xD3u2pz/Ps+p37sx51Z7/cjuYAEAhAksAIAwgQUAECawAADCBBYAQJjAAgAIE1gAAGECCwAgTGABAIT9L7jxctKuHtmGAAAAAElFTkSuQmCC" alt="Antonio del Toro — pixel art portrait">
+            <div class="scanline"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -534,51 +737,67 @@
     <div class="container">
       <div class="section-header">
         <span class="section-title">Client work</span>
-        <a href="https://www.deltoro.codes" target="_blank" rel="noopener" class="section-link">deltoro.codes <i class="ti ti-external-link" style="font-size:11px;"></i></a>
       </div>
-      <div class="projects-grid">
+      <div class="carousel-wrap">
+        <div class="carousel-track-outer">
+          <div class="projects-carousel" id="carousel">
 
-        <a href="https://www.deltoro.codes" target="_blank" rel="noopener" class="project-card fade-in">
-          <div class="project-tag">MERN Stack</div>
-          <div class="project-name">deltoro.codes</div>
-          <div class="project-desc">My own company site — a full custom build using MongoDB, Express, React, and Node. The client-facing home for my web development practice.</div>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">MongoDB</span>
-              <span class="stack-pill">Express</span>
-              <span class="stack-pill">React</span>
-              <span class="stack-pill">Node</span>
-            </div>
-            <i class="ti ti-arrow-up-right project-arrow"></i>
+            <a href="https://www.deltoro.codes" target="_blank" rel="noopener" class="project-card fade-in">
+              <div class="project-tag">MERN Stack</div>
+              <div class="project-name">deltoro.codes</div>
+              <div class="project-desc">My own company site — a full custom build using MongoDB, Express, React, and Node. The client-facing home for my web development practice.</div>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">MongoDB</span>
+                  <span class="stack-pill">Express</span>
+                  <span class="stack-pill">React</span>
+                  <span class="stack-pill">Node</span>
+                </div>
+                <i class="ti ti-arrow-up-right project-arrow"></i>
+              </div>
+            </a>
+
+            <a href="https://www.judahsecurity.com" target="_blank" rel="noopener" class="project-card fade-in">
+              <div class="project-tag">MERN Stack · Client</div>
+              <div class="project-name">Judah Security</div>
+              <div class="project-desc">Website for a physical security company offering guard and protection services. Built to establish professional credibility and drive inbound leads.</div>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">MongoDB</span>
+                  <span class="stack-pill">Express</span>
+                  <span class="stack-pill">React</span>
+                  <span class="stack-pill">Node</span>
+                </div>
+                <i class="ti ti-arrow-up-right project-arrow"></i>
+              </div>
+            </a>
+
+            <a href="https://www.fabyservices.com" target="_blank" rel="noopener" class="project-card fade-in">
+              <div class="project-tag">MERN Stack · Client</div>
+              <div class="project-name">Faby Services</div>
+              <div class="project-desc">Site for a local insurance and tax services business. Designed to be approachable and clear — built for a real community, not a corporate audience.</div>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">MongoDB</span>
+                  <span class="stack-pill">Express</span>
+                  <span class="stack-pill">React</span>
+                  <span class="stack-pill">Node</span>
+                </div>
+                <i class="ti ti-arrow-up-right project-arrow"></i>
+              </div>
+            </a>
+
           </div>
-        </a>
-
-        <a href="https://www.judahsecurity.com" target="_blank" rel="noopener" class="project-card fade-in">
-          <div class="project-tag">Client · Web</div>
-          <div class="project-name">Judah Security</div>
-          <div class="project-desc">Website for a physical security company offering guard and protection services. Built to establish professional credibility and drive inbound leads.</div>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">Web</span>
-              <span class="stack-pill">Design</span>
-            </div>
-            <i class="ti ti-arrow-up-right project-arrow"></i>
-          </div>
-        </a>
-
-        <a href="https://www.fabyservices.com" target="_blank" rel="noopener" class="project-card fade-in">
-          <div class="project-tag">Client · Web</div>
-          <div class="project-name">Faby Services</div>
-          <div class="project-desc">Site for a local insurance and tax services business. Designed to be approachable and clear — built for a real community, not a corporate audience.</div>
-          <div class="project-footer">
-            <div class="project-stack">
-              <span class="stack-pill">Web</span>
-              <span class="stack-pill">Design</span>
-            </div>
-            <i class="ti ti-arrow-up-right project-arrow"></i>
-          </div>
-        </a>
-
+        </div>
+        <div class="carousel-controls">
+          <button class="carousel-btn" id="carousel-prev" aria-label="Previous" disabled>
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <div class="carousel-dots" id="carousel-dots"></div>
+          <button class="carousel-btn" id="carousel-next" aria-label="Next">
+            <i class="ti ti-arrow-right"></i>
+          </button>
+        </div>
       </div>
     </div>
   </section>
@@ -593,7 +812,7 @@
         <div class="about-text fade-in">
           <p>I got into tech the way most self-taught people do — by breaking something and refusing to stop until I understood why. That led to CompTIA certifications, a freelance web dev practice, and eventually a service desk role where I troubleshoot systems and support users daily.</p>
           <p>Now I'm channeling that same curiosity into cybersecurity and information assurance. I believe the best security people are the ones who've sat on both sides — the ones who've built things know how they break.</p>
-          <p>My company, <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>, handles client web work. This site is just me.</p>
+          <p>Based in Los Angeles. My company, <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>, handles client web work. This site is just me.</p>
         </div>
         <div class="skills-block fade-in">
           <div>
@@ -646,81 +865,7 @@
         <span class="section-title">Contact</span>
       </div>
       <p style="font-size:15px; color:var(--text2); margin-bottom:32px; max-width:480px; line-height:1.75;">Let's talk — whether it's a security role, a freelance project, or just to connect.</p>
-      <div class="contact-layout">
-
-        <div class="contact-info fade-in">
-          <a href="mailto:antonio@deltoro.codes" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-mail"></i></div>
-            <div>
-              <div class="contact-lbl">Email</div>
-              <div class="contact-val">antonio@deltoro.codes</div>
-            </div>
-          </a>
-          <a href="https://www.linkedin.com/in/antonioedeltoro/" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-linkedin"></i></div>
-            <div>
-              <div class="contact-lbl">LinkedIn</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://github.com/antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-github"></i></div>
-            <div>
-              <div class="contact-lbl">GitHub</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.instagram.com/antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-instagram"></i></div>
-            <div>
-              <div class="contact-lbl">Instagram</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.youtube.com/@antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-youtube"></i></div>
-            <div>
-              <div class="contact-lbl">YouTube</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.twitter.com/antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-x"></i></div>
-            <div>
-              <div class="contact-lbl">X / Twitter</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.threads.net/@antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-threads"></i></div>
-            <div>
-              <div class="contact-lbl">Threads</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.tiktok.com/@antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-tiktok"></i></div>
-            <div>
-              <div class="contact-lbl">TikTok</div>
-              <div class="contact-val">@antonioedeltoro</div>
-            </div>
-          </a>
-          <a href="https://www.facebook.com/antonioedeltoro" target="_blank" rel="noopener" class="contact-item">
-            <div class="contact-icon"><i class="ti ti-brand-facebook"></i></div>
-            <div>
-              <div class="contact-lbl">Facebook</div>
-              <div class="contact-val">Antonio del Toro</div>
-            </div>
-          </a>
-          <div class="contact-item" style="cursor:default;">
-            <div class="contact-icon"><i class="ti ti-map-pin"></i></div>
-            <div>
-              <div class="contact-lbl">Location</div>
-              <div class="contact-val">Los Angeles, CA</div>
-            </div>
-          </div>
-        </div>
-
+      <div class="contact-form-wrap">
         <form class="contact-form fade-in" onsubmit="sendMail(event)">
           <div class="form-row">
             <div class="field">
@@ -741,21 +886,30 @@
             <textarea id="message" placeholder="Tell me what you're working on..." required></textarea>
           </div>
           <button type="submit" class="form-submit">
-            Open in mail <i class="ti ti-send"></i>
+            Submit message <i class="ti ti-send"></i>
           </button>
         </form>
-
       </div>
     </div>
   </section>
 </main>
 
 <footer>
-  <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+  <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%; flex-wrap:wrap; gap:16px;">
     <span class="footer-copy">
       <span class="footer-dot"></span>
-      2026 · Antonio del Toro
+      <span id="yr"></span> · Antonio del Toro · Los Angeles, CA
     </span>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <a href="https://www.facebook.com/antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="Facebook"><i class="ti ti-brand-facebook"></i></a>
+      <a href="https://github.com/antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="GitHub"><i class="ti ti-brand-github"></i></a>
+      <a href="https://www.instagram.com/antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="Instagram"><i class="ti ti-brand-instagram"></i></a>
+      <a href="https://www.linkedin.com/in/antonioedeltoro/" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn"><i class="ti ti-brand-linkedin"></i></a>
+      <a href="https://www.threads.net/@antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="Threads"><i class="ti ti-brand-threads"></i></a>
+      <a href="https://www.tiktok.com/@antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="TikTok"><i class="ti ti-brand-tiktok"></i></a>
+      <a href="https://www.twitter.com/antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="X / Twitter"><i class="ti ti-brand-x"></i></a>
+      <a href="https://www.youtube.com/@antonioedeltoro" target="_blank" rel="noopener" class="social-icon" aria-label="YouTube"><i class="ti ti-brand-youtube"></i></a>
+    </div>
     <div class="footer-links">
       <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>
       <a href="#work">work</a>
@@ -766,19 +920,119 @@
 </footer>
 
 <script>
-  // Dark mode
-  function toggleMode() {
-    const html = document.documentElement;
-    const btn = document.getElementById('mode-btn');
-    html.classList.toggle('dark');
-    const isDark = html.classList.contains('dark');
-    btn.innerHTML = isDark ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
-    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  // Hamburger menu
+  function toggleMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    const isOpen = menu.classList.toggle('open');
+    btn.innerHTML = isOpen ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
   }
-  // Restore saved theme
-  if (localStorage.getItem('theme') === 'dark') {
-    document.documentElement.classList.add('dark');
-    document.getElementById('mode-btn').innerHTML = '<i class="ti ti-sun"></i>';
+  function closeMenu() {
+    const menu = document.getElementById('mobile-menu');
+    const btn = document.getElementById('hamburger-btn');
+    menu.classList.remove('open');
+    btn.innerHTML = '<i class="ti ti-menu-2"></i>';
+  }
+
+  // Carousel
+  (function() {
+    const track = document.getElementById('carousel');
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    const dotsWrap = document.getElementById('carousel-dots');
+    if (!track) return;
+
+    const cards = Array.from(track.querySelectorAll('.project-card'));
+    let current = 0;
+
+    // Build dots
+    cards.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+
+    function getVisibleCount() {
+      const ow = track.parentElement.offsetWidth;
+      const cardW = 300 + 12;
+      return Math.max(1, Math.floor(ow / cardW));
+    }
+
+    function goTo(idx) {
+      const count = cards.length;
+      const visible = getVisibleCount();
+      const max = Math.max(0, count - visible);
+      current = Math.max(0, Math.min(idx, max));
+      const cardW = cards[0].offsetWidth + 12;
+      track.style.transform = `translateX(-${current * cardW}px)`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current >= max;
+      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => goTo(current));
+
+    // Drag to scroll (desktop)
+    let startX = 0, isDragging = false, startIdx = 0;
+    track.addEventListener('mousedown', e => {
+      isDragging = true; startX = e.clientX; startIdx = current;
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const diff = startX - e.clientX;
+      const cardW = cards[0].offsetWidth + 12;
+      if (Math.abs(diff) > cardW * 0.3) {
+        goTo(startIdx + (diff > 0 ? 1 : -1));
+        isDragging = false;
+      }
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    // Touch swipe (mobile)
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+    }, { passive: true });
+
+    goTo(0);
+  })();
+
+  // Dynamic year
+  document.getElementById('yr').textContent = new Date().getFullYear();
+
+  // Dark mode — respect system preference, allow manual override
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const saved = localStorage.getItem('theme');
+
+  function applyTheme(dark) {
+    document.documentElement.classList.toggle('dark', dark);
+    document.getElementById('mode-btn').innerHTML = dark
+      ? '<i class="ti ti-sun"></i>'
+      : '<i class="ti ti-moon"></i>';
+  }
+
+  // On load: saved preference wins, otherwise follow system
+  applyTheme(saved ? saved === 'dark' : prefersDark.matches);
+
+  // Listen for system changes (only if user hasn't manually overridden)
+  prefersDark.addEventListener('change', e => {
+    if (!localStorage.getItem('theme')) applyTheme(e.matches);
+  });
+
+  function toggleMode() {
+    const isDark = document.documentElement.classList.toggle('dark');
+    document.getElementById('mode-btn').innerHTML = isDark
+      ? '<i class="ti ti-sun"></i>'
+      : '<i class="ti ti-moon"></i>';
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }
 
   // mailto form
