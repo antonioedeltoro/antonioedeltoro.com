@@ -151,7 +151,7 @@
   .nav-logo span { color: var(--orange); }
   .nav-links {
     display: flex;
-    gap: 32px;
+    gap: 20px;
     align-items: center;
     list-style: none;
   }
@@ -306,6 +306,10 @@
     .hero-image-desktop-wrap { display: none; }
     .hero-image-mobile-wrap { display: block; }
     .hero-image-wrap { width: 220px; height: 220px; margin: 0 auto; }
+    .hero { padding: 48px 0 40px; }
+    .hero-image-mobile-wrap .hero-image-wrap { width: 180px; height: 180px; margin: 20px auto; }
+    section { padding: 40px 0; }
+    .section-header { margin-bottom: 20px; }
   }
   .btn-primary {
     background: var(--orange);
@@ -520,6 +524,125 @@
     color: var(--blue);
   }
 
+  /* ── CERTIFICATIONS ── */
+  .cert-card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: border-color 0.2s, transform 0.15s;
+    flex: 0 0 300px;
+    min-width: 0;
+  }
+  .cert-card:hover { border-color: var(--orange); transform: translateY(-2px); }
+  .cert-card:active { transform: scale(0.97) !important; }
+  .cert-icon {
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    background: var(--blue-t);
+    border: 0.5px solid var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--blue);
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .cert-issuer {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 3px;
+  }
+  .cert-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .cert-arrow { margin-left: auto; color: var(--blue); font-size: 14px; flex-shrink: 0; }
+
+  /* ── EXPERIENCE ── */
+  .experience-list { display: flex; flex-direction: column; gap: 0; }
+  .exp-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .exp-item:last-child { border-bottom: none; }
+  .exp-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    padding-top: 3px;
+    line-height: 1.5;
+  }
+  .exp-role {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+    letter-spacing: -0.01em;
+  }
+  .exp-company {
+    font-size: 13px;
+    color: var(--orange);
+    font-family: var(--font-mono);
+    margin-bottom: 10px;
+  }
+  .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+  .exp-bullets li {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.6;
+    padding-left: 14px;
+    position: relative;
+  }
+  .exp-bullets li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--orange);
+    font-size: 11px;
+  }
+
+  /* ── EDUCATION ── */
+  .education-list { display: flex; flex-direction: column; gap: 0; }
+  .edu-item {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 24px;
+    padding: 20px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .edu-item:last-child { border-bottom: none; }
+  .edu-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text3);
+    padding-top: 3px;
+  }
+  .edu-degree {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 3px;
+    letter-spacing: -0.01em;
+  }
+  .edu-school {
+    font-size: 13px;
+    color: var(--text3);
+    font-family: var(--font-mono);
+  }
+
   /* ── CONTACT ── */
   .contact-form-wrap { max-width: 600px; }
   .social-icon {
@@ -669,6 +792,8 @@
     .form-row { grid-template-columns: 1fr; }
     footer .container { flex-direction: column; gap: 16px; text-align: center; }
     footer .container > div { justify-content: center; }
+    .exp-item, .edu-item { grid-template-columns: 1fr; gap: 6px; }
+    .exp-date, .edu-date { font-size: 10px; }
   }
 </style>
 </head>
@@ -684,6 +809,9 @@
   <ul class="nav-links">
     <li><a href="#work" class="active">work</a></li>
     <li><a href="#about">about</a></li>
+    <li><a href="#certifications">certifications</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#education">education</a></li>
     <li><a href="#contact">contact</a></li>
   </ul>
   <div class="nav-right">
@@ -699,6 +827,9 @@
 <div class="mobile-menu" id="mobile-menu">
   <a href="#work" onclick="closeMenu()">work</a>
   <a href="#about" onclick="closeMenu()">about</a>
+  <a href="#certifications" onclick="closeMenu()">certifications</a>
+  <a href="#experience" onclick="closeMenu()">experience</a>
+  <a href="#education" onclick="closeMenu()">education</a>
   <a href="#contact" onclick="closeMenu()">contact</a>
 </div>
 
@@ -742,21 +873,6 @@
         <div class="carousel-track-outer">
           <div class="projects-carousel" id="carousel">
 
-            <a href="https://www.deltoro.codes" target="_blank" rel="noopener" class="project-card fade-in">
-              <div class="project-tag">MERN Stack</div>
-              <div class="project-name">deltoro.codes</div>
-              <div class="project-desc">My own company site — a full custom build using MongoDB, Express, React, and Node. The client-facing home for my web development practice.</div>
-              <div class="project-footer">
-                <div class="project-stack">
-                  <span class="stack-pill">MongoDB</span>
-                  <span class="stack-pill">Express</span>
-                  <span class="stack-pill">React</span>
-                  <span class="stack-pill">Node</span>
-                </div>
-                <i class="ti ti-arrow-up-right project-arrow"></i>
-              </div>
-            </a>
-
             <a href="https://www.judahsecurity.com" target="_blank" rel="noopener" class="project-card fade-in">
               <div class="project-tag">MERN Stack · Client</div>
               <div class="project-name">Judah Security</div>
@@ -776,6 +892,21 @@
               <div class="project-tag">MERN Stack · Client</div>
               <div class="project-name">Faby Services</div>
               <div class="project-desc">Site for a local insurance and tax services business. Designed to be approachable and clear — built for a real community, not a corporate audience.</div>
+              <div class="project-footer">
+                <div class="project-stack">
+                  <span class="stack-pill">MongoDB</span>
+                  <span class="stack-pill">Express</span>
+                  <span class="stack-pill">React</span>
+                  <span class="stack-pill">Node</span>
+                </div>
+                <i class="ti ti-arrow-up-right project-arrow"></i>
+              </div>
+            </a>
+
+            <a href="https://www.deltoro.codes" target="_blank" rel="noopener" class="project-card fade-in">
+              <div class="project-tag">MERN Stack</div>
+              <div class="project-name">deltoro.codes</div>
+              <div class="project-desc">My own company site — a full custom build using MongoDB, Express, React, and Node. The client-facing home for my web development practice.</div>
               <div class="project-footer">
                 <div class="project-stack">
                   <span class="stack-pill">MongoDB</span>
@@ -810,9 +941,9 @@
       </div>
       <div class="about-grid">
         <div class="about-text fade-in">
-          <p>I got into tech the way most self-taught people do — by breaking something and refusing to stop until I understood why. That led to CompTIA certifications, a freelance web dev practice, and eventually a service desk role where I troubleshoot systems and support users daily.</p>
-          <p>Now I'm channeling that same curiosity into cybersecurity and information assurance. I believe the best security people are the ones who've sat on both sides — the ones who've built things know how they break.</p>
-          <p>Based in Los Angeles. My company, <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>, handles client web work. This site is just me.</p>
+          <p>I got into tech the way most self-taught people do — by breaking something and refusing to stop until I understood why. Before IT, I spent nearly a decade as a Certified Court Interpreter in Chicago, navigating high-pressure environments where clarity and accuracy weren't optional. That discipline carried over.</p>
+          <p>It led to CompTIA certifications, a freelance web dev practice under <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>, and eventually a service desk role supporting users and systems in corporate environments. Now I'm channeling that same curiosity into cybersecurity and information assurance at Western Governors University.</p>
+          <p>I believe the best security people are the ones who've sat on both sides — the ones who've built things know how they break. Based in Los Angeles. Bilingual in English and Spanish.</p>
         </div>
         <div class="skills-block fade-in">
           <div>
@@ -821,7 +952,11 @@
               <span class="skill-tag highlight">CompTIA A+</span>
               <span class="skill-tag highlight">Network+</span>
               <span class="skill-tag highlight">CIOS</span>
-              <span class="skill-tag">ITIL 4</span>
+              <span class="skill-tag highlight">ITIL 4</span>
+              <span class="skill-tag">TCP/IP</span>
+              <span class="skill-tag">DNS</span>
+              <span class="skill-tag">DHCP</span>
+              <span class="skill-tag">VPN</span>
               <span class="skill-tag">Access management</span>
               <span class="skill-tag">Network troubleshooting</span>
             </div>
@@ -830,8 +965,11 @@
             <div class="skill-group-label">Support & Ops</div>
             <div class="skill-tags">
               <span class="skill-tag">Help Desk</span>
+              <span class="skill-tag">Microsoft 365</span>
               <span class="skill-tag">SAP Concur</span>
               <span class="skill-tag">SharePoint</span>
+              <span class="skill-tag">DocuSign</span>
+              <span class="skill-tag">Ticketing Systems</span>
               <span class="skill-tag">Onboarding / Offboarding</span>
             </div>
           </div>
@@ -843,6 +981,8 @@
               <span class="skill-tag">Node.js</span>
               <span class="skill-tag">Express</span>
               <span class="skill-tag">MongoDB</span>
+              <span class="skill-tag">HTML</span>
+              <span class="skill-tag">CSS</span>
               <span class="skill-tag">Git</span>
             </div>
           </div>
@@ -852,6 +992,163 @@
               <span class="skill-tag">English (native)</span>
               <span class="skill-tag">Spanish (native)</span>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CERTIFICATIONS -->
+  <section id="certifications">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-title">Certifications</span>
+      </div>
+      <div class="carousel-wrap">
+        <div class="carousel-track-outer">
+          <div class="projects-carousel" id="certs-carousel">
+
+            <a href="https://www.peoplecert.org/public-profile?ed=XCHu3ZqUTNLIj%2f1TUJZ6u57L8x21PR07" target="_blank" rel="noopener" class="cert-card fade-in">
+              <div class="cert-icon"><i class="ti ti-settings"></i></div>
+              <div>
+                <div class="cert-issuer">PeopleCert · May 2026</div>
+                <div class="cert-name">ITIL® 4 Foundation</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+
+            <a href="https://www.credly.com/badges/82ee51c9-6a50-44db-ac3d-c15856fc0ddb" target="_blank" rel="noopener" class="cert-card fade-in">
+              <div class="cert-icon"><i class="ti ti-stack"></i></div>
+              <div>
+                <div class="cert-issuer">CompTIA · Apr 2026</div>
+                <div class="cert-name">IT Operations Specialist (CIOS)</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+
+            <a href="https://www.credly.com/badges/2637667e-971f-40a0-b32e-607f46a8186d" target="_blank" rel="noopener" class="cert-card fade-in">
+              <div class="cert-icon"><i class="ti ti-network"></i></div>
+              <div>
+                <div class="cert-issuer">CompTIA · Apr 2026</div>
+                <div class="cert-name">Network+ ce Certification</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+
+            <a href="https://www.credly.com/badges/2721edcc-6c1e-4ca9-bbdd-9476483cf563" target="_blank" rel="noopener" class="cert-card fade-in">
+              <div class="cert-icon"><i class="ti ti-shield-check"></i></div>
+              <div>
+                <div class="cert-issuer">CompTIA · Oct 2025</div>
+                <div class="cert-name">A+ ce Certification</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+
+          </div>
+        </div>
+        <div class="carousel-controls">
+          <button class="carousel-btn" id="certs-prev" aria-label="Previous" disabled>
+            <i class="ti ti-arrow-left"></i>
+          </button>
+          <div class="carousel-dots" id="certs-dots"></div>
+          <button class="carousel-btn" id="certs-next" aria-label="Next">
+            <i class="ti ti-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-title">Experience</span>
+      </div>
+      <div class="experience-list">
+        <div class="exp-item fade-in">
+          <div class="exp-date">2024 — Present</div>
+          <div>
+            <div class="exp-role">Full-Stack Web Developer</div>
+            <div class="exp-company">deltoro.codes · Remote</div>
+            <ul class="exp-bullets">
+              <li>Build and maintain full-stack web applications for clients using the MERN stack</li>
+              <li>Troubleshoot website, hosting, and user-related issues across client projects</li>
+              <li>Guide clients through system workflows and create documentation to reduce repeat issues</li>
+              <li>Diagnose technical issues independently using documentation and online resources</li>
+            </ul>
+          </div>
+        </div>
+        <div class="exp-item fade-in">
+          <div class="exp-date">2022 — 2023</div>
+          <div>
+            <div class="exp-role">Executive Administrative Assistant to the CEO</div>
+            <div class="exp-company">FUJIFILM Business Innovation Corp. · Hanover Park, IL</div>
+            <ul class="exp-bullets">
+              <li>Coordinated onboarding/offboarding and system access with IT and HR</li>
+              <li>Troubleshot SAP Concur access and user issues in a high-volume corporate environment</li>
+              <li>Supported SharePoint, DocuSign, and internal tools across the organization</li>
+              <li>Resolved user access and reporting discrepancies in expense management systems</li>
+            </ul>
+          </div>
+        </div>
+        <div class="exp-item fade-in">
+          <div class="exp-date">2013 — 2022</div>
+          <div>
+            <div class="exp-role">Certified Court Interpreter</div>
+            <div class="exp-company">Cook County Office of the Chief Judge · Chicago, IL</div>
+            <ul class="exp-bullets">
+              <li>Provided precise English/Spanish interpretation across criminal, civil, and family court proceedings</li>
+              <li>Maintained strict confidentiality, impartiality, and accuracy in high-pressure legal environments</li>
+              <li>Facilitated clear communication between Spanish-speaking individuals and the judicial system</li>
+              <li>Illinois Supreme Court Certified · <a href="https://publicapps.illinoiscourts.gov/apex/f?p=303:18:::::P18_IDINTERPRETER,P18_READMODE:183,1" target="_blank" rel="noopener" style="color:var(--blue); text-decoration:none;">Credential #1190</a> · occasional assignments accepted</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDUCATION -->
+  <section id="education">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-title">Education</span>
+      </div>
+      <div class="education-list">
+        <div class="edu-item fade-in">
+          <div class="edu-date">2025 — Present</div>
+          <div>
+            <div class="edu-degree">BS, Cybersecurity & Information Assurance</div>
+            <div class="edu-school">Western Governors University</div>
+          </div>
+        </div>
+        <div class="edu-item fade-in">
+          <div class="edu-date">2018 — 2022</div>
+          <div>
+            <div class="edu-degree">MA, Latin American Literature & Culture</div>
+            <div class="edu-school">Northeastern Illinois University</div>
+          </div>
+        </div>
+        <div class="edu-item fade-in">
+          <div class="edu-date">2014 — 2017</div>
+          <div>
+            <div class="edu-degree">BA, Spanish Language & Literature</div>
+            <div class="edu-school">Northeastern Illinois University</div>
+          </div>
+        </div>
+        <div class="edu-item fade-in">
+          <div class="edu-date">2011 — 2012</div>
+          <div>
+            <div class="edu-degree">Certificate, Legal Interpreting</div>
+            <div class="edu-school">Waubonsee Community College</div>
+          </div>
+        </div>
+        <div class="edu-item fade-in">
+          <div class="edu-date">2005 — 2006</div>
+          <div>
+            <div class="edu-degree">Certificate, Web Design & Multimedia</div>
+            <div class="edu-school">Waubonsee Community College</div>
           </div>
         </div>
       </div>
@@ -933,6 +1230,68 @@
     menu.classList.remove('open');
     btn.innerHTML = '<i class="ti ti-menu-2"></i>';
   }
+
+  // Certifications Carousel
+  (function() {
+    const track = document.getElementById('certs-carousel');
+    const prevBtn = document.getElementById('certs-prev');
+    const nextBtn = document.getElementById('certs-next');
+    const dotsWrap = document.getElementById('certs-dots');
+    if (!track) return;
+
+    const cards = Array.from(track.querySelectorAll('.cert-card'));
+    let current = 0;
+
+    cards.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    });
+
+    function getVisibleCount() {
+      const ow = track.parentElement.offsetWidth;
+      const cardW = 300 + 12;
+      return Math.max(1, Math.floor(ow / cardW));
+    }
+
+    function goTo(idx) {
+      const count = cards.length;
+      const visible = getVisibleCount();
+      const max = Math.max(0, count - visible);
+      current = Math.max(0, Math.min(idx, max));
+      const cardW = cards[0].offsetWidth + 12;
+      track.style.transform = `translateX(-${current * cardW}px)`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current >= max;
+      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+    window.addEventListener('resize', () => goTo(current));
+
+    let startX = 0, isDragging = false, startIdx = 0;
+    track.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; startIdx = current; e.preventDefault(); });
+    window.addEventListener('mousemove', e => {
+      if (!isDragging) return;
+      const diff = startX - e.clientX;
+      const cardW = cards[0].offsetWidth + 12;
+      if (Math.abs(diff) > cardW * 0.3) { goTo(startIdx + (diff > 0 ? 1 : -1)); isDragging = false; }
+    });
+    window.addEventListener('mouseup', () => { isDragging = false; });
+
+    let touchStartX = 0;
+    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+    track.addEventListener('touchend', e => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
+    }, { passive: true });
+
+    goTo(0);
+  })();
 
   // Carousel
   (function() {
