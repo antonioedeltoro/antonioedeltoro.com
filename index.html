@@ -311,6 +311,14 @@
     section { padding: 40px 0; }
     .section-header { margin-bottom: 20px; }
   }
+
+  @media (max-width: 600px) {
+    .hero-text { text-align: center; }
+    .hero-tag { justify-content: center; }
+    .hero-tag::before { display: none; }
+    .hero-sub { max-width: 100%; margin-left: auto; margin-right: auto; }
+    .hero-actions { justify-content: center; }
+  }
   .btn-primary {
     background: var(--orange);
     color: #fff;
