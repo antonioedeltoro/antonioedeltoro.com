@@ -441,22 +441,15 @@
   }
   .section-link:hover { color: var(--blue-d); }
 
-  /* ── PROJECTS CAROUSEL ── */
-  .carousel-wrap {
-    position: relative;
-  }
-  .carousel-track-outer {
-    overflow: hidden;
-  }
-  .projects-carousel {
-    display: flex;
+  /* ── PROJECTS ── */
+  .project-grid {
+    display: grid;
+    grid-template-columns: 1fr;
     gap: 12px;
-    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-    will-change: transform;
-    cursor: grab;
-    user-select: none;
   }
-  .projects-carousel:active { cursor: grabbing; }
+  @media (min-width: 640px) {
+    .project-grid { grid-template-columns: repeat(2, 1fr); }
+  }
   .project-card {
     background: var(--bg2);
     border: 0.5px solid var(--border);
@@ -474,51 +467,6 @@
     border-color: var(--orange);
     transform: translateY(-2px);
     box-shadow: 0 8px 32px rgba(255,95,0,0.08);
-  }
-  .carousel-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-  }
-  .carousel-btn {
-    width: 36px; height: 36px;
-    border-radius: 8px;
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    color: var(--text3);
-    font-size: 18px;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.1s;
-    flex-shrink: 0;
-  }
-  .carousel-btn:hover { color: var(--text); border-color: var(--orange); }
-  .carousel-btn:disabled { opacity: 0.3; cursor: default; }
-  .carousel-btn:disabled:hover { color: var(--text3); border-color: var(--border); }
-  .carousel-dots {
-    display: flex;
-    gap: 6px;
-    align-items: center;
-  }
-  .carousel-dot {
-    width: 6px; height: 6px;
-    padding: 0;
-    border: none;
-    appearance: none;
-    -webkit-appearance: none;
-    border-radius: 50%;
-    background: var(--bg3);
-    transition: background 0.2s, transform 0.2s;
-    cursor: pointer;
-  }
-  .carousel-dot:focus-visible {
-    outline: 2px solid var(--orange);
-    outline-offset: 3px;
-  }
-  .carousel-dot.active {
-    background: var(--orange);
-    transform: scale(1.3);
   }
   .project-tag {
     font-family: var(--font-mono);
@@ -615,20 +563,36 @@
     align-items: center;
     gap: 14px;
     transition: border-color 0.2s, transform 0.15s;
-    flex: 0 0 300px;
     min-width: 0;
   }
   .cert-card:hover { border-color: var(--orange); transform: translateY(-2px); }
   .cert-card:active { transform: scale(0.97) !important; }
-  .cert-icon {
-    width: 40px; height: 40px;
-    border-radius: 8px;
-    background: var(--blue-t);
-    border: 0.5px solid var(--blue);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--blue);
-    font-size: 20px;
+  .cert-groups { display: flex; flex-direction: column; gap: 28px; }
+  .cert-group-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+  .cert-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .cert-badge {
+    width: 52px; height: 52px;
     flex-shrink: 0;
+    object-fit: contain;
+    transition: filter 0.25s ease, opacity 0.25s ease;
+  }
+  /* Grayscale at rest, full official color on hover/focus — gated to hover-capable devices so touch always shows full color */
+  @media (hover: hover) {
+    .cert-badge { filter: grayscale(1); opacity: 0.9; }
+    .cert-card:hover .cert-badge,
+    .cert-card:focus-visible .cert-badge { filter: grayscale(0); opacity: 1; }
   }
   .cert-issuer {
     font-family: var(--font-mono);
@@ -816,7 +780,6 @@
   .btn-primary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
   .btn-secondary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
   .social-icon:active { transform: scale(0.88); background: var(--bg3); }
-  .carousel-btn:active:not(:disabled) { transform: scale(0.88); }
   .mode-btn:active { transform: scale(0.88); }
   .lang-btn:active { transform: scale(0.88); }
   .hamburger:active { transform: scale(0.88); }
@@ -964,9 +927,7 @@
       <div class="section-header">
         <span class="section-title" data-es="Trabajo con clientes">Client work</span>
       </div>
-      <div class="carousel-wrap">
-        <div class="carousel-track-outer">
-          <div class="projects-carousel" id="carousel">
+      <div class="project-grid">
 
             <a href="https://jrbpremierride.com" target="_blank" rel="noopener" class="project-card fade-in">
               <div class="project-tag" data-es="MERN Stack · Cliente">MERN Stack · Client</div>
@@ -1029,17 +990,6 @@
               </div>
             </a>
 
-          </div>
-        </div>
-        <div class="carousel-controls">
-          <button class="carousel-btn" id="carousel-prev" aria-label="Previous" disabled>
-            <i class="ti ti-arrow-left"></i>
-          </button>
-          <div class="carousel-dots" id="carousel-dots"></div>
-          <button class="carousel-btn" id="carousel-next" aria-label="Next">
-            <i class="ti ti-arrow-right"></i>
-          </button>
-        </div>
       </div>
     </div>
   </section>
@@ -1117,75 +1067,74 @@
       <div class="section-header">
         <span class="section-title" data-es="Certificaciones">Certifications</span>
       </div>
-      <div class="carousel-wrap">
-        <div class="carousel-track-outer">
-          <div class="projects-carousel" id="certs-carousel">
+      <div class="cert-groups">
 
+        <div class="cert-group">
+          <div class="cert-group-label" data-es="Seguridad">Security</div>
+          <div class="cert-grid">
             <a href="https://www.credly.com/badges/8c32bfd7-8aa2-49f9-8162-5d65aaf02fa1" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-lock"></i></div>
+              <img class="cert-badge" src="badges/comptia-security-plus.png" alt="CompTIA Security+ ce badge" width="52" height="52" loading="lazy" decoding="async">
               <div>
                 <div class="cert-issuer" data-es="CompTIA · agosto 2026">CompTIA · Aug 2026</div>
                 <div class="cert-name" data-es="Certificación Security+ ce">Security+ ce Certification</div>
               </div>
               <i class="ti ti-arrow-up-right cert-arrow"></i>
             </a>
-
             <a href="https://www.credly.com/badges/732bc29e-0298-43b3-9133-5312cc5c07c1" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-server-2"></i></div>
+              <img class="cert-badge" src="badges/comptia-csis.png" alt="CompTIA Secure Infrastructure Specialist (CSIS) badge" width="52" height="52" loading="lazy" decoding="async">
               <div>
                 <div class="cert-issuer" data-es="CompTIA · agosto 2026">CompTIA · Aug 2026</div>
                 <div class="cert-name" data-es="Especialista en Infraestructura Segura (CSIS)">Secure Infrastructure Specialist (CSIS)</div>
               </div>
               <i class="ti ti-arrow-up-right cert-arrow"></i>
             </a>
+          </div>
+        </div>
 
-            <a href="https://www.peoplecert.org/public-profile?ed=XCHu3ZqUTNLIj%2f1TUJZ6u57L8x21PR07" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-settings"></i></div>
-              <div>
-                <div class="cert-issuer" data-es="PeopleCert · mayo 2026">PeopleCert · May 2026</div>
-                <div class="cert-name">ITIL® 4 Foundation</div>
-              </div>
-              <i class="ti ti-arrow-up-right cert-arrow"></i>
-            </a>
-
-            <a href="https://www.credly.com/badges/82ee51c9-6a50-44db-ac3d-c15856fc0ddb" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-stack"></i></div>
-              <div>
-                <div class="cert-issuer" data-es="CompTIA · abril 2026">CompTIA · Apr 2026</div>
-                <div class="cert-name" data-es="Especialista en Operaciones de TI (CIOS)">IT Operations Specialist (CIOS)</div>
-              </div>
-              <i class="ti ti-arrow-up-right cert-arrow"></i>
-            </a>
-
+        <div class="cert-group">
+          <div class="cert-group-label" data-es="Fundamentos e Infraestructura">Foundations &amp; Infrastructure</div>
+          <div class="cert-grid">
             <a href="https://www.credly.com/badges/2637667e-971f-40a0-b32e-607f46a8186d" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-network"></i></div>
+              <img class="cert-badge" src="badges/comptia-network-plus.png" alt="CompTIA Network+ ce badge" width="52" height="52" loading="lazy" decoding="async">
               <div>
                 <div class="cert-issuer" data-es="CompTIA · abril 2026">CompTIA · Apr 2026</div>
                 <div class="cert-name" data-es="Certificación Network+ ce">Network+ ce Certification</div>
               </div>
               <i class="ti ti-arrow-up-right cert-arrow"></i>
             </a>
-
             <a href="https://www.credly.com/badges/2721edcc-6c1e-4ca9-bbdd-9476483cf563" target="_blank" rel="noopener" class="cert-card fade-in">
-              <div class="cert-icon"><i class="ti ti-shield-check"></i></div>
+              <img class="cert-badge" src="badges/comptia-aplus.png" alt="CompTIA A+ ce badge" width="52" height="52" loading="lazy" decoding="async">
               <div>
                 <div class="cert-issuer" data-es="CompTIA · octubre 2025">CompTIA · Oct 2025</div>
                 <div class="cert-name" data-es="Certificación A+ ce">A+ ce Certification</div>
               </div>
               <i class="ti ti-arrow-up-right cert-arrow"></i>
             </a>
-
           </div>
         </div>
-        <div class="carousel-controls">
-          <button class="carousel-btn" id="certs-prev" aria-label="Previous" disabled>
-            <i class="ti ti-arrow-left"></i>
-          </button>
-          <div class="carousel-dots" id="certs-dots"></div>
-          <button class="carousel-btn" id="certs-next" aria-label="Next">
-            <i class="ti ti-arrow-right"></i>
-          </button>
+
+        <div class="cert-group">
+          <div class="cert-group-label" data-es="Operaciones y Marcos de TI">IT Operations &amp; Frameworks</div>
+          <div class="cert-grid">
+            <a href="https://www.peoplecert.org/public-profile?ed=XCHu3ZqUTNLIj%2f1TUJZ6u57L8x21PR07" target="_blank" rel="noopener" class="cert-card fade-in">
+              <img class="cert-badge" src="badges/itil-4-foundation.png" alt="ITIL 4 Foundation badge" width="52" height="52" loading="lazy" decoding="async">
+              <div>
+                <div class="cert-issuer" data-es="PeopleCert · mayo 2026">PeopleCert · May 2026</div>
+                <div class="cert-name">ITIL® 4 Foundation</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+            <a href="https://www.credly.com/badges/82ee51c9-6a50-44db-ac3d-c15856fc0ddb" target="_blank" rel="noopener" class="cert-card fade-in">
+              <img class="cert-badge" src="badges/comptia-cios.png" alt="CompTIA IT Operations Specialist (CIOS) badge" width="52" height="52" loading="lazy" decoding="async">
+              <div>
+                <div class="cert-issuer" data-es="CompTIA · abril 2026">CompTIA · Apr 2026</div>
+                <div class="cert-name" data-es="Especialista en Operaciones de TI (CIOS)">IT Operations Specialist (CIOS)</div>
+              </div>
+              <i class="ti ti-arrow-up-right cert-arrow"></i>
+            </a>
+          </div>
         </div>
+
       </div>
     </div>
   </section>
@@ -1381,143 +1330,6 @@
     menu.classList.remove('open');
     btn.innerHTML = '<i class="ti ti-menu-2"></i>';
   }
-
-  // Certifications Carousel
-  (function() {
-    const track = document.getElementById('certs-carousel');
-    const prevBtn = document.getElementById('certs-prev');
-    const nextBtn = document.getElementById('certs-next');
-    const dotsWrap = document.getElementById('certs-dots');
-    if (!track) return;
-
-    const cards = Array.from(track.querySelectorAll('.cert-card'));
-    let current = 0;
-
-    cards.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      dot.addEventListener('click', () => goTo(i));
-      dotsWrap.appendChild(dot);
-    });
-
-    function getVisibleCount() {
-      const ow = track.parentElement.offsetWidth;
-      const cardW = 300 + 12;
-      return Math.max(1, Math.floor(ow / cardW));
-    }
-
-    function goTo(idx) {
-      const count = cards.length;
-      const visible = getVisibleCount();
-      const max = Math.max(0, count - visible);
-      current = Math.max(0, Math.min(idx, max));
-      const cardW = cards[0].offsetWidth + 12;
-      track.style.transform = `translateX(-${current * cardW}px)`;
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current >= max;
-      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === current);
-      });
-    }
-
-    prevBtn.addEventListener('click', () => goTo(current - 1));
-    nextBtn.addEventListener('click', () => goTo(current + 1));
-    window.addEventListener('resize', () => goTo(current));
-
-    let startX = 0, isDragging = false, startIdx = 0;
-    track.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; startIdx = current; e.preventDefault(); });
-    window.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      const diff = startX - e.clientX;
-      const cardW = cards[0].offsetWidth + 12;
-      if (Math.abs(diff) > cardW * 0.3) { goTo(startIdx + (diff > 0 ? 1 : -1)); isDragging = false; }
-    });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    let touchStartX = 0;
-    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    track.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
-    }, { passive: true });
-
-    goTo(0);
-  })();
-
-  // Carousel
-  (function() {
-    const track = document.getElementById('carousel');
-    const prevBtn = document.getElementById('carousel-prev');
-    const nextBtn = document.getElementById('carousel-next');
-    const dotsWrap = document.getElementById('carousel-dots');
-    if (!track) return;
-
-    const cards = Array.from(track.querySelectorAll('.project-card'));
-    let current = 0;
-
-    // Build dots
-    cards.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.type = 'button';
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      dot.addEventListener('click', () => goTo(i));
-      dotsWrap.appendChild(dot);
-    });
-
-    function getVisibleCount() {
-      const ow = track.parentElement.offsetWidth;
-      const cardW = 300 + 12;
-      return Math.max(1, Math.floor(ow / cardW));
-    }
-
-    function goTo(idx) {
-      const count = cards.length;
-      const visible = getVisibleCount();
-      const max = Math.max(0, count - visible);
-      current = Math.max(0, Math.min(idx, max));
-      const cardW = cards[0].offsetWidth + 12;
-      track.style.transform = `translateX(-${current * cardW}px)`;
-      prevBtn.disabled = current === 0;
-      nextBtn.disabled = current >= max;
-      dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
-        d.classList.toggle('active', i === current);
-      });
-    }
-
-    prevBtn.addEventListener('click', () => goTo(current - 1));
-    nextBtn.addEventListener('click', () => goTo(current + 1));
-    window.addEventListener('resize', () => goTo(current));
-
-    // Drag to scroll (desktop)
-    let startX = 0, isDragging = false, startIdx = 0;
-    track.addEventListener('mousedown', e => {
-      isDragging = true; startX = e.clientX; startIdx = current;
-      e.preventDefault();
-    });
-    window.addEventListener('mousemove', e => {
-      if (!isDragging) return;
-      const diff = startX - e.clientX;
-      const cardW = cards[0].offsetWidth + 12;
-      if (Math.abs(diff) > cardW * 0.3) {
-        goTo(startIdx + (diff > 0 ? 1 : -1));
-        isDragging = false;
-      }
-    });
-    window.addEventListener('mouseup', () => { isDragging = false; });
-
-    // Touch swipe (mobile)
-    let touchStartX = 0;
-    track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-    track.addEventListener('touchend', e => {
-      const diff = touchStartX - e.changedTouches[0].clientX;
-      if (Math.abs(diff) > 40) goTo(current + (diff > 0 ? 1 : -1));
-    }, { passive: true });
-
-    goTo(0);
-  })();
 
   // Dynamic year
   document.getElementById('yr').textContent = new Date().getFullYear();
