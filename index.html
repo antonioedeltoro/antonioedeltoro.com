@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+
 <title>Antonio E. del Toro — IT Professional & Cybersecurity Student</title>
 
 <!-- Primary Meta -->
@@ -246,7 +251,7 @@
   /* ── HERO ── */
   .hero {
     padding: 80px 0 72px;
-    border-bottom: 0.5px solid var(--border);
+    position: relative;
   }
   .hero-inner {
     display: grid;
@@ -416,7 +421,21 @@
   /* ── SECTIONS ── */
   section {
     padding: 64px 0;
-    border-bottom: 0.5px solid var(--border);
+    position: relative;
+  }
+  /* Section dividers — centered and limited to the content column width */
+  section::after,
+  .hero::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0 auto;
+    width: calc(100% - 80px);
+    max-width: 880px;
+    height: 0.5px;
+    background: var(--border);
   }
   .section-header {
     display: flex;
@@ -840,6 +859,7 @@
   @media (max-width: 720px) {
     nav { padding: 0 20px; }
     .container { padding: 0 20px; }
+    section::after, .hero::after { width: calc(100% - 40px); }
     .nav-links { display: none; }
     .hamburger { display: flex; }
     .hero { padding: 48px 0 40px; }
@@ -1260,20 +1280,20 @@
           <div class="form-row">
             <div class="field">
               <label for="name" data-es="Nombre">Name</label>
-              <input type="text" id="name" placeholder="Your name" data-es-ph="Tu nombre" required>
+              <input type="text" id="name" placeholder="Your name" data-es-ph="Tu nombre" maxlength="100" autocomplete="name" required>
             </div>
             <div class="field">
               <label for="email" data-es="Correo">Email</label>
-              <input type="email" id="email" placeholder="your@email.com" data-es-ph="tu@correo.com" required>
+              <input type="email" id="email" placeholder="your@email.com" data-es-ph="tu@correo.com" maxlength="254" autocomplete="email" required>
             </div>
           </div>
           <div class="field">
             <label for="subject" data-es="Asunto">Subject</label>
-            <input type="text" id="subject" placeholder="What's this about?" data-es-ph="¿De qué se trata?" required>
+            <input type="text" id="subject" placeholder="What's this about?" data-es-ph="¿De qué se trata?" maxlength="150" required>
           </div>
           <div class="field">
             <label for="message" data-es="Mensaje">Message</label>
-            <textarea id="message" placeholder="Tell me what you're working on..." data-es-ph="Cuéntame en qué estás trabajando..." required></textarea>
+            <textarea id="message" placeholder="Tell me what you're working on..." data-es-ph="Cuéntame en qué estás trabajando..." maxlength="2000" required></textarea>
           </div>
           <button type="submit" class="form-submit" data-es="Enviar mensaje <i class=&quot;ti ti-send&quot;></i>">
             Submit message <i class="ti ti-send"></i>
@@ -1389,10 +1409,13 @@
   // mailto form
   function sendMail(e) {
     e.preventDefault();
-    const name    = document.getElementById('name').value.trim();
-    const email   = document.getElementById('email').value.trim();
-    const subject = document.getElementById('subject').value.trim();
-    const message = document.getElementById('message').value.trim();
+    // Collapse line breaks in single-line fields (defense-in-depth against header injection)
+    // and cap lengths even if maxlength is bypassed. encodeURIComponent already neutralizes the mailto.
+    const line = (id, max) => document.getElementById(id).value.replace(/[\r\n]+/g, ' ').trim().slice(0, max);
+    const name    = line('name', 100);
+    const email   = line('email', 254);
+    const subject = line('subject', 150);
+    const message = document.getElementById('message').value.trim().slice(0, 2000);
     const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
     const mailto = `mailto:antonio@deltoro.codes?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
