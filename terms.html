@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow">
+
+<title>Terms of Service — Antonio E. del Toro</title>
+<meta name="description" content="Terms of Service for antonioedeltoro.com.">
+<link rel="canonical" href="https://www.antonioedeltoro.com/terms.html">
+<link rel="icon" type="image/png" href="/favicon.png">
+<meta name="theme-color" content="#FF5F00">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css">
+
+<!-- Set theme + language before paint to avoid a flash of the wrong state -->
+<script>(function(){try{var s=localStorage.getItem('theme');var d=s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.classList.toggle('dark',d);if(localStorage.getItem('lang')==='es')document.documentElement.classList.add('lang-es');}catch(e){}})();</script>
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #F8F7F4;
+    --bg2:      #EEECEA;
+    --bg3:      #D8D5D1;
+    --text:     #1A1916;
+    --text2:    #3A3834;
+    --text3:    #6B6860;
+    --orange:   #FF5F00;
+    --blue:     #0057FF;
+    --border:   rgba(26,25,22,0.1);
+    --font-display: 'Syne', sans-serif;
+    --font-body:    'DM Sans', sans-serif;
+    --font-mono:    'DM Mono', monospace;
+  }
+  html.dark {
+    --bg:       #1A1916;
+    --bg2:      #242220;
+    --bg3:      #3A3834;
+    --text:     #F0EEE9;
+    --text2:    #C8C5C0;
+    --text3:    #6B6860;
+    --orange:   #FF5F00;
+    --blue:     #4D85FF;
+    --border:   rgba(240,238,233,0.08);
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text2);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Language toggle: only ever hide the inactive language */
+  html:not(.lang-es) [data-l="es"] { display: none; }
+  html.lang-es [data-l="en"] { display: none; }
+
+  /* ── NAV (matches main site) ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--border);
+    padding: 0 40px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .nav-logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span, .brand-dot { color: var(--orange); }
+  .nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    list-style: none;
+  }
+  .nav-links a {
+    font-size: 13px;
+    color: var(--text3);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .lang-btn {
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    height: 34px;
+    padding: 0 11px;
+    display: flex; align-items: center; gap: 5px;
+    cursor: pointer;
+    color: var(--text3);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.03em;
+    transition: color 0.2s, border-color 0.2s, transform 0.1s;
+  }
+  .mode-btn, .hamburger {
+    background: none;
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    width: 34px; height: 34px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 17px;
+    transition: color 0.2s, border-color 0.2s, transform 0.1s;
+  }
+  .lang-btn:hover, .mode-btn:hover, .hamburger:hover { color: var(--text); border-color: var(--text3); }
+  .lang-btn:active, .mode-btn:active, .hamburger:active { transform: scale(0.9); }
+  .hamburger { display: none; font-size: 20px; }
+
+  .mobile-menu {
+    display: none;
+    flex-direction: column;
+    background: var(--bg2);
+    border-bottom: 0.5px solid var(--border);
+    padding: 8px 22px 16px;
+  }
+  .mobile-menu.open { display: flex; }
+  .mobile-menu a {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text3);
+    text-decoration: none;
+    padding: 12px 0;
+    border-bottom: 0.5px solid var(--border);
+    transition: color 0.2s;
+  }
+  .mobile-menu a:last-child { border-bottom: none; }
+  .mobile-menu a:hover { color: var(--orange); }
+
+  main { max-width: 820px; margin: 0 auto; padding: 44px 40px 72px; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--orange);
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(30px, 6vw, 44px);
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1.08;
+    margin-bottom: 12px;
+  }
+  .updated {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text3);
+    margin-bottom: 36px;
+  }
+  .intro { font-size: 16px; color: var(--text2); margin-bottom: 8px; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 20px;
+    color: var(--text);
+    letter-spacing: -0.01em;
+    margin: 44px 0 14px;
+    scroll-margin-top: 72px;
+  }
+  h2 .num {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--orange);
+    margin-right: 10px;
+  }
+
+  p { margin-bottom: 16px; }
+  ul { list-style: none; margin: 0 0 16px 0; display: flex; flex-direction: column; gap: 8px; }
+  li { position: relative; padding-left: 18px; line-height: 1.6; }
+  li::before { content: '—'; position: absolute; left: 0; color: var(--orange); }
+  strong { color: var(--text); font-weight: 600; }
+  .legal { text-transform: none; }
+
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .callout {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    margin: 24px 0;
+    font-size: 14px;
+    color: var(--text2);
+  }
+  .fineprint {
+    font-size: 13px;
+    color: var(--text3);
+    line-height: 1.7;
+  }
+
+  .legal-footer {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 26px 40px 48px;
+    border-top: 0.5px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text3);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .footer-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+  .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+  .footer-links a {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text3);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--text); text-decoration: none; }
+
+  @media (max-width: 720px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .hamburger { display: flex; }
+    main, .legal-footer { padding-left: 22px; padding-right: 22px; }
+  }
+</style>
+</head>
+<body>
+
+  <nav>
+    <a href="/" class="nav-logo">Antonio E<span>.</span> del Toro</a>
+    <ul class="nav-links">
+      <li><a href="/#work"><span data-l="en">work</span><span data-l="es">trabajo</span></a></li>
+      <li><a href="/#about"><span data-l="en">about</span><span data-l="es">perfil</span></a></li>
+      <li><a href="/#certifications"><span data-l="en">certifications</span><span data-l="es">certificaciones</span></a></li>
+      <li><a href="/#experience"><span data-l="en">experience</span><span data-l="es">experiencia</span></a></li>
+      <li><a href="/#education"><span data-l="en">education</span><span data-l="es">educación</span></a></li>
+      <li><a href="/#contact"><span data-l="en">contact</span><span data-l="es">contacto</span></a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="lang-btn" id="lang-btn" type="button" aria-label="Switch language / Cambiar idioma"><i class="ti ti-language"></i><span id="lang-label">ES</span></button>
+      <button class="mode-btn" id="mode-btn" type="button" aria-label="Toggle dark mode"><i class="ti ti-moon"></i></button>
+      <button class="hamburger" id="hamburger-btn" type="button" aria-label="Toggle menu"><i class="ti ti-menu-2"></i></button>
+    </div>
+  </nav>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="/#work"><span data-l="en">work</span><span data-l="es">trabajo</span></a>
+    <a href="/#about"><span data-l="en">about</span><span data-l="es">perfil</span></a>
+    <a href="/#certifications"><span data-l="en">certifications</span><span data-l="es">certificaciones</span></a>
+    <a href="/#experience"><span data-l="en">experience</span><span data-l="es">experiencia</span></a>
+    <a href="/#education"><span data-l="en">education</span><span data-l="es">educación</span></a>
+    <a href="/#contact"><span data-l="en">contact</span><span data-l="es">contacto</span></a>
+  </div>
+
+  <main>
+    <!-- ENGLISH -->
+    <div data-l="en">
+      <div class="eyebrow">Legal</div>
+      <h1>Terms of Service</h1>
+      <div class="updated">Last updated: August 29, 2026</div>
+
+      <p class="intro">Welcome, and thanks for visiting. These Terms of Service (the &ldquo;Terms&rdquo;) govern your access to and use of <strong>antonioedeltoro.com</strong> and its content (the &ldquo;Site&rdquo;), operated by <strong>Antonio E<span class="brand-dot">.</span> del Toro</strong> (&ldquo;I,&rdquo; &ldquo;me,&rdquo; or &ldquo;my&rdquo;). By accessing or using the Site, you agree to these Terms. If you do not agree, please do not use the Site.</p>
+
+      <h2><span class="num">01</span>The Site</h2>
+      <p>The Site is a personal portfolio that shares information about my professional background, projects, and certifications. It is provided for general informational purposes only.</p>
+
+      <h2><span class="num">02</span>Eligibility</h2>
+      <p>The Site is not directed to children under 16, and I do not knowingly collect information from them. By using the Site, you represent that you are able to form a binding agreement under applicable law.</p>
+
+      <h2><span class="num">03</span>Acceptable use</h2>
+      <p>You agree to use the Site lawfully. You will not:</p>
+      <ul>
+        <li>attempt to gain unauthorized access to the Site, its server, or any connected systems;</li>
+        <li>probe, scan, or test the vulnerability of the Site, or breach its security or authentication measures, except as expressly permitted in writing;</li>
+        <li>interfere with or disrupt the Site, including through denial-of-service attempts, malware, or excessive automated requests;</li>
+        <li>scrape, harvest, or collect data from the Site through automated means without permission;</li>
+        <li>use the Site to transmit unlawful, harassing, defamatory, or infringing content; or</li>
+        <li>reverse engineer or otherwise misuse any part of the Site.</li>
+      </ul>
+
+      <h2><span class="num">04</span>Intellectual property</h2>
+      <p>Unless otherwise noted, the text, design, layout, code, and original content of the Site are owned by me and are protected by intellectual-property laws. You may view the Site and share links to it for personal, non-commercial purposes. You may not copy, reproduce, republish, or create derivative works from the Site&rsquo;s content without my prior written permission.</p>
+      <p>Third-party names, logos, certification badges (such as the CompTIA and ITIL / PeopleCert marks), and client project names shown on the Site are the property of their respective owners and appear for identification and portfolio purposes only. Their appearance does not imply endorsement.</p>
+
+      <h2><span class="num">05</span>Third-party links</h2>
+      <p>The Site may link to third-party websites and services that I do not control. I am not responsible for the content, policies, or practices of any third-party site. Visiting them is at your own risk and subject to their terms.</p>
+
+      <h2><span class="num">06</span>No professional advice</h2>
+      <p>Content on the Site is provided for informational purposes only and does not constitute professional, security, legal, or other advice. Do not rely on it as a substitute for advice from a qualified professional.</p>
+
+      <h2><span class="num">07</span>Disclaimer of warranties</h2>
+      <p class="fineprint legal">THE SITE IS PROVIDED &ldquo;AS IS&rdquo; AND &ldquo;AS AVAILABLE,&rdquo; WITHOUT WARRANTIES OF ANY KIND, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. I DO NOT WARRANT THAT THE SITE WILL BE UNINTERRUPTED, SECURE, ERROR-FREE, OR THAT ANY CONTENT IS ACCURATE OR CURRENT. SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CERTAIN WARRANTIES, SO SOME OF THE ABOVE MAY NOT APPLY TO YOU.</p>
+
+      <h2><span class="num">08</span>Limitation of liability</h2>
+      <p class="fineprint legal">TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT WILL I BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, EXEMPLARY, OR PUNITIVE DAMAGES, OR FOR ANY LOSS OF PROFITS, DATA, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATING TO YOUR USE OF (OR INABILITY TO USE) THE SITE.</p>
+      <p class="fineprint legal">TO THE MAXIMUM EXTENT PERMITTED BY LAW, MY TOTAL AGGREGATE LIABILITY FOR ALL CLAIMS ARISING OUT OF OR RELATING TO THE SITE OR THESE TERMS WILL NOT EXCEED THE GREATER OF (A) ONE HUNDRED U.S. DOLLARS (USD&nbsp;$100), OR (B) THE AMOUNT YOU PAID ME, IF ANY, TO ACCESS OR USE THE SITE IN THE TWELVE (12) MONTHS BEFORE THE EVENT GIVING RISE TO THE CLAIM. SOME JURISDICTIONS DO NOT ALLOW CERTAIN LIMITATIONS, SO SOME OF THE ABOVE MAY NOT APPLY TO YOU.</p>
+
+      <h2><span class="num">09</span>Indemnification</h2>
+      <p>You agree to indemnify, defend, and hold harmless Antonio E<span class="brand-dot">.</span> del Toro from and against any claims, liabilities, damages, losses, and expenses (including reasonable attorneys&rsquo; fees) arising out of or related to: (a)&nbsp;your use or misuse of the Site; (b)&nbsp;your violation of these Terms; or (c)&nbsp;your violation of any law or the rights of any third party.</p>
+
+      <h2><span class="num">10</span>Privacy</h2>
+      <p>Your use of the Site is also governed by the <a href="/privacy.html">Privacy Policy</a>, which explains how information is handled.</p>
+
+      <h2><span class="num">11</span>Changes to these Terms</h2>
+      <p>I may update these Terms from time to time. Changes take effect when the updated version is posted on the Site, indicated by the &ldquo;Last updated&rdquo; date above. Your continued use of the Site after changes are posted constitutes acceptance of the revised Terms.</p>
+
+      <h2><span class="num">12</span>Governing law and venue</h2>
+      <p>These Terms are governed by the laws of the State of California, without regard to its conflict-of-laws rules. Any dispute arising out of or relating to these Terms or the Site will be resolved exclusively in the state or federal courts located in Los Angeles County, California, and you consent to their personal jurisdiction and venue, to the extent permitted by law.</p>
+
+      <h2><span class="num">13</span>General</h2>
+      <p>If any provision of these Terms is held unenforceable, the remaining provisions will remain in full effect. My failure to enforce any provision is not a waiver of it. These Terms are the entire agreement between you and me regarding the Site and supersede any prior agreements on that subject.</p>
+
+      <h2><span class="num">14</span>Contact</h2>
+      <p>Questions about these Terms? Email me at <a href="mailto:antonio@deltoro.codes">antonio@deltoro.codes</a>.</p>
+
+      <div class="callout fineprint">This document is a general template provided for convenience and is not legal advice. Consider having it reviewed by a qualified attorney for your specific situation.</div>
+    </div>
+
+    <!-- ESPAÑOL -->
+    <div data-l="es">
+      <div class="eyebrow">Legal</div>
+      <h1>Términos de Servicio</h1>
+      <div class="updated">Última actualización: 29 de agosto de 2026</div>
+
+      <p class="intro">Bienvenido y gracias por su visita. Estos Términos de Servicio (los &laquo;Términos&raquo;) rigen su acceso y uso de <strong>antonioedeltoro.com</strong> y su contenido (el &laquo;Sitio&raquo;), operado por <strong>Antonio E<span class="brand-dot">.</span> del Toro</strong> (&laquo;yo&raquo;, &laquo;me&raquo; o &laquo;mi&raquo;). Al acceder o usar el Sitio, usted acepta estos Términos. Si no está de acuerdo, por favor no use el Sitio.</p>
+
+      <h2><span class="num">01</span>El Sitio</h2>
+      <p>El Sitio es un portafolio personal que comparte información sobre mi trayectoria profesional, mis proyectos y mis certificaciones. Se ofrece únicamente con fines informativos generales.</p>
+
+      <h2><span class="num">02</span>Elegibilidad</h2>
+      <p>El Sitio no está dirigido a menores de 16 años, y no recojo información de ellos a sabiendas. Al usar el Sitio, usted declara que tiene capacidad para celebrar un acuerdo vinculante conforme a la ley aplicable.</p>
+
+      <h2><span class="num">03</span>Uso aceptable</h2>
+      <p>Usted acepta usar el Sitio de forma lícita. No podrá:</p>
+      <ul>
+        <li>intentar obtener acceso no autorizado al Sitio, a su servidor o a cualquier sistema conectado;</li>
+        <li>sondear, escanear o probar la vulnerabilidad del Sitio, ni vulnerar sus medidas de seguridad o autenticación, salvo autorización expresa por escrito;</li>
+        <li>interferir o interrumpir el Sitio, incluso mediante intentos de denegación de servicio, software malicioso o solicitudes automatizadas excesivas;</li>
+        <li>extraer, recopilar o recolectar datos del Sitio por medios automatizados sin permiso;</li>
+        <li>usar el Sitio para transmitir contenido ilícito, acosador, difamatorio o infractor; o</li>
+        <li>aplicar ingeniería inversa o hacer un uso indebido de cualquier parte del Sitio.</li>
+      </ul>
+
+      <h2><span class="num">04</span>Propiedad intelectual</h2>
+      <p>Salvo que se indique lo contrario, el texto, el diseño, la disposición, el código y el contenido original del Sitio son de mi propiedad y están protegidos por las leyes de propiedad intelectual. Puede ver el Sitio y compartir enlaces a él con fines personales y no comerciales. No puede copiar, reproducir, volver a publicar ni crear obras derivadas del contenido del Sitio sin mi permiso previo por escrito.</p>
+      <p>Los nombres, logotipos, insignias de certificación de terceros (como las marcas de CompTIA e ITIL / PeopleCert) y los nombres de proyectos de clientes que aparecen en el Sitio son propiedad de sus respectivos titulares y se muestran únicamente con fines de identificación y de portafolio. Su presencia no implica respaldo alguno.</p>
+
+      <h2><span class="num">05</span>Enlaces de terceros</h2>
+      <p>El Sitio puede enlazar a sitios web y servicios de terceros que no controlo. No soy responsable del contenido, las políticas ni las prácticas de ningún sitio de terceros. Visitarlos es bajo su propio riesgo y está sujeto a sus términos.</p>
+
+      <h2><span class="num">06</span>No es asesoramiento profesional</h2>
+      <p>El contenido del Sitio se ofrece únicamente con fines informativos y no constituye asesoramiento profesional, de seguridad, legal ni de ningún otro tipo. No lo tome como sustituto del consejo de un profesional cualificado.</p>
+
+      <h2><span class="num">07</span>Renuncia de garantías</h2>
+      <p class="fineprint legal">EL SITIO SE PROPORCIONA &laquo;TAL CUAL&raquo; Y &laquo;SEGÚN DISPONIBILIDAD&raquo;, SIN GARANTÍAS DE NINGÚN TIPO, YA SEAN EXPRESAS, IMPLÍCITAS O LEGALES, INCLUIDAS, SIN LIMITACIÓN, LAS GARANTÍAS IMPLÍCITAS DE COMERCIABILIDAD, IDONEIDAD PARA UN FIN DETERMINADO, TITULARIDAD Y NO INFRACCIÓN. NO GARANTIZO QUE EL SITIO SEA ININTERRUMPIDO, SEGURO O LIBRE DE ERRORES, NI QUE SU CONTENIDO SEA EXACTO O ESTÉ ACTUALIZADO. ALGUNAS JURISDICCIONES NO PERMITEN LA EXCLUSIÓN DE CIERTAS GARANTÍAS, POR LO QUE ES POSIBLE QUE ALGUNAS DE LAS ANTERIORES NO SE APLIQUEN A USTED.</p>
+
+      <h2><span class="num">08</span>Limitación de responsabilidad</h2>
+      <p class="fineprint legal">EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, EN NINGÚN CASO SERÉ RESPONSABLE POR DAÑOS INDIRECTOS, INCIDENTALES, ESPECIALES, CONSECUENTES, EJEMPLARES O PUNITIVOS, NI POR PÉRDIDA DE BENEFICIOS, DATOS, FONDO DE COMERCIO U OTRAS PÉRDIDAS INTANGIBLES, DERIVADOS DE O RELACIONADOS CON SU USO (O IMPOSIBILIDAD DE USO) DEL SITIO.</p>
+      <p class="fineprint legal">EN LA MÁXIMA MEDIDA PERMITIDA POR LA LEY, MI RESPONSABILIDAD TOTAL AGREGADA POR TODAS LAS RECLAMACIONES DERIVADAS DE O RELACIONADAS CON EL SITIO O ESTOS TÉRMINOS NO EXCEDERÁ LA CANTIDAD MAYOR ENTRE (A)&nbsp;CIEN DÓLARES ESTADOUNIDENSES (USD&nbsp;$100), O (B)&nbsp;EL IMPORTE QUE ME HAYA PAGADO, SI LO HUBIERA, POR ACCEDER O USAR EL SITIO EN LOS DOCE (12) MESES ANTERIORES AL HECHO QUE ORIGINE LA RECLAMACIÓN. ALGUNAS JURISDICCIONES NO PERMITEN CIERTAS LIMITACIONES, POR LO QUE ES POSIBLE QUE ALGUNAS DE LAS ANTERIORES NO SE APLIQUEN A USTED.</p>
+
+      <h2><span class="num">09</span>Indemnización</h2>
+      <p>Usted acepta indemnizar, defender y eximir de responsabilidad a Antonio E<span class="brand-dot">.</span> del Toro frente a cualquier reclamación, responsabilidad, daño, pérdida y gasto (incluidos los honorarios razonables de abogados) que surjan de o se relacionen con: (a)&nbsp;su uso o uso indebido del Sitio; (b)&nbsp;su incumplimiento de estos Términos; o (c)&nbsp;su violación de cualquier ley o de los derechos de un tercero.</p>
+
+      <h2><span class="num">10</span>Privacidad</h2>
+      <p>El uso del Sitio también se rige por la <a href="/privacy.html">Política de Privacidad</a>, que explica cómo se maneja la información.</p>
+
+      <h2><span class="num">11</span>Cambios a estos Términos</h2>
+      <p>Puedo actualizar estos Términos de vez en cuando. Los cambios entran en vigor cuando la versión actualizada se publica en el Sitio, según indica la fecha de &laquo;Última actualización&raquo; que aparece arriba. Su uso continuado del Sitio después de publicados los cambios constituye la aceptación de los Términos revisados.</p>
+
+      <h2><span class="num">12</span>Ley aplicable y jurisdicción</h2>
+      <p>Estos Términos se rigen por las leyes del Estado de California, sin considerar sus normas sobre conflicto de leyes. Cualquier disputa que surja de o se relacione con estos Términos o con el Sitio se resolverá exclusivamente ante los tribunales estatales o federales ubicados en el Condado de Los Ángeles, California, y usted acepta su jurisdicción personal y competencia territorial, en la medida en que lo permita la ley.</p>
+
+      <h2><span class="num">13</span>Disposiciones generales</h2>
+      <p>Si alguna disposición de estos Términos se considera inaplicable, las disposiciones restantes permanecerán en pleno vigor. El hecho de que no exija el cumplimiento de alguna disposición no constituye una renuncia a ella. Estos Términos constituyen el acuerdo íntegro entre usted y yo respecto del Sitio y reemplazan cualquier acuerdo previo sobre esa materia.</p>
+
+      <h2><span class="num">14</span>Contacto</h2>
+      <p>¿Preguntas sobre estos Términos? Escríbame a <a href="mailto:antonio@deltoro.codes">antonio@deltoro.codes</a>.</p>
+
+      <div class="callout fineprint">Este documento es una plantilla general que se ofrece por conveniencia y no constituye asesoramiento legal. Considere que un abogado cualificado lo revise para su situación específica.</div>
+    </div>
+  </main>
+
+  <footer class="legal-footer">
+    <span class="footer-copy">
+      <span class="footer-dot"></span>
+      <span id="yr"></span> · Antonio del Toro · <span data-l="en">Los Angeles, CA</span><span data-l="es">Los Ángeles, CA</span>
+    </span>
+    <div class="footer-links">
+      <a href="/"><span data-l="en">home</span><span data-l="es">inicio</span></a>
+      <a href="/privacy.html"><span data-l="en">privacy</span><span data-l="es">privacidad</span></a>
+      <a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      var root = document.documentElement;
+
+      // Theme toggle
+      var modeBtn = document.getElementById('mode-btn');
+      function modeIcon() {
+        modeBtn.innerHTML = root.classList.contains('dark') ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
+      }
+      modeIcon();
+      modeBtn.addEventListener('click', function () {
+        var isDark = root.classList.toggle('dark');
+        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch (e) {}
+        modeIcon();
+      });
+
+      // Language toggle (shares the 'lang' preference with the main site)
+      var langBtn = document.getElementById('lang-btn');
+      var langLabel = document.getElementById('lang-label');
+      function applyLangUI() {
+        var es = root.classList.contains('lang-es');
+        root.setAttribute('lang', es ? 'es' : 'en');
+        langLabel.textContent = es ? 'EN' : 'ES';
+      }
+      applyLangUI();
+      langBtn.addEventListener('click', function () {
+        var es = root.classList.toggle('lang-es');
+        try { localStorage.setItem('lang', es ? 'es' : 'en'); } catch (e) {}
+        applyLangUI();
+      });
+
+      // Mobile menu
+      var hamburger = document.getElementById('hamburger-btn');
+      var menu = document.getElementById('mobile-menu');
+      function setMenu(open) {
+        menu.classList.toggle('open', open);
+        hamburger.innerHTML = open ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
+      }
+      hamburger.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
+      menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+
+      document.getElementById('yr').textContent = new Date().getFullYear();
+    })();
+  </script>
+
+</body>
+</html>
