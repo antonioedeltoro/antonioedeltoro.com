@@ -146,10 +146,15 @@
     function setMenu(open) {
       menu.classList.toggle('open', open);
       hamburger.innerHTML = open ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
-      document.body.style.overflow = open ? 'hidden' : '';
     }
     hamburger.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
     menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
+    // Close the open menu when clicking/tapping outside it (nav buttons handle themselves)
+    document.addEventListener('click', function (e) {
+      if (!menu.classList.contains('open')) return;
+      if (menu.contains(e.target) || e.target.closest('nav')) return;
+      setMenu(false);
+    });
 
     // ── Active nav (scroll-spy) — only where in-page sections exist (homepage) ──
     if (onHome) {
