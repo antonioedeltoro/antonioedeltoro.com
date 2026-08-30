@@ -102,6 +102,13 @@ nav {
 /* ── MOBILE MENU ── */
 .mobile-menu {
   display: none;
+  position: fixed;
+  top: 56px;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  max-height: calc(100vh - 56px);
+  overflow-y: auto;
   flex-direction: column;
   background: var(--bg2);
   border-bottom: 0.5px solid var(--border);

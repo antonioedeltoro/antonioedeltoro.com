@@ -146,6 +146,7 @@
     function setMenu(open) {
       menu.classList.toggle('open', open);
       hamburger.innerHTML = open ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
+      document.body.style.overflow = open ? 'hidden' : '';
     }
     hamburger.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
     menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });
