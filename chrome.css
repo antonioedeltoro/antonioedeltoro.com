@@ -1,0 +1,184 @@
+/* ============================================================
+   Shared site chrome — navigation bar + footer.
+   Single source of truth loaded by every page (index, terms, privacy).
+   Depends on each page defining the color tokens (--bg, --text, etc.)
+   and loading the Tabler icon font.
+   ============================================================ */
+
+/* Language visibility — only ever hide the inactive language */
+html:not(.lang-es) [data-l="es"] { display: none; }
+html.lang-es [data-l="en"] { display: none; }
+
+/* Reserve nav height before chrome.js injects, to avoid layout shift */
+#site-nav { display: block; min-height: 56px; }
+
+/* ── NAV ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+  padding: 0 40px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.3s;
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.02em;
+}
+.nav-logo span { color: var(--orange); }
+.nav-links {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  list-style: none;
+}
+.nav-links a {
+  font-size: 13px;
+  color: var(--text3);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  letter-spacing: 0.02em;
+  transition: color 0.2s, transform 0.1s;
+  display: inline-block;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a.active { color: var(--orange); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.mode-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 17px;
+  transition: color 0.2s, border-color 0.2s, transform 0.1s;
+}
+.mode-btn:hover { color: var(--text); border-color: var(--text3); }
+.lang-btn {
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  height: 34px;
+  padding: 0 11px;
+  display: flex; align-items: center; gap: 5px;
+  cursor: pointer;
+  color: var(--text3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  transition: color 0.2s, border-color 0.2s, transform 0.1s;
+}
+.lang-btn:hover { color: var(--text); border-color: var(--text3); }
+.lang-btn i { font-size: 16px; }
+.hamburger {
+  display: none;
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 8px;
+  width: 34px; height: 34px;
+  align-items: center; justify-content: center;
+  cursor: pointer;
+  color: var(--text3);
+  font-size: 20px;
+  transition: color 0.2s;
+}
+.hamburger:hover { color: var(--text); }
+.nav-links a:active { transform: scale(0.92); }
+.mode-btn:active, .lang-btn:active, .hamburger:active { transform: scale(0.88); }
+
+/* ── MOBILE MENU ── */
+.mobile-menu {
+  display: none;
+  flex-direction: column;
+  background: var(--bg2);
+  border-bottom: 0.5px solid var(--border);
+  padding: 8px 20px 16px;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text3);
+  text-decoration: none;
+  padding: 12px 0;
+  border-bottom: 0.5px solid var(--border);
+  transition: color 0.2s;
+}
+.mobile-menu a:last-child { border-bottom: none; }
+.mobile-menu a:hover, .mobile-menu a.active { color: var(--orange); }
+
+/* ── FOOTER ── */
+.site-footer { position: relative; }
+/* Top divider only where the page has no section dividers of its own (added by chrome.js) */
+.site-footer.has-top-divider::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  margin: 0 auto;
+  width: calc(100% - 80px);
+  max-width: 880px;
+  height: 0.5px;
+  background: var(--border);
+}
+.site-footer-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 28px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-copy {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text3);
+  display: flex; align-items: center; gap: 8px;
+}
+.footer-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+.footer-social { display: flex; align-items: center; gap: 6px; }
+.social-icon {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  background: var(--bg2);
+  border: 0.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text3);
+  font-size: 18px;
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.1s;
+}
+.social-icon:hover { color: var(--text); border-color: var(--text3); }
+.social-icon:active { transform: scale(0.88); background: var(--bg3); }
+.footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+.footer-links a {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text3);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footer-links a:hover { color: var(--text); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 720px) {
+  nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .site-footer-inner { flex-direction: column; text-align: center; padding: 28px 20px; }
+  .site-footer-inner > div { justify-content: center; }
+}
