@@ -30,6 +30,7 @@
     ['https://www.linkedin.com/in/antonioedeltoro/', 'LinkedIn', 'ti-brand-linkedin'],
     ['https://www.threads.net/@antonioedeltoro',  'Threads',     'ti-brand-threads'],
     ['https://www.tiktok.com/@antonioedeltoro',   'TikTok',      'ti-brand-tiktok'],
+    ['https://www.twitch.tv/antonioedeltoro',     'Twitch',      'ti-brand-twitch'],
     ['https://www.twitter.com/antonioedeltoro',   'X / Twitter', 'ti-brand-x'],
     ['https://www.youtube.com/@antonioedeltoro',  'YouTube',     'ti-brand-youtube']
   ].map(function (s) {
