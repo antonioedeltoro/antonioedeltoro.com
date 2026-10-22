@@ -1,0 +1,4 @@
+Contact: mailto:antonio@deltoro.codes
+Expires: 2027-10-22T00:00:00.000Z
+Preferred-Languages: en, es
+Canonical: https://www.antonioedeltoro.com/.well-known/security.txt

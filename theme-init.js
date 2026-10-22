@@ -1,0 +1,2 @@
+// Applies saved/system theme and language before first paint (loaded synchronously in <head>).
+(function(){try{var s=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches);var l=localStorage.getItem('lang');if(l?l==='es':(navigator.language||'').toLowerCase().indexOf('es')===0)document.documentElement.classList.add('lang-es');}catch(e){}})();

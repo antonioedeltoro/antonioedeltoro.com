@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
 <title>Antonio E. del Toro — IT Professional & Cybersecurity Student</title>
@@ -82,14 +82,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css" integrity="sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p" crossorigin="anonymous">
 
 <!-- Shared nav + footer (single source of truth) -->
 <link rel="stylesheet" href="chrome.css">
 <script defer src="chrome.js"></script>
 
 <!-- Set theme + language before paint to avoid a flash of the wrong state -->
-<script>(function(){try{var s=localStorage.getItem('theme');document.documentElement.classList.toggle('dark',s?s==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches);var l=localStorage.getItem('lang');if(l?l==='es':(navigator.language||'').toLowerCase().indexOf('es')===0)document.documentElement.classList.add('lang-es');}catch(e){}})();</script>
+<script src="theme-init.js"></script>
 
 <!-- Fallback: if JavaScript is unavailable, reveal all scroll-animated content -->
 <noscript><style>.fade-in{opacity:1 !important;transform:none !important;}</style></noscript>
@@ -985,19 +985,6 @@
       </div>
       <div class="experience-list">
         <div class="exp-item fade-in">
-          <div class="exp-date" data-es="mayo 2026 — Presente">May 2026 — Present</div>
-          <div>
-            <h3 class="exp-role" data-es="Analista de Mesa de Servicio">Service Desk Analyst</h3>
-            <div class="exp-company" data-es="Thunderhawk Technology Partners · Contrato · Glendale, CA">Thunderhawk Technology Partners · Contract · Glendale, CA</div>
-            <ul class="exp-bullets">
-              <li data-es="Realizo el triage de primer nivel de problemas de autenticación y acceso en un entorno Okta SSO para Public Storage, aislando la causa raíz (contraseña, MFA o asignación de aplicaciones) antes de escalar con hallazgos documentados">Triage first-line authentication and access issues in an Okta SSO environment for Public Storage, isolating password, MFA, or app-assignment root cause before escalating with documented findings</li>
-              <li data-es="Verifico la identidad del usuario según la política antes de restablecer credenciales y MFA para reforzar la mesa de servicio contra la ingeniería social, y remedio endpoints con Tanium en un entorno distribuido">Verify user identity against policy before credential and MFA resets to harden the service desk against social engineering, and remediate endpoints via Tanium across a distributed environment</li>
-              <li data-es="Gestiono de principio a fin la preparación de 18 ubicaciones durante una integración de 1,000 sitios adquiridos, coordinando la instalación de hardware de red, estaciones de trabajo y pagos en un entorno de alcance PCI DSS">Own end-to-end site readiness for 18 locations during a 1,000-site acquisition integration, coordinating network, workstation, and PCI DSS-scoped payment hardware installs</li>
-              <li data-es="Administro las colas de incidentes y solicitudes de servicio en ServiceNow bajo procesos alineados con ITIL, dando soporte a Cisco Meraki y VMware VeloCloud SD-WAN en sitios minoristas distribuidos">Manage ServiceNow incident and service-request queues under ITIL-aligned processes, supporting Cisco Meraki and VMware VeloCloud SD-WAN across distributed retail sites</li>
-            </ul>
-          </div>
-        </div>
-        <div class="exp-item fade-in">
           <div class="exp-date" data-es="2024 — Presente">2024 — Present</div>
           <div>
             <h3 class="exp-role" data-es="Desarrollador Web Full-Stack">Full-Stack Web Developer</h3>
@@ -1007,6 +994,20 @@
               <li data-es="Resuelvo problemas de sitios web, hosting y usuarios en los proyectos de clientes">Troubleshoot website, hosting, and user-related issues across client projects</li>
               <li data-es="Guío a los clientes por los flujos de trabajo del sistema y creo documentación para reducir problemas recurrentes">Guide clients through system workflows and create documentation to reduce repeat issues</li>
               <li data-es="Diagnostico problemas técnicos de forma independiente usando documentación y recursos en línea">Diagnose technical issues independently using documentation and online resources</li>
+            </ul>
+          </div>
+        </div>
+        <div class="exp-item fade-in">
+          <div class="exp-date" data-es="mayo 2026 — octubre 2026">May 2026 — Oct 2026</div>
+          <div>
+            <h3 class="exp-role" data-es="Analista de Mesa de Servicio">Service Desk Analyst</h3>
+            <div class="exp-company" data-es="Thunderhawk Technology Partners · Contrato · Glendale, CA · Remoto">Thunderhawk Technology Partners · Contract · Glendale, CA · Remote</div>
+            <ul class="exp-bullets">
+              <li data-es="Realicé el triage de primer nivel de problemas de autenticación y acceso en un entorno Okta SSO para Public Storage, aislando la causa raíz (contraseña, MFA o asignación de aplicaciones) antes de escalar con hallazgos documentados">Triaged first-line authentication and access issues in an Okta SSO environment for Public Storage, isolating password, MFA, or app-assignment root cause before escalating with documented findings</li>
+              <li data-es="Verifiqué la identidad del usuario según la política antes de restablecer credenciales y MFA para reforzar la mesa de servicio contra la ingeniería social, y remedié endpoints con Tanium en un entorno distribuido">Verified user identity against policy before credential and MFA resets to harden the service desk against social engineering, and remediated endpoints via Tanium across a distributed environment</li>
+              <li data-es="Gestioné de principio a fin la preparación de 18 ubicaciones en la primera fase de una integración de 1,000 sitios adquiridos, coordinando la instalación de hardware de red, estaciones de trabajo y pagos en un entorno de alcance PCI DSS">Owned end-to-end site readiness for 18 locations in phase one of a 1,000-site acquisition integration, coordinating network, workstation, and PCI DSS-scoped payment hardware installs</li>
+              <li data-es="Coordiné la instalación de puntos de acceso en 150 propiedades durante la segunda fase de la integración">Coordinated access point installs across 150 properties in phase two of the integration</li>
+              <li data-es="Administré las colas de incidentes y solicitudes de servicio en ServiceNow bajo procesos alineados con ITIL, dando soporte a Cisco Meraki y VMware VeloCloud SD-WAN en sitios minoristas distribuidos">Managed ServiceNow incident and service-request queues under ITIL-aligned processes, supporting Cisco Meraki and VMware VeloCloud SD-WAN across distributed retail sites</li>
             </ul>
           </div>
         </div>
@@ -1048,7 +1049,7 @@
       </div>
       <div class="education-list">
         <div class="edu-item fade-in">
-          <div class="edu-date" data-es="2025 — Presente">2025 — Present</div>
+          <div class="edu-date" data-es="2025 — 2027 (previsto)">2025 — 2027 (expected)</div>
           <div>
             <h3 class="edu-degree" data-es="Lic. en Ciberseguridad y Seguridad de la Información">BS, Cybersecurity & Information Assurance</h3>
             <div class="edu-school">Western Governors University</div>
@@ -1094,7 +1095,7 @@
       </div>
       <p style="font-size:15px; color:var(--text2); margin-bottom:32px; max-width:480px; line-height:1.75;" data-es="Hablemos — ya sea sobre un puesto en seguridad, un proyecto freelance o simplemente para conectar.">Let's talk — whether it's a security role, a freelance project, or just to connect.</p>
       <div class="contact-form-wrap">
-        <form class="contact-form fade-in" onsubmit="sendMail(event)">
+        <form class="contact-form fade-in">
           <div class="form-row">
             <div class="field">
               <label for="name" data-es="Nombre">Name</label>
@@ -1124,40 +1125,7 @@
 
 <div id="site-footer"></div>
 
-<!-- Safety net: reveal all scroll-animated content even if the main script errors out -->
-<script>
-  setTimeout(function () {
-    document.querySelectorAll('.fade-in:not(.visible)').forEach(function (el) { el.classList.add('visible'); });
-  }, 2000);
-</script>
-
-<script>
-  // mailto form
-  function sendMail(e) {
-    e.preventDefault();
-    // Collapse line breaks in single-line fields (defense-in-depth against header injection)
-    // and cap lengths even if maxlength is bypassed. encodeURIComponent already neutralizes the mailto.
-    const line = (id, max) => document.getElementById(id).value.replace(/[\r\n]+/g, ' ').trim().slice(0, max);
-    const name    = line('name', 100);
-    const email   = line('email', 254);
-    const subject = line('subject', 150);
-    const message = document.getElementById('message').value.trim().slice(0, 2000);
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    const mailto = `mailto:antonio@deltoro.codes?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-  }
-
-  // Scroll fade-in
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 80);
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-</script>
+<script src="main.js"></script>
 
 </body>
 </html>
