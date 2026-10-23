@@ -1,0 +1,2 @@
+/* Loaded only when JavaScript is unavailable: reveal scroll-animated content */
+.fade-in { opacity: 1 !important; transform: none !important; }

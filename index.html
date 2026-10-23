@@ -5,24 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
 <title>Antonio E. del Toro — IT Professional & Cybersecurity Student</title>
 
 <!-- Primary Meta -->
 <meta name="description" content="Antonio E. del Toro — Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
-<meta name="keywords" content="Antonio del Toro, IT support, cybersecurity, MERN developer, web development, Los Angeles, CompTIA, deltoro.codes">
 <meta name="author" content="Antonio E. del Toro">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://www.antonioedeltoro.com">
+<link rel="canonical" href="https://antonioedeltoro.com">
 
 <!-- Open Graph (Facebook, LinkedIn) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.antonioedeltoro.com">
+<meta property="og:url" content="https://antonioedeltoro.com">
 <meta property="og:title" content="Antonio E. del Toro — IT Professional & Cybersecurity Student">
 <meta property="og:description" content="Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
-<meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta property="og:image" content="https://antonioedeltoro.com/og-image.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="en_US">
@@ -30,10 +29,10 @@
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://www.antonioedeltoro.com">
+<meta name="twitter:url" content="https://antonioedeltoro.com">
 <meta name="twitter:title" content="Antonio E. del Toro — IT Professional & Cybersecurity Student">
 <meta name="twitter:description" content="Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.">
-<meta name="twitter:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta name="twitter:image" content="https://antonioedeltoro.com/og-image.jpg">
 <meta name="twitter:creator" content="@antonioedeltoro">
 
 <!-- Structured data (Person) -->
@@ -42,8 +41,8 @@
   "@context": "https://schema.org",
   "@type": "Person",
   "name": "Antonio E. del Toro",
-  "url": "https://www.antonioedeltoro.com",
-  "image": "https://www.antonioedeltoro.com/og-image.jpg",
+  "url": "https://antonioedeltoro.com",
+  "image": "https://antonioedeltoro.com/og-image.jpg",
   "jobTitle": "IT Professional & Cybersecurity Student",
   "description": "Bilingual IT professional, cybersecurity student, and self-taught MERN developer based in Los Angeles, CA.",
   "address": {
@@ -92,633 +91,8 @@
 <script src="theme-init.js"></script>
 
 <!-- Fallback: if JavaScript is unavailable, reveal all scroll-animated content -->
-<noscript><style>.fade-in{opacity:1 !important;transform:none !important;}</style></noscript>
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg:       #F8F7F4;
-    --bg2:      #EEECEA;
-    --bg3:      #D8D5D1;
-    --text:     #1A1916;
-    --text2:    #3A3834;
-    --text3:    #6B6860;
-    --orange:   #FF5F00;
-    --orange-l: #FF7A29;
-    --orange-d: #CC4C00;
-    --blue:     #0057FF;
-    --blue-d:   #0040CC;
-    --blue-t:   #E5ECFF;
-    --border:   rgba(26,25,22,0.1);
-    --font-display: 'Syne', sans-serif;
-    --font-body:    'DM Sans', sans-serif;
-    --font-mono:    'DM Mono', monospace;
-  }
-
-  html.dark {
-    --bg:       #1A1916;
-    --bg2:      #242220;
-    --bg3:      #3A3834;
-    --text:     #F0EEE9;
-    --text2:    #C8C5C0;
-    --text3:    #6B6860;
-    --orange:   #FF5F00;
-    --orange-l: #FF7A29;
-    --orange-d: #CC4C00;
-    --blue:     #4D85FF;
-    --blue-d:   #3A6FE0;
-    --blue-t:   #0F1F3D;
-    --border:   rgba(240,238,233,0.08);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.6;
-    transition: background 0.3s, color 0.3s;
-    min-height: 100vh;
-  }
-
-  /* ── NOISE TEXTURE ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-  /* ── AVAILABILITY BAR ── */
-  .avail-bar {
-    background: var(--orange);
-    padding: 7px 24px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-    z-index: 10;
-  }
-  .avail-bar span {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: #fff;
-    letter-spacing: 0.04em;
-  }
-  .avail-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.7);
-    animation: pulse 2s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%,100% { opacity: 1; } 50% { opacity: 0.3; }
-  }
-
-  /* ── LAYOUT ── */
-  .container { max-width: 960px; margin: 0 auto; padding: 0 40px; position: relative; z-index: 1; }
-
-  /* ── HERO ── */
-  .hero {
-    padding: 80px 0 72px;
-    position: relative;
-  }
-  .hero-inner {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 64px;
-    align-items: center;
-  }
-  .hero-tag {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--orange);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hero-tag::before {
-    content: '';
-    display: inline-block;
-    width: 24px; height: 1.5px;
-    background: var(--orange);
-  }
-  .hero h1 {
-    font-family: var(--font-display);
-    font-size: clamp(32px, 4vw, 52px);
-    font-weight: 700;
-    line-height: 1.08;
-    letter-spacing: -0.03em;
-    color: var(--text);
-    margin-bottom: 24px;
-  }
-  .hero h1 em {
-    color: var(--orange);
-    font-style: normal;
-  }
-  .hero-sub {
-    font-size: 16px;
-    color: var(--text2);
-    max-width: 480px;
-    line-height: 1.75;
-    margin-bottom: 36px;
-  }
-  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
-
-  /* ── PIXEL IMAGE ── */
-  .hero-image-wrap {
-    position: relative;
-    width: 300px;
-    height: 300px;
-    flex-shrink: 0;
-    border-radius: 50%;
-    overflow: hidden;
-    border: 2px solid var(--orange);
-    box-shadow: 0 0 0 4px rgba(255,95,0,0.15), 0 0 40px rgba(255,95,0,0.25), 0 0 80px rgba(255,95,0,0.1);
-  }
-  .hero-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    image-rendering: pixelated;
-  }
-  /* static scanline grid */
-  .hero-image-wrap::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      to bottom,
-      transparent 0px,
-      transparent 2px,
-      rgba(0,0,0,0.18) 2px,
-      rgba(0,0,0,0.18) 4px
-    );
-    pointer-events: none;
-    z-index: 2;
-    border-radius: 50%;
-  }
-  /* moving scanline sweep — stronger */
-  .scanline {
-    position: absolute;
-    top: -60%;
-    left: 0;
-    width: 100%;
-    height: 60%;
-    background: linear-gradient(
-      to bottom,
-      transparent 0%,
-      rgba(255, 95, 0, 0.08) 20%,
-      rgba(255, 95, 0, 0.28) 45%,
-      rgba(255, 255, 255, 0.08) 50%,
-      rgba(255, 95, 0, 0.28) 55%,
-      rgba(255, 95, 0, 0.08) 80%,
-      transparent 100%
-    );
-    animation: scanline-sweep 2.2s linear infinite;
-    pointer-events: none;
-    z-index: 3;
-  }
-  @keyframes scanline-sweep {
-    0%   { top: -60%; }
-    100% { top: 100%; }
-  }
-
-  /* mobile image slot — hidden on desktop */
-  .hero-image-mobile-wrap { display: none; }
-  .hero-image-mobile-wrap .hero-image-wrap {
-    width: 220px; height: 220px;
-    margin: 24px auto;
-  }
-
-  @media (max-width: 860px) {
-    .hero-inner {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-    .hero-image-desktop-wrap { display: none; }
-    .hero-image-mobile-wrap { display: block; }
-    .hero-image-mobile-wrap .hero-image-wrap { width: 180px; height: 180px; margin: 20px auto; }
-    .hero { padding: 48px 0 40px; }
-    .hero-text { width: 100%; }
-    .hero-sub { max-width: 100%; }
-    section { padding: 40px 0; }
-    .section-header { margin-bottom: 20px; }
-  }
-
-  @media (max-width: 600px) {
-    .hero-text { text-align: center; }
-    .hero-tag { justify-content: center; }
-    .hero-tag::before { display: none; }
-    .hero-actions { justify-content: center; }
-  }
-  .btn-primary {
-    background: var(--orange);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 24px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font-body);
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex; align-items: center; gap: 6px;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .btn-primary:hover { background: var(--orange-d); transform: translateY(-1px); }
-  .btn-secondary {
-    background: none;
-    color: var(--text);
-    border: 0.5px solid var(--border);
-    border-radius: 10px;
-    padding: 12px 24px;
-    font-size: 13px;
-    font-family: var(--font-body);
-    cursor: pointer;
-    text-decoration: none;
-    display: inline-flex; align-items: center; gap: 6px;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
-  }
-  .btn-secondary:hover { background: var(--bg2); transform: translateY(-1px); }
-
-  /* ── SECTIONS ── */
-  section {
-    padding: 64px 0;
-    position: relative;
-  }
-  /* Section dividers — centered and limited to the content column width */
-  section::after,
-  .hero::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: 0 auto;
-    width: calc(100% - 80px);
-    max-width: 880px;
-    height: 0.5px;
-    background: var(--border);
-  }
-  .section-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 32px;
-  }
-  .section-title {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text3);
-  }
-  .section-link {
-    font-size: 12px;
-    color: var(--blue);
-    text-decoration: none;
-    font-family: var(--font-mono);
-    transition: color 0.2s;
-  }
-  .section-link:hover { color: var(--blue-d); }
-
-  /* ── PROJECTS ── */
-  .project-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  @media (min-width: 640px) {
-    .project-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  .project-card {
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    text-decoration: none;
-    display: flex;
-    flex-direction: column;
-    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-    flex: 0 0 300px;
-    min-width: 0;
-  }
-  .project-card:hover {
-    border-color: var(--orange);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(255,95,0,0.08);
-  }
-  .project-tag {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--orange);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 10px;
-  }
-  .project-name {
-    font-family: var(--font-display);
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-  .project-desc {
-    font-size: 13px;
-    color: var(--text3);
-    line-height: 1.6;
-    flex: 1;
-    margin-bottom: 16px;
-  }
-  .project-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .project-stack { display: flex; gap: 4px; flex-wrap: wrap; }
-  .stack-pill {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    background: var(--bg3);
-    color: var(--text2);
-    padding: 2px 7px;
-    border-radius: 4px;
-  }
-  .project-arrow { color: var(--blue); font-size: 16px; }
-
-  /* ── ABOUT ── */
-  .about-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 48px;
-    align-items: start;
-  }
-  .about-text {
-    font-size: 15px;
-    color: var(--text2);
-    line-height: 1.8;
-  }
-  .about-text p + p { margin-top: 16px; }
-  .about-text a {
-    color: var(--blue);
-    text-decoration: none;
-  }
-  .about-text a:hover { text-decoration: underline; }
-  .skills-block { display: flex; flex-direction: column; gap: 20px; }
-  .skill-group-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 8px;
-  }
-  .skill-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .skill-tag {
-    font-size: 12px;
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    color: var(--text2);
-    padding: 4px 10px;
-    border-radius: 6px;
-    font-family: var(--font-mono);
-  }
-  .skill-tag.highlight {
-    background: var(--blue-t);
-    border-color: var(--blue);
-    color: var(--blue);
-  }
-
-  /* ── CERTIFICATIONS ── */
-  .cert-card {
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    transition: border-color 0.2s, transform 0.15s;
-    min-width: 0;
-  }
-  .cert-card:hover { border-color: var(--orange); transform: translateY(-2px); }
-  .cert-card:active { transform: scale(0.97) !important; }
-  .cert-groups { display: flex; flex-direction: column; gap: 28px; }
-  .cert-group-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-    margin-bottom: 10px;
-  }
-  .cert-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 12px;
-  }
-  .cert-badge {
-    width: 52px; height: 52px;
-    flex-shrink: 0;
-    object-fit: contain;
-    transition: filter 0.25s ease, opacity 0.25s ease;
-  }
-  /* Grayscale at rest, full official color on hover/focus — gated to hover-capable devices so touch always shows full color */
-  @media (hover: hover) {
-    .cert-badge { filter: grayscale(1); opacity: 0.9; }
-    .cert-card:hover .cert-badge,
-    .cert-card:focus-visible .cert-badge { filter: grayscale(0); opacity: 1; }
-  }
-  .cert-issuer {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text3);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-bottom: 3px;
-  }
-  .cert-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.3;
-  }
-  .cert-arrow { margin-left: auto; color: var(--blue); font-size: 14px; flex-shrink: 0; }
-
-  /* ── EXPERIENCE ── */
-  .experience-list { display: flex; flex-direction: column; gap: 0; }
-  .exp-item {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 24px;
-    padding: 24px 0;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .exp-item:last-child { border-bottom: none; }
-  .exp-date {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text3);
-    padding-top: 3px;
-    line-height: 1.5;
-  }
-  .exp-role {
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 3px;
-    letter-spacing: -0.01em;
-  }
-  .exp-company {
-    font-size: 13px;
-    color: var(--orange);
-    font-family: var(--font-mono);
-    margin-bottom: 10px;
-  }
-  .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-  .exp-bullets li {
-    font-size: 13px;
-    color: var(--text2);
-    line-height: 1.6;
-    padding-left: 14px;
-    position: relative;
-  }
-  .exp-bullets li::before {
-    content: '—';
-    position: absolute;
-    left: 0;
-    color: var(--orange);
-    font-size: 11px;
-  }
-
-  /* ── EDUCATION ── */
-  .education-list { display: flex; flex-direction: column; gap: 0; }
-  .edu-item {
-    display: grid;
-    grid-template-columns: 120px 1fr;
-    gap: 24px;
-    padding: 20px 0;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .edu-item:last-child { border-bottom: none; }
-  .edu-date {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text3);
-    padding-top: 3px;
-  }
-  .edu-degree {
-    font-family: var(--font-display);
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 3px;
-    letter-spacing: -0.01em;
-  }
-  .edu-school {
-    font-size: 13px;
-    color: var(--text3);
-    font-family: var(--font-mono);
-  }
-
-  /* ── CONTACT ── */
-  .contact-form-wrap { max-width: 600px; }
-
-  /* ── CONTACT FORM ── */
-  .contact-form { display: flex; flex-direction: column; gap: 12px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .field { display: flex; flex-direction: column; gap: 6px; }
-  .field label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: var(--text3);
-  }
-  .field input, .field textarea {
-    background: var(--bg2);
-    border: 0.5px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
-    font-size: 14px;
-    font-family: var(--font-body);
-    color: var(--text);
-    outline: none;
-    transition: border-color 0.2s;
-    resize: none;
-  }
-  .field input::placeholder, .field textarea::placeholder { color: var(--text3); }
-  .field input:focus, .field textarea:focus { border-color: var(--orange); }
-  .field textarea { min-height: 120px; }
-  .form-submit {
-    background: var(--orange);
-    color: #fff;
-    border: none;
-    border-radius: 10px;
-    padding: 12px 24px;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: var(--font-body);
-    cursor: pointer;
-    display: inline-flex; align-items: center; gap: 8px;
-    align-self: flex-start;
-    transition: background 0.2s, transform 0.15s;
-  }
-  .form-submit:hover { background: var(--orange-d); transform: translateY(-1px); }
-
-  /* ── TACTILE FEEDBACK ── */
-  .btn-primary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
-  .btn-secondary:active { transform: translateY(1px) scale(0.97) !important; box-shadow: none !important; }
-  .project-card:active { transform: translateY(0px) scale(0.98) !important; box-shadow: none !important; }
-  .fade-in {
-    opacity: 0;
-    transform: translateY(16px);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-  .fade-in.visible { opacity: 1; transform: none; }
-
-  /* Respect users who prefer reduced motion — show everything, skip animations */
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-      scroll-behavior: auto !important;
-    }
-    .fade-in { opacity: 1 !important; transform: none !important; }
-  }
-
-  @media (max-width: 720px) {
-    .container { padding: 0 20px; }
-    section::after, .hero::after { width: calc(100% - 40px); }
-    .hero { padding: 48px 0 40px; }
-    .about-grid { grid-template-columns: 1fr; gap: 32px; }
-    .form-row { grid-template-columns: 1fr; }
-    .exp-item, .edu-item { grid-template-columns: 1fr; gap: 6px; }
-    .exp-date, .edu-date { font-size: 10px; }
-  }
-</style>
+<noscript><link rel="stylesheet" href="noscript.css"></noscript>
+<link rel="stylesheet" href="site.css">
 </head>
 <body>
 
@@ -743,7 +117,7 @@
               <div class="scanline"></div>
             </div>
           </div>
-          <p class="hero-sub" data-es="Soy Antonio — un profesional de TI bilingüe y desarrollador autodidacta al que le fascina cómo funcionan los sistemas por dentro. De día mantengo todo en marcha en la mesa de servicio. Fuera de horario estudio ciberseguridad y escribo código.">I'm Antonio — a bilingual IT professional and self-taught developer with a thing for how systems work under the hood. By day I keep things running at the service desk. Off the clock I'm studying cybersecurity and writing code.</p>
+          <p class="hero-sub" data-es="Soy Antonio, un profesional de TI bilingüe y desarrollador autodidacta al que le fascina cómo funcionan los sistemas por dentro. Doy soporte a las personas y los sistemas que mantienen en marcha a las organizaciones, desarrollo para la web y estoy de lleno en la ciberseguridad.">I'm Antonio, a bilingual IT professional and self-taught developer with a thing for how systems work under the hood. I support the people and systems that keep organizations running, I build for the web, and I'm deep into cybersecurity.</p>
           <div class="hero-actions">
             <a href="#work" class="btn-primary" data-es="Ver mis proyectos <i class=&quot;ti ti-arrow-down&quot;></i>">See my projects <i class="ti ti-arrow-down"></i></a>
             <a href="#contact" class="btn-secondary" data-es="Contáctame <i class=&quot;ti ti-arrow-down&quot;></i>">Get in touch <i class="ti ti-arrow-down"></i></a>
@@ -1033,7 +407,7 @@
               <li data-es="Proporcioné interpretación precisa inglés/español en procedimientos judiciales penales, civiles y de familia">Provided precise English/Spanish interpretation across criminal, civil, and family court proceedings</li>
               <li data-es="Mantuve estricta confidencialidad, imparcialidad y precisión en entornos legales de alta presión">Maintained strict confidentiality, impartiality, and accuracy in high-pressure legal environments</li>
               <li data-es="Facilité la comunicación clara entre personas hispanohablantes y el sistema judicial">Facilitated clear communication between Spanish-speaking individuals and the judicial system</li>
-              <li data-es="Certificado por la Corte Suprema de Illinois · <a href=&quot;https://publicapps.illinoiscourts.gov/apex/f?p=303:18:::::P18_IDINTERPRETER,P18_READMODE:183,1&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:var(--blue); text-decoration:none;&quot;>Credencial n.º 1190</a> · acepto asignaciones ocasionales">Illinois Supreme Court Certified · <a href="https://publicapps.illinoiscourts.gov/apex/f?p=303:18:::::P18_IDINTERPRETER,P18_READMODE:183,1" target="_blank" rel="noopener" style="color:var(--blue); text-decoration:none;">Credential #1190</a> · occasional assignments accepted</li>
+              <li data-es="Certificado por la Corte Suprema de Illinois · <a href=&quot;https://publicapps.illinoiscourts.gov/apex/f?p=303:18:::::P18_IDINTERPRETER,P18_READMODE:183,1&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; class=&quot;credential-link&quot;>Credencial n.º 1190</a> · acepto asignaciones ocasionales">Illinois Supreme Court Certified · <a href="https://publicapps.illinoiscourts.gov/apex/f?p=303:18:::::P18_IDINTERPRETER,P18_READMODE:183,1" target="_blank" rel="noopener" class="credential-link">Credential #1190</a> · occasional assignments accepted</li>
             </ul>
           </div>
         </div>
@@ -1093,7 +467,7 @@
       <div class="section-header">
         <h2 class="section-title" data-es="Contacto">Contact</h2>
       </div>
-      <p style="font-size:15px; color:var(--text2); margin-bottom:32px; max-width:480px; line-height:1.75;" data-es="Hablemos — ya sea sobre un puesto en seguridad, un proyecto freelance o simplemente para conectar.">Let's talk — whether it's a security role, a freelance project, or just to connect.</p>
+      <p class="contact-intro" data-es="Hablemos — ya sea sobre un puesto en seguridad, un proyecto freelance o simplemente para conectar.">Let's talk — whether it's a security role, a freelance project, or just to connect.</p>
       <div class="contact-form-wrap">
         <form class="contact-form fade-in">
           <div class="form-row">
