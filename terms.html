@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
@@ -15,10 +15,8 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="theme-color" content="#FF5F00">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css" integrity="sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p" crossorigin="anonymous">
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 
 <!-- Shared nav + footer -->
 <link rel="stylesheet" href="chrome.css">

@@ -1,0 +1,33 @@
+/* ============================================================
+   Self-hosted fonts — no third-party requests.
+   Syne, DM Sans, DM Mono: SIL Open Font License 1.1 (via Fontsource)
+   Tabler Icons 3.46.0: MIT — subset to only the glyphs this site uses.
+   Adding a new ti-* icon? Re-run the subset (see fonts/README.md).
+   ============================================================ */
+@font-face{font-family:'Syne';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/syne-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'Syne';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/syne-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'Syne';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/syne-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:'Syne';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/syne-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:300;font-display:swap;src:url(fonts/dm-mono-latin-300-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/dm-mono-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Mono';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/dm-mono-latin-500-normal.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:100 1000;font-display:swap;src:url(fonts/dm-sans-latin-opsz-normal.woff2) format('woff2-variations'),url(fonts/dm-sans-latin-opsz-normal.woff2) format('woff2')}
+@font-face{font-family:"tabler-icons";font-style:normal;font-weight:400;font-display:block;src:url(fonts/tabler-icons-subset.woff2) format("woff2")}
+.ti{font-family:"tabler-icons" !important;speak:none;font-style:normal;font-weight:normal;font-variant:normal;text-transform:none;line-height:1;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+.ti-arrow-down:before{content:"\ea16"}
+.ti-arrow-up-right:before{content:"\ea24"}
+.ti-brand-facebook:before{content:"\ec1a"}
+.ti-brand-github:before{content:"\ec1c"}
+.ti-brand-instagram:before{content:"\ec20"}
+.ti-brand-linkedin:before{content:"\ec8c"}
+.ti-brand-threads:before{content:"\fb02"}
+.ti-brand-tiktok:before{content:"\ec73"}
+.ti-brand-twitch:before{content:"\ed05"}
+.ti-brand-x:before{content:"\fc0f"}
+.ti-brand-youtube:before{content:"\ec90"}
+.ti-language:before{content:"\ebbe"}
+.ti-menu-2:before{content:"\ec42"}
+.ti-moon:before{content:"\eaf8"}
+.ti-send:before{content:"\eb1e"}
+.ti-sun:before{content:"\eb30"}
+.ti-x:before{content:"\eb55"}

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; form-action 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
@@ -15,10 +15,8 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <meta name="theme-color" content="#FF5F00">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Mono:wght@300;400;500&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.46.0/dist/tabler-icons.min.css" integrity="sha384-ND+q1IVc0KDElX60dZaqKc7Xl9cdxd2PpU2JfVUHcurCkFVtVLFdt9vJfxtHSL3p" crossorigin="anonymous">
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
 
 <!-- Shared nav + footer -->
 <link rel="stylesheet" href="chrome.css">
@@ -38,7 +36,7 @@
     <div data-l="en">
       <div class="eyebrow">Legal</div>
       <h1>Privacy Policy</h1>
-      <div class="updated">Last updated: August 29, 2026</div>
+      <div class="updated">Last updated: October 28, 2026</div>
 
       <p class="intro">This Privacy Policy explains how <strong>Antonio E<span class="brand-dot">.</span> del Toro</strong> (&ldquo;I,&rdquo; &ldquo;me,&rdquo; or &ldquo;my&rdquo;) handles information in connection with <strong>antonioedeltoro.com</strong> (the &ldquo;Site&rdquo;).</p>
 
@@ -54,8 +52,8 @@
       <p>The Site is hosted by Render. Like most web hosts, Render&rsquo;s servers automatically log basic technical information when your browser requests a page &mdash; such as your IP address, browser type, referring page, and the date and time of the request. This is used to operate and secure the Site.</p>
       <h3>Browser local storage</h3>
       <p>To remember your preferences, the Site stores your chosen color theme (light/dark) and language (English/Spanish) in your browser&rsquo;s local storage. This stays on your device, is not transmitted to me, and is not used to track you. It is not a cookie.</p>
-      <h3>Fonts and assets from third parties</h3>
-      <p>The Site loads fonts from Google Fonts and certain front-end assets from the jsDelivr CDN. When your browser requests these files, your IP address is necessarily disclosed to those providers so they can deliver the files. I do not control this and do not use it for tracking. Their policies are linked below.</p>
+      <h3>Fonts and assets</h3>
+      <p>All fonts, icons, and other assets are served directly from the Site itself. Your browser does not contact any third-party font service or content delivery network when you visit.</p>
 
       <h2><span class="num">03</span>How I use information</h2>
       <p>I use the limited information above to respond to your inquiries and communicate with you; to operate, maintain, and secure the Site; and to comply with legal obligations. I do <strong>not</strong> sell, rent, or share your personal information, and I do not use it for advertising.</p>
@@ -88,8 +86,6 @@
       <p>For reference, the providers involved in delivering the Site maintain their own privacy policies:</p>
       <ul>
         <li>Render (hosting) &mdash; <a href="https://render.com/privacy" target="_blank" rel="noopener">render.com/privacy</a></li>
-        <li>Google Fonts &mdash; <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></li>
-        <li>jsDelivr (CDN) &mdash; <a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener">jsdelivr.com privacy policy</a></li>
       </ul>
 
       <h2><span class="num">11</span>Changes to this policy</h2>
@@ -105,7 +101,7 @@
     <div data-l="es">
       <div class="eyebrow">Legal</div>
       <h1>Política de Privacidad</h1>
-      <div class="updated">Última actualización: 29 de agosto de 2026</div>
+      <div class="updated">Última actualización: 28 de octubre de 2026</div>
 
       <p class="intro">Esta Política de Privacidad explica cómo <strong>Antonio E<span class="brand-dot">.</span> del Toro</strong> (&laquo;yo&raquo;, &laquo;me&raquo; o &laquo;mi&raquo;) maneja la información en relación con <strong>antonioedeltoro.com</strong> (el &laquo;Sitio&raquo;).</p>
 
@@ -121,8 +117,8 @@
       <p>El Sitio está alojado por Render. Como la mayoría de los proveedores de alojamiento, los servidores de Render registran automáticamente información técnica básica cuando su navegador solicita una página &mdash; como su dirección IP, el tipo de navegador, la página de referencia y la fecha y hora de la solicitud. Esto se usa para operar y proteger el Sitio.</p>
       <h3>Almacenamiento local del navegador</h3>
       <p>Para recordar sus preferencias, el Sitio guarda el tema de color (claro/oscuro) y el idioma (inglés/español) que elija en el almacenamiento local de su navegador. Esto permanece en su dispositivo, no se me transmite y no se usa para rastrearle. No es una cookie.</p>
-      <h3>Fuentes y recursos de terceros</h3>
-      <p>El Sitio carga fuentes desde Google Fonts y ciertos recursos de front-end desde la CDN de jsDelivr. Cuando su navegador solicita esos archivos, su dirección IP se revela necesariamente a esos proveedores para que puedan entregárselos. No controlo esto ni lo uso para rastrear. Sus políticas están enlazadas más abajo.</p>
+      <h3>Fuentes tipográficas y recursos</h3>
+      <p>Todas las fuentes, íconos y demás recursos se sirven directamente desde el propio Sitio. Su navegador no se comunica con ningún servicio de fuentes ni red de distribución de contenido de terceros cuando usted lo visita.</p>
 
       <h2><span class="num">03</span>Cómo uso la información</h2>
       <p>Uso la información limitada anterior para responder a sus consultas y comunicarme con usted; para operar, mantener y proteger el Sitio; y para cumplir con obligaciones legales. <strong>No</strong> vendo, alquilo ni comparto su información personal, y no la uso para publicidad.</p>
@@ -155,8 +151,6 @@
       <p>Como referencia, los proveedores que participan en la entrega del Sitio mantienen sus propias políticas de privacidad:</p>
       <ul>
         <li>Render (alojamiento) &mdash; <a href="https://render.com/privacy" target="_blank" rel="noopener">render.com/privacy</a></li>
-        <li>Google Fonts &mdash; <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">policies.google.com/privacy</a></li>
-        <li>jsDelivr (CDN) &mdash; <a href="https://www.jsdelivr.com/terms/privacy-policy-jsdelivr-net" target="_blank" rel="noopener">política de privacidad de jsdelivr.com</a></li>
       </ul>
 
       <h2><span class="num">11</span>Cambios a esta política</h2>
