@@ -140,12 +140,12 @@ upgrade-insecure-requests</code></pre>
       <pre><code>@                  TXT  "v=spf1 -all"
 send               TXT  "v=spf1 include:amazonses.com ~all"
 resend._domainkey  TXT  (Resend DKIM key — already present)
-_dmarc             TXT  "v=DMARC1; p=none;"
+_dmarc             TXT  "v=DMARC1; p=quarantine;"
 @                  CAA  0 issue "pki.goog"
 @                  CAA  0 issue "letsencrypt.org"</code></pre>
       <ul>
         <li><strong>Apex SPF is <code>-all</code></strong> because the apex itself sends nothing. Resend sends with a bounce address on the <code>send</code> subdomain, which was missing its SPF record.</li>
-        <li><strong>DMARC</strong> passes through the aligned DKIM signature. It starts at <code>p=none</code> to monitor, and moves to quarantine and then reject once real mail is confirmed passing.</li>
+        <li><strong>DMARC</strong> passes through the aligned DKIM signature. It started at <code>p=none</code> to monitor. After confirming that a real booking notification passed and reached the client&rsquo;s inbox, I moved it to <code>p=quarantine</code> the same day. It moves to <code>p=reject</code> after two weeks of clean delivery.</li>
         <li><strong>CAA issuers came from Certificate Transparency logs.</strong> Every certificate ever issued for the domain came from Google Trust Services, so <code>pki.goog</code> is required; Let&rsquo;s Encrypt is listed as a precaution in case the host ever falls back to it.</li>
         <li><strong>DNSSEC</strong> was already on, and every record was confirmed through a public DNSSEC-validating resolver.</li>
       </ul>
@@ -156,15 +156,15 @@ _dmarc             TXT  "v=DMARC1; p=none;"
         <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures &mdash; forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
         <li><strong>Stage 1</strong> shipped the code plus the strict policy as <code>Content-Security-Policy-Report-Only</code>. On the live site every page reported zero would-be violations, address autocomplete and quotes worked against real Mapbox and the live API, and a real Book &amp; Pay went through Stripe end to end.</li>
         <li><strong>Stage 2</strong> enforced the policy and tightened the remaining headers. I re-ran every check live and tested Book &amp; Pay again.</li>
-        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan.</li>
+        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan. It happened again with routing: removing the catch-all rewrite from <code>render.yaml</code> (see below) didn&rsquo;t remove the live rule either, so I deleted it in the dashboard too. Lesson: on this host, removing something from the config file doesn&rsquo;t remove it from the live service &mdash; always re-verify after a removal.</li>
       </ul>
 
-      <h2><span class="num">09</span>What I&rsquo;d do next</h2>
+      <h2><span class="num">09</span>Follow-ups</h2>
       <ul>
-        <li><strong>Account security is now the perimeter.</strong> Multi-factor authentication is on for the host, GitHub, Stripe, the registrar, the database, the email provider and Mapbox.</li>
-        <li><strong>DMARC enforcement.</strong> Move to quarantine, then reject.</li>
-        <li><strong>HSTS preload.</strong> Deferred for the same reason as on the portfolio: it&rsquo;s effectively permanent.</li>
-        <li><strong>Real 404s.</strong> Make unknown URLs return a 404 status instead of 200.</li>
+        <li><strong>Done &mdash; real 404s.</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
+        <li><strong>In progress &mdash; DMARC enforcement:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
+        <li><strong>Deferred &mdash; HSTS preload</strong>, for the same reason as on my portfolio: it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
+        <li><strong>Account security:</strong> multi-factor authentication is on for the host, GitHub, Stripe, the registrar, the database, the email provider and Mapbox &mdash; that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Back to security work</a>
@@ -268,12 +268,12 @@ upgrade-insecure-requests</code></pre>
       <pre><code>@                  TXT  "v=spf1 -all"
 send               TXT  "v=spf1 include:amazonses.com ~all"
 resend._domainkey  TXT  (Resend DKIM key — already present)
-_dmarc             TXT  "v=DMARC1; p=none;"
+_dmarc             TXT  "v=DMARC1; p=quarantine;"
 @                  CAA  0 issue "pki.goog"
 @                  CAA  0 issue "letsencrypt.org"</code></pre>
       <ul>
         <li><strong>El SPF del dominio raíz es <code>-all</code></strong> porque la raíz no envía nada. Resend envía con una dirección de rebote en el subdominio <code>send</code>, al que le faltaba su registro SPF.</li>
-        <li><strong>DMARC</strong> se cumple gracias a la firma DKIM alineada. Empieza en <code>p=none</code> para monitorear y pasará a cuarentena y luego a rechazo cuando se confirme que el correo real pasa la verificación.</li>
+        <li><strong>DMARC</strong> se cumple gracias a la firma DKIM alineada. Empezó en <code>p=none</code> para monitorear. Tras confirmar que una notificación de reserva real pasó la verificación y llegó a la bandeja de entrada del cliente, lo cambié a <code>p=quarantine</code> ese mismo día. Pasará a <code>p=reject</code> después de dos semanas de entregas sin problemas.</li>
         <li><strong>Las autoridades del CAA salieron de los registros de Certificate Transparency.</strong> Todos los certificados emitidos para el dominio provienen de Google Trust Services, así que <code>pki.goog</code> es obligatorio; Let&rsquo;s Encrypt se incluye como precaución por si el proveedor alguna vez recurre a él.</li>
         <li><strong>DNSSEC</strong> ya estaba activado, y cada registro se confirmó mediante un resolutor público que valida DNSSEC.</li>
       </ul>
@@ -284,15 +284,15 @@ _dmarc             TXT  "v=DMARC1; p=none;"
         <li><strong>Antes del despliegue:</strong> 23 pruebas automatizadas de la API (validación, cuerpos de error, CORS, límites de solicitudes y firmas de webhook falsificadas, ausentes y válidas), además de un navegador sin interfaz que recorrió cada página en escritorio y en móvil bajo la política final aplicada, incluido un paso simulado de cotización a pago en Stripe, y verificó que no hubiera ninguna violación de la CSP y que las fuentes fueran propias. Esa prueba es la que me permitió descubrir el punto de inserción de Trusted Types en el JSON-LD y diseñar la política <code>default</code>.</li>
         <li><strong>Etapa 1:</strong> se publicó el código junto con la política estricta como <code>Content-Security-Policy-Report-Only</code>. En el sitio en vivo, ninguna página reportó posibles violaciones, el autocompletado de direcciones y las cotizaciones funcionaron con Mapbox real y la API en producción, y una reserva real con pago completó el recorrido por Stripe de principio a fin.</li>
         <li><strong>Etapa 2:</strong> se aplicó la política y se endurecieron los demás encabezados. Repetí todas las verificaciones en vivo y volví a probar la reserva con pago.</li>
-        <li><strong>Un imprevisto:</strong> la sincronización de infraestructura como código del proveedor agregó los encabezados nuevos, pero no eliminó el antiguo encabezado de solo reporte, así que lo borré desde el panel y lo confirmé con un nuevo análisis.</li>
+        <li><strong>Un imprevisto:</strong> la sincronización de infraestructura como código del proveedor agregó los encabezados nuevos, pero no eliminó el antiguo encabezado de solo reporte, así que lo borré desde el panel y lo confirmé con un nuevo análisis. Volvió a ocurrir con el enrutamiento: quitar la regla de reescritura general de <code>render.yaml</code> (ver más abajo) tampoco eliminó la regla activa, así que también la borré desde el panel. Lección: en este proveedor, quitar algo del archivo de configuración no lo quita del servicio en vivo; siempre hay que volver a verificar después de eliminar algo.</li>
       </ul>
 
-      <h2><span class="num">09</span>Próximos pasos</h2>
+      <h2><span class="num">09</span>Seguimiento</h2>
       <ul>
-        <li><strong>La seguridad de las cuentas es ahora el perímetro.</strong> La autenticación multifactor está activada en el proveedor de alojamiento, GitHub, Stripe, el registrador, la base de datos, el proveedor de correo y Mapbox.</li>
-        <li><strong>Aplicación de DMARC.</strong> Pasar a cuarentena y luego a rechazo.</li>
-        <li><strong>Precarga de HSTS.</strong> Pospuesta por la misma razón que en el portafolio: es prácticamente permanente.</li>
-        <li><strong>Errores 404 reales.</strong> Hacer que las URL desconocidas devuelvan un estado 404 en lugar de 200.</li>
+        <li><strong>Hecho: errores 404 reales.</strong> La antigua regla de reescritura general enviaba cualquier URL desconocida a la página de &laquo;no encontrado&raquo; con un estado HTTP 200, así que los buscadores podían indexar enlaces rotos. La eliminé; ahora el proveedor sirve la página 404 prerrenderizada con un estado 404 real. Verificado en vivo: las URL desconocidas devuelven 404, mientras que todas las páginas reales, los recursos y las URL de retorno de Stripe siguen devolviendo 200.</li>
+        <li><strong>En curso: aplicación de DMARC:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (hecho) &rarr; <code>p=reject</code> (programado tras dos semanas de entregas sin problemas).</li>
+        <li><strong>Pospuesto: precarga de HSTS</strong>, por la misma razón que en mi portafolio: es prácticamente permanente y aporta poco frente a una política HSTS de dos años.</li>
+        <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en el proveedor de alojamiento, GitHub, Stripe, el registrador, la base de datos, el proveedor de correo y Mapbox; ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
