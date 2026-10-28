@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
@@ -48,7 +48,7 @@
       <h1>Hardening a static portfolio site</h1>
       <div class="meta-row">
         <span class="updated">October 28, 2026</span>
-        <span class="pill">CSP</span><span class="pill">HTTP headers</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span>
+        <span class="pill">CSP</span><span class="pill">HTTP headers</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">Trusted Types</span>
       </div>
 
       <p class="intro">This site is a static portfolio: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end &mdash; the page, the server responses, and the domain itself.</p>
@@ -91,8 +91,11 @@ script-src 'self'; style-src 'self'; font-src 'self';
 img-src 'self' data:; manifest-src 'self';
 form-action 'self'; base-uri 'none';
 object-src 'none'; frame-src 'none'; worker-src 'none';
-frame-ancestors 'none'; upgrade-insecure-requests</code></pre>
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types 'none';
+upgrade-insecure-requests</code></pre>
       <p>There are no <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> exceptions; inline styles had already been moved into stylesheets. The policy ships twice: as a <code>&lt;meta&gt;</code> tag in each page and as an HTTP header. That is deliberate &mdash; <strong>browsers ignore <code>frame-ancestors</code> in a meta tag</strong>, so clickjacking protection only works from the header.</p>
+      <p>The policy also enforces <strong>Trusted Types</strong> with no policies allowed (<code>trusted-types 'none'</code>). The browser now refuses to turn any string into HTML or script &mdash; assigning to <code>innerHTML</code>, <code>outerHTML</code> or a script&rsquo;s text throws an error &mdash; which shuts down DOM-based XSS as a class rather than one bug at a time. Getting there meant removing every such sink from the site&rsquo;s own code: the shared nav and footer are now built with DOM APIs, and the language toggle, which used to swap copy with <code>innerHTML</code>, now ships both languages as static markup and lets CSS show the active one.</p>
 
       <h2><span class="num">05</span>HTTP response headers</h2>
       <div class="table-wrap">
@@ -125,16 +128,15 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <p>I also wanted a null MX record (<code>0 .</code>) to declare that the domain accepts no mail. The DNS provider&rsquo;s interface rejects it. Since SPF and DMARC already cover the spoofing risk, I documented the gap rather than move DNS providers over it.</p>
 
       <h2><span class="num">07</span>Rollout and verification</h2>
-      <p>Order mattered. Tightening the CSP <em>header</em> before the self-hosted assets were deployed would have blocked the old Google Fonts and jsDelivr requests on the live site and broken every font and icon. So the sequence was: ship the code with the strict <code>&lt;meta&gt;</code> CSP, confirm the deploy, then tighten the header.</p>
+      <p>Order mattered. Tightening the CSP <em>header</em> before the self-hosted assets were deployed would have blocked the old Google Fonts and jsDelivr requests on the live site and broken every font and icon. So the sequence was: ship the code with the strict <code>&lt;meta&gt;</code> CSP, confirm the deploy, then tighten the header. The Trusted Types change followed the same order: the old language toggle relied on <code>innerHTML</code>, so enforcing it in the header before the rewritten code was live would have broken the page.</p>
       <ul>
-        <li><strong>Before deploying:</strong> a headless browser loaded every page in light and dark mode, English and Spanish, desktop and mobile, and asserted zero CSP violations, zero JavaScript errors, zero third-party requests, and that every font and icon actually loaded.</li>
+        <li><strong>Before deploying:</strong> a headless browser loaded every page in light and dark mode, English and Spanish, desktop and mobile, and asserted zero CSP violations, zero JavaScript errors, zero third-party requests, and that every font and icon actually loaded. For the Trusted Types rewrite it also compared the old and new versions side by side &mdash; identical visible text, identical toggle behavior &mdash; and confirmed the browser now blocks <code>innerHTML</code> outright.</li>
         <li><strong>After deploying:</strong> the live response headers were checked directly, then scored by Mozilla&rsquo;s HTTP Observatory.</li>
         <li><strong>DNS:</strong> each record was confirmed through a public DNSSEC-validating resolver.</li>
       </ul>
 
       <h2><span class="num">08</span>What I&rsquo;d do next</h2>
       <ul>
-        <li><strong>Trusted Types.</strong> The language toggle swaps content with <code>innerHTML</code>. The strings are static and first-party, so the risk is low, but refactoring to DOM APIs would allow <code>require-trusted-types-for 'script'</code> and close that class of bug entirely.</li>
         <li><strong>HSTS preload.</strong> Considered and deferred. Preloading is effectively permanent and gains little over a two-year HSTS policy on a site with no logins.</li>
         <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site. All three are behind multi-factor authentication, and that&rsquo;s where ongoing attention belongs.</li>
       </ul>
@@ -148,7 +150,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <h1>Protección de un sitio de portafolio estático</h1>
       <div class="meta-row">
         <span class="updated">28 de octubre de 2026</span>
-        <span class="pill">CSP</span><span class="pill">Encabezados HTTP</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span>
+        <span class="pill">CSP</span><span class="pill">Encabezados HTTP</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">Trusted Types</span>
       </div>
 
       <p class="intro">Este sitio es un portafolio estático: sin backend, sin base de datos, sin inicios de sesión. Eso lo convierte en un objetivo pequeño, pero no nulo. Lo traté como un activo de producción y lo protegí de principio a fin: la página, las respuestas del servidor y el propio dominio.</p>
@@ -191,8 +193,11 @@ script-src 'self'; style-src 'self'; font-src 'self';
 img-src 'self' data:; manifest-src 'self';
 form-action 'self'; base-uri 'none';
 object-src 'none'; frame-src 'none'; worker-src 'none';
-frame-ancestors 'none'; upgrade-insecure-requests</code></pre>
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types 'none';
+upgrade-insecure-requests</code></pre>
       <p>No hay excepciones <code>'unsafe-inline'</code> ni <code>'unsafe-eval'</code>; los estilos en línea ya se habían trasladado a hojas de estilo. La política se envía dos veces: como etiqueta <code>&lt;meta&gt;</code> en cada página y como encabezado HTTP. Es intencional: <strong>los navegadores ignoran <code>frame-ancestors</code> en una etiqueta meta</strong>, así que la protección contra clickjacking solo funciona desde el encabezado.</p>
+      <p>La política también aplica <strong>Trusted Types</strong> sin permitir ninguna política (<code>trusted-types 'none'</code>). El navegador ahora se niega a convertir cualquier cadena de texto en HTML o en script: asignar a <code>innerHTML</code>, <code>outerHTML</code> o al texto de un script genera un error. Esto elimina el XSS basado en el DOM como categoría completa, no un error a la vez. Para lograrlo hubo que quitar todos esos puntos de inserción del código del propio sitio: la navegación y el pie de página compartidos ahora se construyen con las API del DOM, y el selector de idioma, que antes cambiaba el texto con <code>innerHTML</code>, ahora incluye ambos idiomas como marcado estático y deja que CSS muestre el activo.</p>
 
       <h2><span class="num">05</span>Encabezados de respuesta HTTP</h2>
       <div class="table-wrap">
@@ -225,16 +230,15 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <p>También quería un registro MX nulo (<code>0 .</code>) para declarar que el dominio no acepta correo. La interfaz del proveedor de DNS lo rechaza. Como SPF y DMARC ya cubren el riesgo de suplantación, documenté la limitación en lugar de cambiar de proveedor de DNS por ella.</p>
 
       <h2><span class="num">07</span>Implementación y verificación</h2>
-      <p>El orden importaba. Endurecer el <em>encabezado</em> CSP antes de desplegar los recursos propios habría bloqueado las solicitudes a Google Fonts y jsDelivr en el sitio en vivo y habría roto todas las fuentes e íconos. Por eso la secuencia fue: publicar el código con la CSP estricta en la etiqueta <code>&lt;meta&gt;</code>, confirmar el despliegue y luego endurecer el encabezado.</p>
+      <p>El orden importaba. Endurecer el <em>encabezado</em> CSP antes de desplegar los recursos propios habría bloqueado las solicitudes a Google Fonts y jsDelivr en el sitio en vivo y habría roto todas las fuentes e íconos. Por eso la secuencia fue: publicar el código con la CSP estricta en la etiqueta <code>&lt;meta&gt;</code>, confirmar el despliegue y luego endurecer el encabezado. El cambio a Trusted Types siguió el mismo orden: el selector de idioma anterior dependía de <code>innerHTML</code>, así que aplicarlo en el encabezado antes de publicar el código reescrito habría roto la página.</p>
       <ul>
-        <li><strong>Antes del despliegue:</strong> un navegador sin interfaz cargó cada página en modo claro y oscuro, en inglés y en español, en escritorio y en móvil, y verificó que no hubiera ninguna violación de la CSP, ningún error de JavaScript, ninguna solicitud a terceros, y que todas las fuentes e íconos cargaran correctamente.</li>
+        <li><strong>Antes del despliegue:</strong> un navegador sin interfaz cargó cada página en modo claro y oscuro, en inglés y en español, en escritorio y en móvil, y verificó que no hubiera ninguna violación de la CSP, ningún error de JavaScript, ninguna solicitud a terceros, y que todas las fuentes e íconos cargaran correctamente. Para la reescritura de Trusted Types también comparó la versión anterior y la nueva lado a lado (mismo texto visible, mismo comportamiento de los selectores) y confirmó que el navegador ahora bloquea <code>innerHTML</code> por completo.</li>
         <li><strong>Después del despliegue:</strong> se revisaron directamente los encabezados de la respuesta en vivo y luego se evaluaron con el HTTP Observatory de Mozilla.</li>
         <li><strong>DNS:</strong> cada registro se confirmó mediante un resolutor público que valida DNSSEC.</li>
       </ul>
 
       <h2><span class="num">08</span>Próximos pasos</h2>
       <ul>
-        <li><strong>Trusted Types.</strong> El selector de idioma cambia el contenido con <code>innerHTML</code>. Los textos son estáticos y propios, así que el riesgo es bajo, pero reescribirlo con las API del DOM permitiría usar <code>require-trusted-types-for 'script'</code> y eliminar por completo esa clase de errores.</li>
         <li><strong>Precarga de HSTS.</strong> Evaluada y pospuesta. La precarga es prácticamente permanente y aporta poco frente a una política HSTS de dos años en un sitio sin inicios de sesión.</li>
         <li><strong>Seguridad de las cuentas.</strong> Tras este trabajo, el eslabón más débil ya no es el sitio, sino las cuentas detrás de él. Quien controle el repositorio Git, el proveedor de alojamiento o el registrador controla el sitio. Las tres cuentas están protegidas con autenticación multifactor, y ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>

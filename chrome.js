@@ -4,6 +4,9 @@
    and wires up theme, language, mobile menu, and active-nav.
    Loaded (deferred) by every page. Single source of truth.
 
+   Builds everything with DOM APIs — no innerHTML/outerHTML — so the
+   site can enforce Trusted Types (require-trusted-types-for 'script').
+
    Uses RELATIVE links so it works both when served from a web
    root and when the .html files are opened directly (file://).
    ============================================================ */
@@ -16,71 +19,90 @@
     { frag: 'about',          en: 'about',          es: 'perfil' },
     { frag: 'certifications', en: 'certifications', es: 'certificaciones' },
     { frag: 'experience',     en: 'experience',     es: 'experiencia' },
-    { frag: 'education',      en: 'education',       es: 'educación' },
+    { frag: 'education',      en: 'education',      es: 'educación' },
     { frag: 'contact',        en: 'contact',        es: 'contacto' }
   ];
-
-  function label(l) {
-    return '<span data-l="en">' + l.en + '</span><span data-l="es">' + l.es + '</span>';
-  }
+  function link(frag) { return LINKS.filter(function (l) { return l.frag === frag; })[0]; }
 
   var SOCIALS = [
-    ['https://www.facebook.com/antonioedeltoro',  'Facebook',    'ti-brand-facebook'],
-    ['https://github.com/antonioedeltoro',        'GitHub',      'ti-brand-github'],
-    ['https://www.instagram.com/antonioedeltoro', 'Instagram',   'ti-brand-instagram'],
-    ['https://www.linkedin.com/in/antonioedeltoro/', 'LinkedIn', 'ti-brand-linkedin'],
-    ['https://www.threads.net/@antonioedeltoro',  'Threads',     'ti-brand-threads'],
-    ['https://www.tiktok.com/@antonioedeltoro',   'TikTok',      'ti-brand-tiktok'],
-    ['https://www.twitch.tv/antonioedeltoro',     'Twitch',      'ti-brand-twitch'],
-    ['https://www.twitter.com/antonioedeltoro',   'X / Twitter', 'ti-brand-x'],
-    ['https://www.youtube.com/@antonioedeltoro',  'YouTube',     'ti-brand-youtube']
-  ].map(function (s) {
-    return '<a href="' + s[0] + '" target="_blank" rel="noopener" class="social-icon" aria-label="' + s[1] + '"><i class="ti ' + s[2] + '"></i></a>';
-  }).join('');
+    ['https://www.facebook.com/antonioedeltoro',     'Facebook',    'ti-brand-facebook'],
+    ['https://github.com/antonioedeltoro',           'GitHub',      'ti-brand-github'],
+    ['https://www.instagram.com/antonioedeltoro',    'Instagram',   'ti-brand-instagram'],
+    ['https://www.linkedin.com/in/antonioedeltoro/', 'LinkedIn',    'ti-brand-linkedin'],
+    ['https://www.threads.net/@antonioedeltoro',     'Threads',     'ti-brand-threads'],
+    ['https://www.tiktok.com/@antonioedeltoro',      'TikTok',      'ti-brand-tiktok'],
+    ['https://www.twitch.tv/antonioedeltoro',        'Twitch',      'ti-brand-twitch'],
+    ['https://www.twitter.com/antonioedeltoro',      'X / Twitter', 'ti-brand-x'],
+    ['https://www.youtube.com/@antonioedeltoro',     'YouTube',     'ti-brand-youtube']
+  ];
+
+  // h('a', {href: '#', class: 'x'}, child, 'text', ...) — children may be nodes, strings, or arrays
+  function h(tag, attrs) {
+    var el = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+    for (var i = 2; i < arguments.length; i++) append(el, arguments[i]);
+    return el;
+  }
+  function append(el, c) {
+    if (c == null) return;
+    if (Array.isArray(c)) c.forEach(function (x) { append(el, x); });
+    else el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  }
+  function icon(name) { return h('i', { class: 'ti ' + name }); }
+  function label(l) { return [h('span', { 'data-l': 'en' }, l.en), h('span', { 'data-l': 'es' }, l.es)]; }
+  function newTab(href, attrs) {
+    attrs = attrs || {};
+    attrs.href = href; attrs.target = '_blank'; attrs.rel = 'noopener';
+    return attrs;
+  }
 
   // home = '' on the homepage (in-page anchors), 'index.html' elsewhere (jump to homepage section)
   function buildNav(home) {
-    var navItems  = LINKS.map(function (l) { return '<li><a href="' + home + '#' + l.frag + '">' + label(l) + '</a></li>'; }).join('');
-    var menuItems = LINKS.map(function (l) { return '<a href="' + home + '#' + l.frag + '">' + label(l) + '</a>'; }).join('');
-    return (
-      '<nav>' +
-        '<a href="' + (home || '#') + '" class="nav-logo">Antonio E<span>.</span> del Toro</a>' +
-        '<ul class="nav-links">' + navItems + '</ul>' +
-        '<div class="nav-right">' +
-          '<button class="lang-btn" id="lang-btn" type="button" aria-label="Switch language / Cambiar idioma"><i class="ti ti-language"></i><span id="lang-label">ES</span></button>' +
-          '<button class="mode-btn" id="mode-btn" type="button" aria-label="Toggle dark mode"><i class="ti ti-moon"></i></button>' +
-          '<button class="hamburger" id="hamburger-btn" type="button" aria-label="Toggle menu"><i class="ti ti-menu-2"></i></button>' +
-        '</div>' +
-      '</nav>' +
-      '<div class="mobile-menu" id="mobile-menu">' + menuItems + '</div>'
-    );
+    var frag = document.createDocumentFragment();
+    frag.appendChild(h('nav', null,
+      h('a', { href: home || '#', class: 'nav-logo' }, 'Antonio E', h('span', null, '.'), ' del Toro'),
+      h('ul', { class: 'nav-links' }, LINKS.map(function (l) {
+        return h('li', null, h('a', { href: home + '#' + l.frag }, label(l)));
+      })),
+      h('div', { class: 'nav-right' },
+        h('button', { class: 'lang-btn', id: 'lang-btn', type: 'button', 'aria-label': 'Switch language / Cambiar idioma' },
+          icon('ti-language'), h('span', { id: 'lang-label' }, 'ES')),
+        h('button', { class: 'mode-btn', id: 'mode-btn', type: 'button', 'aria-label': 'Toggle dark mode' }, icon('ti-moon')),
+        h('button', { class: 'hamburger', id: 'hamburger-btn', type: 'button', 'aria-label': 'Toggle menu' }, icon('ti-menu-2'))
+      )
+    ));
+    frag.appendChild(h('div', { class: 'mobile-menu', id: 'mobile-menu' }, LINKS.map(function (l) {
+      return h('a', { href: home + '#' + l.frag }, label(l));
+    })));
+    return frag;
   }
 
   function buildFooter(home) {
-    return (
-      '<footer class="site-footer">' +
-        '<div class="site-footer-inner">' +
-          '<span class="footer-copy">' +
-            '<span class="footer-dot"></span>' +
-            '<span id="yr"></span> · Antonio del Toro · <span data-l="en">Los Angeles, CA</span><span data-l="es">Los Ángeles, CA</span>' +
-          '</span>' +
-          '<div class="footer-social">' + SOCIALS + '</div>' +
-          '<div class="footer-links">' +
-            '<a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>' +
-            '<a href="' + home + '#work">' + label(LINKS[0]) + '</a>' +
-            '<a href="' + home + '#about">' + label(LINKS[2]) + '</a>' +
-            '<a href="' + home + '#contact">' + label(LINKS[6]) + '</a>' +
-            '<a href="terms.html"><span data-l="en">terms</span><span data-l="es">términos</span></a>' +
-            '<a href="privacy.html"><span data-l="en">privacy</span><span data-l="es">privacidad</span></a>' +
-          '</div>' +
-        '</div>' +
-      '</footer>'
+    return h('footer', { class: 'site-footer' },
+      h('div', { class: 'site-footer-inner' },
+        h('span', { class: 'footer-copy' },
+          h('span', { class: 'footer-dot' }),
+          h('span', { id: 'yr' }), ' · Antonio del Toro · ',
+          h('span', { 'data-l': 'en' }, 'Los Angeles, CA'), h('span', { 'data-l': 'es' }, 'Los Ángeles, CA')
+        ),
+        h('div', { class: 'footer-social' }, SOCIALS.map(function (s) {
+          return h('a', newTab(s[0], { class: 'social-icon', 'aria-label': s[1] }), icon(s[2]));
+        })),
+        h('div', { class: 'footer-links' },
+          h('a', newTab('https://www.deltoro.codes'), 'deltoro.codes'),
+          h('a', { href: home + '#work' }, label(link('work'))),
+          h('a', { href: home + '#about' }, label(link('about'))),
+          h('a', { href: home + '#contact' }, label(link('contact'))),
+          h('a', { href: 'terms.html' }, label({ en: 'terms', es: 'términos' })),
+          h('a', { href: 'privacy.html' }, label({ en: 'privacy', es: 'privacidad' }))
+        )
+      )
     );
   }
 
-  function replace(id, html) {
+  function replace(id, node) {
     var el = document.getElementById(id);
-    if (el) el.outerHTML = html;
+    if (el) el.replaceWith(node);
   }
 
   function init() {
@@ -104,7 +126,7 @@
     // ── Theme ──
     var modeBtn = document.getElementById('mode-btn');
     function modeIcon() {
-      modeBtn.innerHTML = root.classList.contains('dark') ? '<i class="ti ti-sun"></i>' : '<i class="ti ti-moon"></i>';
+      modeBtn.replaceChildren(icon(root.classList.contains('dark') ? 'ti-sun' : 'ti-moon'));
     }
     modeIcon();
     modeBtn.addEventListener('click', function () {
@@ -120,18 +142,15 @@
     } catch (e) {}
 
     // ── Language ──
-    // Nav/footer translate via the .lang-es class + data-l (CSS). Page bodies that use
-    // data-es / data-es-ph (the homepage) are swapped here too.
-    var i18nEls = document.querySelectorAll('[data-es]');
-    var i18nPh  = document.querySelectorAll('[data-es-ph]');
-    i18nEls.forEach(function (el) { el.dataset.en = el.innerHTML; });
+    // All copy ships in both languages as [data-l] pairs; CSS shows the active one
+    // via the .lang-es class. Only placeholders (attributes) are swapped here.
+    var i18nPh = document.querySelectorAll('[data-es-ph]');
     i18nPh.forEach(function (el) { el.dataset.enPh = el.placeholder; });
 
     var langLabel = document.getElementById('lang-label');
     function applyLang(es) {
       root.classList.toggle('lang-es', es);
       root.setAttribute('lang', es ? 'es' : 'en');
-      i18nEls.forEach(function (el) { el.innerHTML = es ? el.dataset.es : el.dataset.en; });
       i18nPh.forEach(function (el) { el.placeholder = es ? el.dataset.esPh : el.dataset.enPh; });
       if (langLabel) langLabel.textContent = es ? 'EN' : 'ES';
     }
@@ -147,7 +166,7 @@
     var menu = document.getElementById('mobile-menu');
     function setMenu(open) {
       menu.classList.toggle('open', open);
-      hamburger.innerHTML = open ? '<i class="ti ti-x"></i>' : '<i class="ti ti-menu-2"></i>';
+      hamburger.replaceChildren(icon(open ? 'ti-x' : 'ti-menu-2'));
     }
     hamburger.addEventListener('click', function () { setMenu(!menu.classList.contains('open')); });
     menu.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { setMenu(false); }); });

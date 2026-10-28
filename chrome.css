@@ -8,6 +8,9 @@
 /* Language visibility — only ever hide the inactive language */
 html:not(.lang-es) [data-l="es"] { display: none; }
 html.lang-es [data-l="en"] { display: none; }
+/* Inline translation pairs: the active one is layout-transparent, so the
+   parent (flex buttons, headings) lays out exactly as with a single language */
+.t { display: contents; }
 
 /* Reserve nav height before chrome.js injects, to avoid layout shift */
 #site-nav { display: block; min-height: 56px; }
