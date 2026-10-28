@@ -136,7 +136,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Trusted Types.</strong> The language toggle swaps content with <code>innerHTML</code>. The strings are static and first-party, so the risk is low, but refactoring to DOM APIs would allow <code>require-trusted-types-for 'script'</code> and close that class of bug entirely.</li>
         <li><strong>HSTS preload.</strong> Considered and deferred. Preloading is effectively permanent and gains little over a two-year HSTS policy on a site with no logins.</li>
-        <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site, so the next step is confirming multi-factor authentication on all three.</li>
+        <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site. All three are behind multi-factor authentication, and that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Back to security work</a>
@@ -236,7 +236,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Trusted Types.</strong> El selector de idioma cambia el contenido con <code>innerHTML</code>. Los textos son estáticos y propios, así que el riesgo es bajo, pero reescribirlo con las API del DOM permitiría usar <code>require-trusted-types-for 'script'</code> y eliminar por completo esa clase de errores.</li>
         <li><strong>Precarga de HSTS.</strong> Evaluada y pospuesta. La precarga es prácticamente permanente y aporta poco frente a una política HSTS de dos años en un sitio sin inicios de sesión.</li>
-        <li><strong>Seguridad de las cuentas.</strong> Tras este trabajo, el eslabón más débil ya no es el sitio, sino las cuentas detrás de él. Quien controle el repositorio Git, el proveedor de alojamiento o el registrador controla el sitio, así que el siguiente paso es confirmar la autenticación multifactor en las tres cuentas.</li>
+        <li><strong>Seguridad de las cuentas.</strong> Tras este trabajo, el eslabón más débil ya no es el sitio, sino las cuentas detrás de él. Quien controle el repositorio Git, el proveedor de alojamiento o el registrador controla el sitio. Las tres cuentas están protegidas con autenticación multifactor, y ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
