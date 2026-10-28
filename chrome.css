@@ -188,4 +188,5 @@ nav {
   .hamburger { display: flex; }
   .site-footer-inner { flex-direction: column; text-align: center; padding: 28px 20px; }
   .site-footer-inner > div { justify-content: center; }
+  .footer-social { flex-wrap: wrap; }
 }

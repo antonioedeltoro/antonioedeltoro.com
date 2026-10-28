@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow">
+
+<title>Hardening a Static Portfolio Site — Antonio E. del Toro</title>
+<meta name="description" content="How I took antonioedeltoro.com to an A+ (140/100) on Mozilla's HTTP Observatory: removing third-party dependencies, a strict CSP, security headers, and email/certificate DNS controls.">
+<meta name="author" content="Antonio E. del Toro">
+<link rel="canonical" href="https://www.antonioedeltoro.com/site-hardening.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="theme-color" content="#FF5F00">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.antonioedeltoro.com/site-hardening.html">
+<meta property="og:title" content="Hardening a Static Portfolio Site">
+<meta property="og:description" content="From third-party fonts and a permissive CSP to an A+ (140/100) on Mozilla's HTTP Observatory.">
+<meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta property="og:site_name" content="Antonio E. del Toro">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@antonioedeltoro">
+
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+
+<!-- Shared nav + footer -->
+<link rel="stylesheet" href="chrome.css">
+<script defer src="chrome.js"></script>
+
+<!-- Set theme + language before paint to avoid a flash of the wrong state -->
+<script src="theme-init.js"></script>
+
+<link rel="stylesheet" href="writeup.css">
+</head>
+<body>
+
+  <div id="site-nav"></div>
+
+  <main>
+    <!-- ENGLISH -->
+    <article data-l="en">
+      <div class="eyebrow">Security · Write-up</div>
+      <h1>Hardening a static portfolio site</h1>
+      <div class="meta-row">
+        <span class="updated">October 28, 2026</span>
+        <span class="pill">CSP</span><span class="pill">HTTP headers</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span>
+      </div>
+
+      <p class="intro">This site is a static portfolio: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end &mdash; the page, the server responses, and the domain itself.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 on Mozilla&rsquo;s HTTP Observatory, 12 of 12 tests passed.</strong> The score above 100 comes from bonus points that only the strictest configurations earn. <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=www.antonioedeltoro.com" target="_blank" rel="noopener">View the live report</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Threat model</h2>
+      <p>With no user data to steal, the realistic risks for a site like this are about <strong>integrity and reputation</strong>, not data breaches:</p>
+      <ul>
+        <li><strong>Script injection</strong> through a compromised third-party asset (a font or icon CDN).</li>
+        <li><strong>Clickjacking</strong> &mdash; the site framed inside a hostile page.</li>
+        <li><strong>Protocol downgrade</strong> &mdash; a visitor pushed from HTTPS to HTTP on an untrusted network.</li>
+        <li><strong>Email spoofing</strong> &mdash; phishing sent &ldquo;from&rdquo; this domain to recruiters who have seen it on my r&eacute;sum&eacute;.</li>
+        <li><strong>Mis-issued certificates</strong> &mdash; a certificate authority issuing a valid TLS certificate for this domain to someone else.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Starting point</h2>
+      <p>The site already had a reasonable baseline: HTTPS, a <code>&lt;meta&gt;</code> Content Security Policy, Subresource Integrity on the icon stylesheet, a <code>security.txt</code>, DNSSEC on the domain, and a set of response headers configured at the host. The gaps:</p>
+      <ul>
+        <li>Two third-party origins (Google Fonts and jsDelivr) were allowed to serve styles and fonts. Google Fonts serves CSS that varies by browser, so it <strong>cannot be pinned with SRI</strong> &mdash; that origin was trusted blindly.</li>
+        <li>Every visit disclosed the visitor&rsquo;s IP address to both providers, which the privacy policy had to call out.</li>
+        <li>The CSP started from <code>default-src 'self'</code> rather than denying by default.</li>
+        <li>The domain had no email authentication records and no CAA record.</li>
+      </ul>
+
+      <h2><span class="num">03</span>Removing third-party dependencies</h2>
+      <p>The cleanest way to secure a dependency is to not load it from someone else. I self-hosted all three typefaces as WOFF2 files and replaced the full Tabler Icons webfont with a <strong>subset containing only the 17 glyphs the site uses</strong>:</p>
+      <pre><code>pyftsubset tabler-icons.ttf --unicodes="U+ea16,U+ea24,…" \
+  --flavor=woff2 --no-hinting --layout-features='' \
+  --output-file=fonts/tabler-icons-subset.woff2</code></pre>
+      <p>The icon font went from <strong>462&nbsp;KB to 3.5&nbsp;KB</strong>. The site now makes zero requests to any origin but its own, and the privacy policy was updated to say so.</p>
+
+      <h2><span class="num">04</span>A deny-by-default Content Security Policy</h2>
+      <p>With every asset first-party, the CSP could start from nothing and allow back only what the site actually uses:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+img-src 'self' data:; manifest-src 'self';
+form-action 'self'; base-uri 'none';
+object-src 'none'; frame-src 'none'; worker-src 'none';
+frame-ancestors 'none'; upgrade-insecure-requests</code></pre>
+      <p>There are no <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> exceptions; inline styles had already been moved into stylesheets. The policy ships twice: as a <code>&lt;meta&gt;</code> tag in each page and as an HTTP header. That is deliberate &mdash; <strong>browsers ignore <code>frame-ancestors</code> in a meta tag</strong>, so clickjacking protection only works from the header.</p>
+
+      <h2><span class="num">05</span>HTTP response headers</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><code>Strict-Transport-Security</code></td><td>Two-year HSTS with <code>includeSubDomains</code>: browsers refuse plain HTTP for this domain.</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Clickjacking protection for older browsers that predate <code>frame-ancestors</code>.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code> stops the browser from guessing a file&rsquo;s type.</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td>Outbound links reveal only the origin, never full URLs.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Camera, microphone, location, payment, USB, motion sensors and ad-topics APIs are disabled outright.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td>Isolates the page&rsquo;s browsing context from cross-origin windows.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td>Other sites can&rsquo;t embed this site&rsquo;s resources.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">06</span>Domain: email and certificates</h2>
+      <p>This domain never sends or receives email, so the right policy is to say so publicly:</p>
+      <pre><code>@        TXT  "v=spf1 -all"
+_dmarc   TXT  "v=DMARC1; p=reject;"
+@        CAA  0 issue "letsencrypt.org"
+@        CAA  0 issue "pki.goog"</code></pre>
+      <ul>
+        <li><strong>SPF <code>-all</code></strong> authorizes no server to send mail as the domain.</li>
+        <li><strong>DMARC <code>p=reject</code></strong> tells receiving providers to reject anything that fails, rather than just flag it.</li>
+        <li><strong>CAA</strong> limits certificate issuance to the two authorities my host uses. Listing only one would have broken a future renewal through the other.</li>
+        <li><strong>DNSSEC</strong> was already on, so these records are signed and can&rsquo;t be forged in transit.</li>
+      </ul>
+      <p>I also wanted a null MX record (<code>0 .</code>) to declare that the domain accepts no mail. The DNS provider&rsquo;s interface rejects it. Since SPF and DMARC already cover the spoofing risk, I documented the gap rather than move DNS providers over it.</p>
+
+      <h2><span class="num">07</span>Rollout and verification</h2>
+      <p>Order mattered. Tightening the CSP <em>header</em> before the self-hosted assets were deployed would have blocked the old Google Fonts and jsDelivr requests on the live site and broken every font and icon. So the sequence was: ship the code with the strict <code>&lt;meta&gt;</code> CSP, confirm the deploy, then tighten the header.</p>
+      <ul>
+        <li><strong>Before deploying:</strong> a headless browser loaded every page in light and dark mode, English and Spanish, desktop and mobile, and asserted zero CSP violations, zero JavaScript errors, zero third-party requests, and that every font and icon actually loaded.</li>
+        <li><strong>After deploying:</strong> the live response headers were checked directly, then scored by Mozilla&rsquo;s HTTP Observatory.</li>
+        <li><strong>DNS:</strong> each record was confirmed through a public DNSSEC-validating resolver.</li>
+      </ul>
+
+      <h2><span class="num">08</span>What I&rsquo;d do next</h2>
+      <ul>
+        <li><strong>Trusted Types.</strong> The language toggle swaps content with <code>innerHTML</code>. The strings are static and first-party, so the risk is low, but refactoring to DOM APIs would allow <code>require-trusted-types-for 'script'</code> and close that class of bug entirely.</li>
+        <li><strong>HSTS preload.</strong> Considered and deferred. Preloading is effectively permanent and gains little over a two-year HSTS policy on a site with no logins.</li>
+        <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site, so the next step is confirming multi-factor authentication on all three.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Back to security work</a>
+    </article>
+
+    <!-- ESPAÑOL -->
+    <article data-l="es">
+      <div class="eyebrow">Seguridad · Informe</div>
+      <h1>Protección de un sitio de portafolio estático</h1>
+      <div class="meta-row">
+        <span class="updated">28 de octubre de 2026</span>
+        <span class="pill">CSP</span><span class="pill">Encabezados HTTP</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span>
+      </div>
+
+      <p class="intro">Este sitio es un portafolio estático: sin backend, sin base de datos, sin inicios de sesión. Eso lo convierte en un objetivo pequeño, pero no nulo. Lo traté como un activo de producción y lo protegí de principio a fin: la página, las respuestas del servidor y el propio dominio.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 en el HTTP Observatory de Mozilla, 12 de 12 pruebas superadas.</strong> La puntuación por encima de 100 proviene de puntos adicionales que solo obtienen las configuraciones más estrictas. <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=www.antonioedeltoro.com" target="_blank" rel="noopener">Ver el informe en vivo</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Modelo de amenazas</h2>
+      <p>Sin datos de usuarios que robar, los riesgos realistas para un sitio como este tienen que ver con la <strong>integridad y la reputación</strong>, no con filtraciones de datos:</p>
+      <ul>
+        <li><strong>Inyección de scripts</strong> a través de un recurso de terceros comprometido (una CDN de fuentes o de íconos).</li>
+        <li><strong>Clickjacking</strong>: el sitio incrustado dentro de una página maliciosa.</li>
+        <li><strong>Degradación de protocolo</strong>: un visitante forzado de HTTPS a HTTP en una red no confiable.</li>
+        <li><strong>Suplantación de correo</strong>: phishing enviado &laquo;desde&raquo; este dominio a reclutadores que lo han visto en mi currículum.</li>
+        <li><strong>Certificados emitidos indebidamente</strong>: una autoridad de certificación que emite un certificado TLS válido para este dominio a otra persona.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Punto de partida</h2>
+      <p>El sitio ya tenía una base razonable: HTTPS, una Política de Seguridad de Contenido (CSP) en una etiqueta <code>&lt;meta&gt;</code>, Integridad de Subrecursos (SRI) en la hoja de estilos de íconos, un archivo <code>security.txt</code>, DNSSEC en el dominio y un conjunto de encabezados configurados en el servidor. Las deficiencias:</p>
+      <ul>
+        <li>Dos orígenes de terceros (Google Fonts y jsDelivr) podían servir estilos y fuentes. Google Fonts sirve CSS que varía según el navegador, por lo que <strong>no puede fijarse con SRI</strong>: se confiaba en ese origen a ciegas.</li>
+        <li>Cada visita revelaba la dirección IP del visitante a ambos proveedores, algo que la política de privacidad tenía que advertir.</li>
+        <li>La CSP partía de <code>default-src 'self'</code> en lugar de denegar todo por defecto.</li>
+        <li>El dominio no tenía registros de autenticación de correo ni registro CAA.</li>
+      </ul>
+
+      <h2><span class="num">03</span>Eliminación de dependencias de terceros</h2>
+      <p>La forma más limpia de proteger una dependencia es no cargarla desde los servidores de otro. Alojé las tres tipografías en el propio sitio como archivos WOFF2 y reemplacé la fuente completa de Tabler Icons por un <strong>subconjunto que contiene solo los 17 glifos que usa el sitio</strong>:</p>
+      <pre><code>pyftsubset tabler-icons.ttf --unicodes="U+ea16,U+ea24,…" \
+  --flavor=woff2 --no-hinting --layout-features='' \
+  --output-file=fonts/tabler-icons-subset.woff2</code></pre>
+      <p>La fuente de íconos pasó de <strong>462&nbsp;KB a 3.5&nbsp;KB</strong>. El sitio ya no hace ninguna solicitud a otro origen que no sea el suyo, y la política de privacidad se actualizó para reflejarlo.</p>
+
+      <h2><span class="num">04</span>Una CSP que deniega por defecto</h2>
+      <p>Con todos los recursos alojados en el propio sitio, la CSP pudo partir de cero y permitir únicamente lo que el sitio realmente usa:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+img-src 'self' data:; manifest-src 'self';
+form-action 'self'; base-uri 'none';
+object-src 'none'; frame-src 'none'; worker-src 'none';
+frame-ancestors 'none'; upgrade-insecure-requests</code></pre>
+      <p>No hay excepciones <code>'unsafe-inline'</code> ni <code>'unsafe-eval'</code>; los estilos en línea ya se habían trasladado a hojas de estilo. La política se envía dos veces: como etiqueta <code>&lt;meta&gt;</code> en cada página y como encabezado HTTP. Es intencional: <strong>los navegadores ignoran <code>frame-ancestors</code> en una etiqueta meta</strong>, así que la protección contra clickjacking solo funciona desde el encabezado.</p>
+
+      <h2><span class="num">05</span>Encabezados de respuesta HTTP</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Encabezado</th><th>Propósito</th></tr></thead>
+          <tbody>
+            <tr><td><code>Strict-Transport-Security</code></td><td>HSTS de dos años con <code>includeSubDomains</code>: los navegadores rechazan HTTP sin cifrar para este dominio.</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Protección contra clickjacking para navegadores antiguos que no admiten <code>frame-ancestors</code>.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code> impide que el navegador adivine el tipo de un archivo.</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td>Los enlaces salientes revelan solo el origen, nunca la URL completa.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Desactiva por completo la cámara, el micrófono, la ubicación, los pagos, USB, los sensores de movimiento y la API de temas publicitarios.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td>Aísla el contexto de navegación de la página de las ventanas de otros orígenes.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td>Otros sitios no pueden incrustar los recursos de este sitio.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">06</span>Dominio: correo y certificados</h2>
+      <p>Este dominio nunca envía ni recibe correo, así que la política correcta es declararlo públicamente:</p>
+      <pre><code>@        TXT  "v=spf1 -all"
+_dmarc   TXT  "v=DMARC1; p=reject;"
+@        CAA  0 issue "letsencrypt.org"
+@        CAA  0 issue "pki.goog"</code></pre>
+      <ul>
+        <li><strong>SPF <code>-all</code></strong> no autoriza a ningún servidor a enviar correo en nombre del dominio.</li>
+        <li><strong>DMARC <code>p=reject</code></strong> indica a los proveedores que rechacen todo lo que no pase la verificación, en lugar de solo marcarlo.</li>
+        <li><strong>CAA</strong> limita la emisión de certificados a las dos autoridades que usa mi proveedor de alojamiento. Incluir solo una habría hecho fallar una renovación futura a través de la otra.</li>
+        <li><strong>DNSSEC</strong> ya estaba activado, así que estos registros están firmados y no pueden falsificarse en tránsito.</li>
+      </ul>
+      <p>También quería un registro MX nulo (<code>0 .</code>) para declarar que el dominio no acepta correo. La interfaz del proveedor de DNS lo rechaza. Como SPF y DMARC ya cubren el riesgo de suplantación, documenté la limitación en lugar de cambiar de proveedor de DNS por ella.</p>
+
+      <h2><span class="num">07</span>Implementación y verificación</h2>
+      <p>El orden importaba. Endurecer el <em>encabezado</em> CSP antes de desplegar los recursos propios habría bloqueado las solicitudes a Google Fonts y jsDelivr en el sitio en vivo y habría roto todas las fuentes e íconos. Por eso la secuencia fue: publicar el código con la CSP estricta en la etiqueta <code>&lt;meta&gt;</code>, confirmar el despliegue y luego endurecer el encabezado.</p>
+      <ul>
+        <li><strong>Antes del despliegue:</strong> un navegador sin interfaz cargó cada página en modo claro y oscuro, en inglés y en español, en escritorio y en móvil, y verificó que no hubiera ninguna violación de la CSP, ningún error de JavaScript, ninguna solicitud a terceros, y que todas las fuentes e íconos cargaran correctamente.</li>
+        <li><strong>Después del despliegue:</strong> se revisaron directamente los encabezados de la respuesta en vivo y luego se evaluaron con el HTTP Observatory de Mozilla.</li>
+        <li><strong>DNS:</strong> cada registro se confirmó mediante un resolutor público que valida DNSSEC.</li>
+      </ul>
+
+      <h2><span class="num">08</span>Próximos pasos</h2>
+      <ul>
+        <li><strong>Trusted Types.</strong> El selector de idioma cambia el contenido con <code>innerHTML</code>. Los textos son estáticos y propios, así que el riesgo es bajo, pero reescribirlo con las API del DOM permitiría usar <code>require-trusted-types-for 'script'</code> y eliminar por completo esa clase de errores.</li>
+        <li><strong>Precarga de HSTS.</strong> Evaluada y pospuesta. La precarga es prácticamente permanente y aporta poco frente a una política HSTS de dos años en un sitio sin inicios de sesión.</li>
+        <li><strong>Seguridad de las cuentas.</strong> Tras este trabajo, el eslabón más débil ya no es el sitio, sino las cuentas detrás de él. Quien controle el repositorio Git, el proveedor de alojamiento o el registrador controla el sitio, así que el siguiente paso es confirmar la autenticación multifactor en las tres cuentas.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+    </article>
+  </main>
+
+  <div id="site-footer"></div>
+
+</body>
+</html>

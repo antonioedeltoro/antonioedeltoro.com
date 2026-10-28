@@ -12,6 +12,7 @@
 
   var LINKS = [
     { frag: 'work',           en: 'work',           es: 'trabajo' },
+    { frag: 'security',       en: 'security',       es: 'seguridad' },
     { frag: 'about',          en: 'about',          es: 'perfil' },
     { frag: 'certifications', en: 'certifications', es: 'certificaciones' },
     { frag: 'experience',     en: 'experience',     es: 'experiencia' },
@@ -67,8 +68,8 @@
           '<div class="footer-links">' +
             '<a href="https://www.deltoro.codes" target="_blank" rel="noopener">deltoro.codes</a>' +
             '<a href="' + home + '#work">' + label(LINKS[0]) + '</a>' +
-            '<a href="' + home + '#about">' + label(LINKS[1]) + '</a>' +
-            '<a href="' + home + '#contact">' + label(LINKS[5]) + '</a>' +
+            '<a href="' + home + '#about">' + label(LINKS[2]) + '</a>' +
+            '<a href="' + home + '#contact">' + label(LINKS[6]) + '</a>' +
             '<a href="terms.html"><span data-l="en">terms</span><span data-l="es">términos</span></a>' +
             '<a href="privacy.html"><span data-l="en">privacy</span><span data-l="es">privacidad</span></a>' +
           '</div>' +

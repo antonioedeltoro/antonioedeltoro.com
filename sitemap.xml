@@ -2,9 +2,15 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://www.antonioedeltoro.com/</loc>
-    <lastmod>2026-10-23</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://www.antonioedeltoro.com/site-hardening.html</loc>
+    <lastmod>2026-10-28</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.antonioedeltoro.com/terms.html</loc>
@@ -14,7 +20,7 @@
   </url>
   <url>
     <loc>https://www.antonioedeltoro.com/privacy.html</loc>
-    <lastmod>2026-09-08</lastmod>
+    <lastmod>2026-10-28</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.3</priority>
   </url>
