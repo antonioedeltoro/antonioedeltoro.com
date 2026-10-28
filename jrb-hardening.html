@@ -129,10 +129,10 @@ upgrade-insecure-requests</code></pre>
         <li><strong>Headers.</strong> Helmet with a deny-everything CSP (the API only returns JSON), two-year HSTS, and <code>no-referrer</code>.</li>
         <li><strong>CORS.</strong> Limited to the custom domain (apex and www), <code>GET</code>/<code>POST</code> only, <code>Content-Type</code> only, no credentials. Even the host&rsquo;s own <code>onrender.com</code> copy of the site is refused &mdash; verified live.</li>
         <li><strong>Validation.</strong> Zod on every write endpoint: vehicle restricted to priced vehicles, ObjectId format on quote and booking IDs, phone format, length caps, control-character stripping. Unknown fields are dropped, so a client can never set status or payment fields.</li>
-        <li><strong>Rate limits per IP.</strong> 20 quotes per minute (each one hits billed Mapbox calls); 10 per 15 minutes on bookings, contact and checkout (each creates database records or a Stripe session); 100 per minute overall. The JSON body limit went from 1&nbsp;MB to 16&nbsp;KB.</li>
+        <li><strong>Rate limits per IP.</strong> Tight limits on quotes (each one triggers billed Mapbox calls) and on bookings, contact and checkout (each creates database records or a Stripe session), sized to the cost of each call, plus an overall cap. The JSON body size limit was cut sharply.</li>
         <li><strong>Errors.</strong> A central error handler never returns stack traces or internal error text: server errors are a generic 500, malformed JSON is &ldquo;Bad request&rdquo;, and database cast or validation errors are a generic 400.</li>
         <li><strong>Email output.</strong> The paid-booking notification email now HTML-escapes every rider-supplied field.</li>
-        <li><strong>Dependencies.</strong> The API is at zero vulnerabilities after upgrading Zod (3&nbsp;&rarr;&nbsp;4) and Express. The remaining front-end advisories are in the Vite dev server (never deployed) and a React Router redirect issue that isn&rsquo;t reachable, because no user input feeds navigation.</li>
+        <li><strong>Dependencies.</strong> The API is at zero vulnerabilities after upgrading Zod (3&nbsp;&rarr;&nbsp;4) and Express. The remaining front-end advisories are limited to development-only tooling that is never deployed, or to code paths that user input can&rsquo;t reach.</li>
       </ul>
 
       <h2><span class="num">07</span>Domain: email and certificates</h2>
@@ -164,7 +164,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Done &mdash; real 404s.</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
         <li><strong>In progress &mdash; DMARC enforcement:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
         <li><strong>Deferred &mdash; HSTS preload</strong>, for the same reason as on my portfolio: it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
-        <li><strong>Account security:</strong> multi-factor authentication is on for the host, GitHub, Stripe, the registrar, the database, the email provider and Mapbox &mdash; that&rsquo;s where ongoing attention belongs.</li>
+        <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments &mdash; that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Back to security work</a>
@@ -257,10 +257,10 @@ upgrade-insecure-requests</code></pre>
         <li><strong>Encabezados.</strong> Helmet con una CSP que lo deniega todo (la API solo devuelve JSON), HSTS de dos años y <code>no-referrer</code>.</li>
         <li><strong>CORS.</strong> Limitado al dominio propio (raíz y www), solo <code>GET</code>/<code>POST</code>, solo el encabezado <code>Content-Type</code>, sin credenciales. Incluso la copia del sitio en <code>onrender.com</code> del propio proveedor queda rechazada; se verificó en vivo.</li>
         <li><strong>Validación.</strong> Zod en todos los endpoints de escritura: el vehículo se limita a los que tienen precio, formato de ObjectId en los identificadores de cotizaciones y reservas, formato de teléfono, longitudes máximas y eliminación de caracteres de control. Los campos desconocidos se descartan, así que un cliente nunca puede asignar campos de estado o de pago.</li>
-        <li><strong>Límites de solicitudes por IP.</strong> 20 cotizaciones por minuto (cada una genera llamadas a Mapbox que se cobran); 10 cada 15 minutos en reservas, contacto y pago (cada una crea registros en la base de datos o una sesión de Stripe); 100 por minuto en total. El límite del cuerpo JSON bajó de 1&nbsp;MB a 16&nbsp;KB.</li>
+        <li><strong>Límites de solicitudes por IP.</strong> Límites estrictos en las cotizaciones (cada una genera llamadas a Mapbox que se cobran) y en las reservas, el contacto y el pago (cada una crea registros en la base de datos o una sesión de Stripe), ajustados al costo de cada llamada, además de un límite general. El tamaño máximo del cuerpo JSON se redujo considerablemente.</li>
         <li><strong>Errores.</strong> Un gestor central de errores nunca devuelve trazas de pila ni texto interno: los errores del servidor son un 500 genérico, el JSON mal formado devuelve &laquo;Bad request&raquo; y los errores de conversión o validación de la base de datos son un 400 genérico.</li>
         <li><strong>Correos salientes.</strong> El correo de notificación de reservas pagadas ahora escapa en HTML todos los campos escritos por el pasajero.</li>
-        <li><strong>Dependencias.</strong> La API quedó sin vulnerabilidades tras actualizar Zod (3&nbsp;&rarr;&nbsp;4) y Express. Los avisos que quedan en el front end están en el servidor de desarrollo de Vite (que nunca se despliega) y en un problema de redirección de React Router que no es alcanzable, porque ninguna entrada del usuario alimenta la navegación.</li>
+        <li><strong>Dependencias.</strong> La API quedó sin vulnerabilidades tras actualizar Zod (3&nbsp;&rarr;&nbsp;4) y Express. Los avisos que quedan en el front end se limitan a herramientas de desarrollo que nunca se despliegan o a partes del código a las que no llega ninguna entrada del usuario.</li>
       </ul>
 
       <h2><span class="num">07</span>Dominio: correo y certificados</h2>
@@ -292,7 +292,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Hecho: errores 404 reales.</strong> La antigua regla de reescritura general enviaba cualquier URL desconocida a la página de &laquo;no encontrado&raquo; con un estado HTTP 200, así que los buscadores podían indexar enlaces rotos. La eliminé; ahora el proveedor sirve la página 404 prerrenderizada con un estado 404 real. Verificado en vivo: las URL desconocidas devuelven 404, mientras que todas las páginas reales, los recursos y las URL de retorno de Stripe siguen devolviendo 200.</li>
         <li><strong>En curso: aplicación de DMARC:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (hecho) &rarr; <code>p=reject</code> (programado tras dos semanas de entregas sin problemas).</li>
         <li><strong>Pospuesto: precarga de HSTS</strong>, por la misma razón que en mi portafolio: es prácticamente permanente y aporta poco frente a una política HSTS de dos años.</li>
-        <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en el proveedor de alojamiento, GitHub, Stripe, el registrador, la base de datos, el proveedor de correo y Mapbox; ahí es donde debe centrarse la atención de aquí en adelante.</li>
+        <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en todas las cuentas que pueden modificar el sitio, sus datos o sus pagos; ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
