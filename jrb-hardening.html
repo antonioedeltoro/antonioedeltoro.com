@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow">
+
+<title>Hardening a MERN Booking App with Stripe Payments — Antonio E. del Toro</title>
+<meta name="description" content="How I hardened jrbpremierride.com, a MERN booking app with Stripe payments: PCI DSS SAQ A scope, a deny-by-default CSP with Trusted Types, API hardening, and email/certificate DNS controls. A+ (140/100) on Mozilla's HTTP Observatory.">
+<meta name="author" content="Antonio E. del Toro">
+<link rel="canonical" href="https://www.antonioedeltoro.com/jrb-hardening.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="theme-color" content="#FF5F00">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.antonioedeltoro.com/jrb-hardening.html">
+<meta property="og:title" content="Hardening a MERN Booking App with Stripe Payments">
+<meta property="og:description" content="The browser, the API, the payment flow, and the domain, hardened end to end and rolled out in stages. A+ (140/100) on Mozilla's HTTP Observatory.">
+<meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta property="og:site_name" content="Antonio E. del Toro">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@antonioedeltoro">
+
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+
+<!-- Shared nav + footer -->
+<link rel="stylesheet" href="chrome.css">
+<script defer src="chrome.js"></script>
+
+<!-- Set theme + language before paint to avoid a flash of the wrong state -->
+<script src="theme-init.js"></script>
+
+<link rel="stylesheet" href="writeup.css">
+</head>
+<body>
+
+  <div id="site-nav"></div>
+
+  <main>
+    <!-- ENGLISH -->
+    <article data-l="en">
+      <div class="eyebrow">Security · Write-up</div>
+      <h1>Hardening a MERN booking app with Stripe payments</h1>
+      <div class="meta-row">
+        <span class="updated">October 28, 2026</span>
+        <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">API security</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
+      </div>
+
+      <p class="intro"><strong>jrbpremierride.com</strong> is a client site I built and maintain through deltoro.codes: a React/Vite front end (prerendered to static HTML), an Express/MongoDB API, Mapbox address search, and Stripe payments for a Los Angeles black-car service. Unlike my <a href="site-hardening.html">static portfolio</a>, it takes bookings and money, so the attack surface is the browser, the API, the payment flow, and the domain. I hardened it end to end using the same approach and rolled it out in stages so nothing broke in production.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 on Mozilla&rsquo;s HTTP Observatory, 12 of 12 tests passed</strong> (baseline before this work: A+, 135). <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=jrbpremierride.com" target="_blank" rel="noopener">View the live report</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Threat model</h2>
+      <p>A booking app that takes payments has more to protect than a static site:</p>
+      <ul>
+        <li><strong>Card-payment fraud and PCI scope</strong> &mdash; how much of the card flow the site is responsible for.</li>
+        <li><strong>Script injection</strong> that could tamper with the handoff to checkout.</li>
+        <li><strong>API abuse</strong> &mdash; spam bookings, scraping the billed Mapbox endpoints, junk Stripe sessions.</li>
+        <li><strong>Information leakage</strong> through error messages.</li>
+        <li><strong>Cross-site use of the API</strong> from origins that aren&rsquo;t the site.</li>
+        <li><strong>Email spoofing</strong> from the business domain.</li>
+        <li><strong>Mis-issued certificates</strong> for the domain.</li>
+        <li><strong>Account takeover</strong> of the host, Git, Stripe, the registrar, or the database.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Starting point</h2>
+      <p>I ran a baseline scan before changing anything. The site was already at <strong>A+ (135)</strong>: HTTPS, a CSP with no <code>'unsafe-inline'</code> (a postbuild step moves the prerenderer&rsquo;s inline scripts into external files), Helmet, CORS, Zod validation, rate limiting, signed Stripe webhooks, and DNSSEC. The gaps:</p>
+      <ul>
+        <li>Google Fonts was allowed in the CSP, and the policy started from <code>default-src 'self'</code> rather than denying by default. No Trusted Types.</li>
+        <li>HSTS was set for one year.</li>
+        <li>Error responses could carry internal error text.</li>
+        <li>Booking, contact and checkout had no write-specific rate limits, and vehicle and ID fields were loosely validated.</li>
+        <li>The paid-booking notification email interpolated rider-supplied text into HTML <strong>unescaped</strong>.</li>
+        <li>An unused <code>mapbox-gl</code> dependency, and dependency advisories in the API &mdash; including one critical.</li>
+        <li>No SPF on the apex or on the email provider&rsquo;s bounce subdomain, and no CAA record.</li>
+      </ul>
+
+      <h2><span class="num">03</span>Payments and PCI scope</h2>
+      <p>Payment uses <strong>Stripe Checkout</strong> (hosted): the browser is redirected to <code>checkout.stripe.com</code>, so card data never touches the site, its scripts, or the API. That keeps the merchant at <strong>PCI DSS SAQ A</strong>, the lightest self-assessment.</p>
+      <ul>
+        <li>The charge amount always comes from the server-stored quote, never from the browser.</li>
+        <li>The webhook verifies Stripe&rsquo;s signature against the raw request body and is the only thing that can mark a booking paid. Requests with no signature are rejected with a generic error.</li>
+        <li>Stripe secret keys exist only as host environment variables &mdash; not in the repo (full Git history scanned clean) and not in the client bundle.</li>
+        <li>Defense in depth: the client refuses to redirect anywhere except <code>https://checkout.stripe.com</code>.</li>
+      </ul>
+      <p>Because Checkout is a full-page redirect, the CSP needs <strong>no Stripe origins at all</strong>. Adding <code>js.stripe.com</code> &ldquo;just in case&rdquo; would only widen the policy. If the site ever moves to Stripe Elements, it would need <code>js.stripe.com</code> in <code>script-src</code> and <code>frame-src</code>, and <code>api.stripe.com</code> in <code>connect-src</code>.</p>
+
+      <h2><span class="num">04</span>Front end: deny-by-default CSP and Trusted Types</h2>
+      <p>I self-hosted the Marcellus webfont via <code>@fontsource</code> (its Latin subset covers English and Spanish) and removed Google Fonts, so the site makes no requests to any origin except its own, the API, and Mapbox&rsquo;s search API. I also removed the unused <code>mapbox-gl</code> package. The final policy:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+img-src 'self' data:;
+connect-src 'self' https://jrb-premiere-ride-api.onrender.com
+            https://api.mapbox.com;
+manifest-src 'self'; form-action 'self'; base-uri 'none';
+object-src 'none'; frame-src 'none'; worker-src 'none';
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types default;
+upgrade-insecure-requests</code></pre>
+      <p><strong>Trusted Types with React.</strong> Unlike the portfolio (<code>trusted-types 'none'</code>), this app has one legitimate sink: the head manager writes each page&rsquo;s JSON-LD structured data with <code>innerHTML</code> during client-side navigation. The solution is a single <code>default</code> policy, loaded as the first script, whose <code>createHTML</code> accepts a string only if it contains no <code>&lt;</code> &mdash; text without <code>&lt;</code> can&rsquo;t create elements, attributes, or event handlers. There is deliberately no <code>createScript</code> or <code>createScriptURL</code>, so string-to-script stays blocked outright. I verified in the browser that markup injection through HTML sinks throws, and that a script whose text is set from a string never executes.</p>
+
+      <h2><span class="num">05</span>HTTP response headers</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><code>Content-Security-Policy</code></td><td>Deny-by-default; only the site itself, the API, and Mapbox search; Trusted Types enforced.</td></tr>
+            <tr><td><code>Strict-Transport-Security</code></td><td>Two years with <code>includeSubDomains</code> (raised from one year).</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Clickjacking protection for older browsers; <code>frame-ancestors</code> covers modern ones.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code>.</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code>.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Geolocation only for the site itself (the &ldquo;use my location&rdquo; pickup button); camera, microphone, payment, USB, motion sensors, display capture and ad-topics disabled. <code>payment=()</code> is correct because Stripe Checkout runs on Stripe&rsquo;s own page.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td><code>same-origin</code>.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td><code>same-origin</code> (tightened from <code>same-site</code>).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">06</span>The API</h2>
+      <ul>
+        <li><strong>Headers.</strong> Helmet with a deny-everything CSP (the API only returns JSON), two-year HSTS, and <code>no-referrer</code>.</li>
+        <li><strong>CORS.</strong> Limited to the custom domain (apex and www), <code>GET</code>/<code>POST</code> only, <code>Content-Type</code> only, no credentials. Even the host&rsquo;s own <code>onrender.com</code> copy of the site is refused &mdash; verified live.</li>
+        <li><strong>Validation.</strong> Zod on every write endpoint: vehicle restricted to priced vehicles, ObjectId format on quote and booking IDs, phone format, length caps, control-character stripping. Unknown fields are dropped, so a client can never set status or payment fields.</li>
+        <li><strong>Rate limits per IP.</strong> 20 quotes per minute (each one hits billed Mapbox calls); 10 per 15 minutes on bookings, contact and checkout (each creates database records or a Stripe session); 100 per minute overall. The JSON body limit went from 1&nbsp;MB to 16&nbsp;KB.</li>
+        <li><strong>Errors.</strong> A central error handler never returns stack traces or internal error text: server errors are a generic 500, malformed JSON is &ldquo;Bad request&rdquo;, and database cast or validation errors are a generic 400.</li>
+        <li><strong>Email output.</strong> The paid-booking notification email now HTML-escapes every rider-supplied field.</li>
+        <li><strong>Dependencies.</strong> The API is at zero vulnerabilities after upgrading Zod (3&nbsp;&rarr;&nbsp;4) and Express. The remaining front-end advisories are in the Vite dev server (never deployed) and a React Router redirect issue that isn&rsquo;t reachable, because no user input feeds navigation.</li>
+      </ul>
+
+      <h2><span class="num">07</span>Domain: email and certificates</h2>
+      <p>I identified the providers before writing any records. DNS and the registrar are Squarespace Domains; the domain receives no mail (no MX); and the only sender is Resend (on Amazon SES) for booking notifications.</p>
+      <pre><code>@                  TXT  "v=spf1 -all"
+send               TXT  "v=spf1 include:amazonses.com ~all"
+resend._domainkey  TXT  (Resend DKIM key — already present)
+_dmarc             TXT  "v=DMARC1; p=none;"
+@                  CAA  0 issue "pki.goog"
+@                  CAA  0 issue "letsencrypt.org"</code></pre>
+      <ul>
+        <li><strong>Apex SPF is <code>-all</code></strong> because the apex itself sends nothing. Resend sends with a bounce address on the <code>send</code> subdomain, which was missing its SPF record.</li>
+        <li><strong>DMARC</strong> passes through the aligned DKIM signature. It starts at <code>p=none</code> to monitor, and moves to quarantine and then reject once real mail is confirmed passing.</li>
+        <li><strong>CAA issuers came from Certificate Transparency logs.</strong> Every certificate ever issued for the domain came from Google Trust Services, so <code>pki.goog</code> is required; Let&rsquo;s Encrypt is listed as a precaution in case the host ever falls back to it.</li>
+        <li><strong>DNSSEC</strong> was already on, and every record was confirmed through a public DNSSEC-validating resolver.</li>
+      </ul>
+
+      <h2><span class="num">08</span>Rollout and verification</h2>
+      <p>Same rule as the portfolio: <strong>never tighten a header before the code that needs it is live.</strong></p>
+      <ul>
+        <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures &mdash; forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
+        <li><strong>Stage 1</strong> shipped the code plus the strict policy as <code>Content-Security-Policy-Report-Only</code>. On the live site every page reported zero would-be violations, address autocomplete and quotes worked against real Mapbox and the live API, and a real Book &amp; Pay went through Stripe end to end.</li>
+        <li><strong>Stage 2</strong> enforced the policy and tightened the remaining headers. I re-ran every check live and tested Book &amp; Pay again.</li>
+        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan.</li>
+      </ul>
+
+      <h2><span class="num">09</span>What I&rsquo;d do next</h2>
+      <ul>
+        <li><strong>Account security is now the perimeter.</strong> Multi-factor authentication is on for the host, GitHub, Stripe, the registrar, the database, the email provider and Mapbox.</li>
+        <li><strong>DMARC enforcement.</strong> Move to quarantine, then reject.</li>
+        <li><strong>HSTS preload.</strong> Deferred for the same reason as on the portfolio: it&rsquo;s effectively permanent.</li>
+        <li><strong>Real 404s.</strong> Make unknown URLs return a 404 status instead of 200.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Back to security work</a>
+    </article>
+
+    <!-- ESPAÑOL -->
+    <article data-l="es">
+      <div class="eyebrow">Seguridad · Informe</div>
+      <h1>Protección de una aplicación de reservas MERN con pagos de Stripe</h1>
+      <div class="meta-row">
+        <span class="updated">28 de octubre de 2026</span>
+        <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">Seguridad de API</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
+      </div>
+
+      <p class="intro"><strong>jrbpremierride.com</strong> es un sitio de un cliente que desarrollé y mantengo a través de deltoro.codes: un front end en React/Vite (prerrenderizado a HTML estático), una API en Express/MongoDB, búsqueda de direcciones con Mapbox y pagos con Stripe para un servicio de autos ejecutivos en Los Ángeles. A diferencia de mi <a href="site-hardening.html">portafolio estático</a>, este sitio recibe reservas y dinero, así que la superficie de ataque abarca el navegador, la API, el flujo de pago y el dominio. Lo protegí de principio a fin con el mismo enfoque y lo implementé por etapas para que nada fallara en producción.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 en el HTTP Observatory de Mozilla, 12 de 12 pruebas superadas</strong> (punto de partida antes de este trabajo: A+, 135). <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=jrbpremierride.com" target="_blank" rel="noopener">Ver el informe en vivo</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Modelo de amenazas</h2>
+      <p>Una aplicación de reservas que cobra tiene más que proteger que un sitio estático:</p>
+      <ul>
+        <li><strong>Fraude con tarjetas y alcance de PCI</strong>: cuánta parte del flujo de la tarjeta queda bajo la responsabilidad del sitio.</li>
+        <li><strong>Inyección de scripts</strong> que podría alterar el paso hacia el pago.</li>
+        <li><strong>Abuso de la API</strong>: reservas falsas, extracción masiva de los endpoints de Mapbox que se cobran por uso, sesiones basura de Stripe.</li>
+        <li><strong>Filtración de información</strong> a través de los mensajes de error.</li>
+        <li><strong>Uso de la API desde otros sitios</strong> que no son el propio.</li>
+        <li><strong>Suplantación de correo</strong> desde el dominio de la empresa.</li>
+        <li><strong>Certificados emitidos indebidamente</strong> para el dominio.</li>
+        <li><strong>Toma de control de cuentas</strong>: el proveedor de alojamiento, Git, Stripe, el registrador o la base de datos.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Punto de partida</h2>
+      <p>Antes de cambiar nada, hice un análisis de referencia. El sitio ya tenía <strong>A+ (135)</strong>: HTTPS, una CSP sin <code>'unsafe-inline'</code> (un paso posterior a la compilación traslada los scripts en línea del prerrenderizador a archivos externos), Helmet, CORS, validación con Zod, límites de solicitudes, webhooks de Stripe firmados y DNSSEC. Las deficiencias:</p>
+      <ul>
+        <li>La CSP permitía Google Fonts y partía de <code>default-src 'self'</code> en lugar de denegar todo por defecto. Sin Trusted Types.</li>
+        <li>HSTS estaba configurado a un año.</li>
+        <li>Las respuestas de error podían incluir texto interno del error.</li>
+        <li>Las reservas, el contacto y el pago no tenían límites de solicitudes propios para escrituras, y los campos de vehículo e identificadores se validaban de forma laxa.</li>
+        <li>El correo de notificación de reservas pagadas insertaba en el HTML el texto escrito por el pasajero <strong>sin escapar</strong>.</li>
+        <li>Una dependencia <code>mapbox-gl</code> sin usar, y avisos de seguridad en las dependencias de la API, uno de ellos crítico.</li>
+        <li>Sin SPF en el dominio raíz ni en el subdominio de rebotes del proveedor de correo, y sin registro CAA.</li>
+      </ul>
+
+      <h2><span class="num">03</span>Pagos y alcance de PCI</h2>
+      <p>El pago usa <strong>Stripe Checkout</strong> (alojado por Stripe): el navegador se redirige a <code>checkout.stripe.com</code>, así que los datos de la tarjeta nunca pasan por el sitio, sus scripts ni la API. Eso mantiene al comercio en <strong>PCI DSS SAQ A</strong>, la autoevaluación más sencilla.</p>
+      <ul>
+        <li>El monto del cobro siempre proviene de la cotización guardada en el servidor, nunca del navegador.</li>
+        <li>El webhook verifica la firma de Stripe sobre el cuerpo original de la solicitud y es lo único que puede marcar una reserva como pagada. Las solicitudes sin firma se rechazan con un error genérico.</li>
+        <li>Las claves secretas de Stripe existen únicamente como variables de entorno en el servidor: no están en el repositorio (se revisó todo el historial de Git sin hallazgos) ni en el paquete del cliente.</li>
+        <li>Defensa en profundidad: el cliente se niega a redirigir a cualquier destino que no sea <code>https://checkout.stripe.com</code>.</li>
+      </ul>
+      <p>Como Checkout es una redirección de página completa, la CSP <strong>no necesita ningún origen de Stripe</strong>. Agregar <code>js.stripe.com</code> &laquo;por si acaso&raquo; solo ampliaría la política. Si algún día el sitio pasa a Stripe Elements, necesitará <code>js.stripe.com</code> en <code>script-src</code> y <code>frame-src</code>, y <code>api.stripe.com</code> en <code>connect-src</code>.</p>
+
+      <h2><span class="num">04</span>Front end: CSP que deniega por defecto y Trusted Types</h2>
+      <p>Alojé la tipografía Marcellus en el propio sitio mediante <code>@fontsource</code> (su subconjunto latino cubre el inglés y el español) y eliminé Google Fonts, de modo que el sitio no hace solicitudes a ningún origen salvo el propio, la API y la API de búsqueda de Mapbox. También eliminé el paquete <code>mapbox-gl</code>, que no se usaba. La política final:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+img-src 'self' data:;
+connect-src 'self' https://jrb-premiere-ride-api.onrender.com
+            https://api.mapbox.com;
+manifest-src 'self'; form-action 'self'; base-uri 'none';
+object-src 'none'; frame-src 'none'; worker-src 'none';
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types default;
+upgrade-insecure-requests</code></pre>
+      <p><strong>Trusted Types con React.</strong> A diferencia del portafolio (<code>trusted-types 'none'</code>), esta aplicación tiene un punto de inserción legítimo: el gestor del <code>&lt;head&gt;</code> escribe los datos estructurados JSON-LD de cada página con <code>innerHTML</code> durante la navegación del lado del cliente. La solución es una única política <code>default</code>, cargada como el primer script, cuyo <code>createHTML</code> solo acepta una cadena si no contiene <code>&lt;</code>: un texto sin <code>&lt;</code> no puede crear elementos, atributos ni manejadores de eventos. A propósito no tiene <code>createScript</code> ni <code>createScriptURL</code>, así que convertir una cadena en script sigue bloqueado por completo. Comprobé en el navegador que inyectar marcado a través de los puntos de inserción de HTML genera un error, y que un script cuyo texto se asigna desde una cadena nunca se ejecuta.</p>
+
+      <h2><span class="num">05</span>Encabezados de respuesta HTTP</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Encabezado</th><th>Propósito</th></tr></thead>
+          <tbody>
+            <tr><td><code>Content-Security-Policy</code></td><td>Deniega por defecto; solo el propio sitio, la API y la búsqueda de Mapbox; Trusted Types aplicado.</td></tr>
+            <tr><td><code>Strict-Transport-Security</code></td><td>Dos años con <code>includeSubDomains</code> (antes, un año).</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Protección contra clickjacking para navegadores antiguos; <code>frame-ancestors</code> cubre los modernos.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code>.</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code>.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Ubicación permitida solo para el propio sitio (el botón &laquo;usar mi ubicación&raquo; para el punto de recogida); cámara, micrófono, pagos, USB, sensores de movimiento, captura de pantalla y temas publicitarios desactivados. <code>payment=()</code> es correcto porque Stripe Checkout se ejecuta en la página de Stripe.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td><code>same-origin</code>.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td><code>same-origin</code> (antes, <code>same-site</code>).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">06</span>La API</h2>
+      <ul>
+        <li><strong>Encabezados.</strong> Helmet con una CSP que lo deniega todo (la API solo devuelve JSON), HSTS de dos años y <code>no-referrer</code>.</li>
+        <li><strong>CORS.</strong> Limitado al dominio propio (raíz y www), solo <code>GET</code>/<code>POST</code>, solo el encabezado <code>Content-Type</code>, sin credenciales. Incluso la copia del sitio en <code>onrender.com</code> del propio proveedor queda rechazada; se verificó en vivo.</li>
+        <li><strong>Validación.</strong> Zod en todos los endpoints de escritura: el vehículo se limita a los que tienen precio, formato de ObjectId en los identificadores de cotizaciones y reservas, formato de teléfono, longitudes máximas y eliminación de caracteres de control. Los campos desconocidos se descartan, así que un cliente nunca puede asignar campos de estado o de pago.</li>
+        <li><strong>Límites de solicitudes por IP.</strong> 20 cotizaciones por minuto (cada una genera llamadas a Mapbox que se cobran); 10 cada 15 minutos en reservas, contacto y pago (cada una crea registros en la base de datos o una sesión de Stripe); 100 por minuto en total. El límite del cuerpo JSON bajó de 1&nbsp;MB a 16&nbsp;KB.</li>
+        <li><strong>Errores.</strong> Un gestor central de errores nunca devuelve trazas de pila ni texto interno: los errores del servidor son un 500 genérico, el JSON mal formado devuelve &laquo;Bad request&raquo; y los errores de conversión o validación de la base de datos son un 400 genérico.</li>
+        <li><strong>Correos salientes.</strong> El correo de notificación de reservas pagadas ahora escapa en HTML todos los campos escritos por el pasajero.</li>
+        <li><strong>Dependencias.</strong> La API quedó sin vulnerabilidades tras actualizar Zod (3&nbsp;&rarr;&nbsp;4) y Express. Los avisos que quedan en el front end están en el servidor de desarrollo de Vite (que nunca se despliega) y en un problema de redirección de React Router que no es alcanzable, porque ninguna entrada del usuario alimenta la navegación.</li>
+      </ul>
+
+      <h2><span class="num">07</span>Dominio: correo y certificados</h2>
+      <p>Identifiqué a los proveedores antes de escribir cualquier registro. El DNS y el registrador son Squarespace Domains; el dominio no recibe correo (sin MX); y el único remitente es Resend (sobre Amazon SES), para las notificaciones de reservas.</p>
+      <pre><code>@                  TXT  "v=spf1 -all"
+send               TXT  "v=spf1 include:amazonses.com ~all"
+resend._domainkey  TXT  (Resend DKIM key — already present)
+_dmarc             TXT  "v=DMARC1; p=none;"
+@                  CAA  0 issue "pki.goog"
+@                  CAA  0 issue "letsencrypt.org"</code></pre>
+      <ul>
+        <li><strong>El SPF del dominio raíz es <code>-all</code></strong> porque la raíz no envía nada. Resend envía con una dirección de rebote en el subdominio <code>send</code>, al que le faltaba su registro SPF.</li>
+        <li><strong>DMARC</strong> se cumple gracias a la firma DKIM alineada. Empieza en <code>p=none</code> para monitorear y pasará a cuarentena y luego a rechazo cuando se confirme que el correo real pasa la verificación.</li>
+        <li><strong>Las autoridades del CAA salieron de los registros de Certificate Transparency.</strong> Todos los certificados emitidos para el dominio provienen de Google Trust Services, así que <code>pki.goog</code> es obligatorio; Let&rsquo;s Encrypt se incluye como precaución por si el proveedor alguna vez recurre a él.</li>
+        <li><strong>DNSSEC</strong> ya estaba activado, y cada registro se confirmó mediante un resolutor público que valida DNSSEC.</li>
+      </ul>
+
+      <h2><span class="num">08</span>Implementación y verificación</h2>
+      <p>La misma regla que en el portafolio: <strong>nunca endurecer un encabezado antes de que esté en producción el código que lo necesita.</strong></p>
+      <ul>
+        <li><strong>Antes del despliegue:</strong> 23 pruebas automatizadas de la API (validación, cuerpos de error, CORS, límites de solicitudes y firmas de webhook falsificadas, ausentes y válidas), además de un navegador sin interfaz que recorrió cada página en escritorio y en móvil bajo la política final aplicada, incluido un paso simulado de cotización a pago en Stripe, y verificó que no hubiera ninguna violación de la CSP y que las fuentes fueran propias. Esa prueba es la que me permitió descubrir el punto de inserción de Trusted Types en el JSON-LD y diseñar la política <code>default</code>.</li>
+        <li><strong>Etapa 1:</strong> se publicó el código junto con la política estricta como <code>Content-Security-Policy-Report-Only</code>. En el sitio en vivo, ninguna página reportó posibles violaciones, el autocompletado de direcciones y las cotizaciones funcionaron con Mapbox real y la API en producción, y una reserva real con pago completó el recorrido por Stripe de principio a fin.</li>
+        <li><strong>Etapa 2:</strong> se aplicó la política y se endurecieron los demás encabezados. Repetí todas las verificaciones en vivo y volví a probar la reserva con pago.</li>
+        <li><strong>Un imprevisto:</strong> la sincronización de infraestructura como código del proveedor agregó los encabezados nuevos, pero no eliminó el antiguo encabezado de solo reporte, así que lo borré desde el panel y lo confirmé con un nuevo análisis.</li>
+      </ul>
+
+      <h2><span class="num">09</span>Próximos pasos</h2>
+      <ul>
+        <li><strong>La seguridad de las cuentas es ahora el perímetro.</strong> La autenticación multifactor está activada en el proveedor de alojamiento, GitHub, Stripe, el registrador, la base de datos, el proveedor de correo y Mapbox.</li>
+        <li><strong>Aplicación de DMARC.</strong> Pasar a cuarentena y luego a rechazo.</li>
+        <li><strong>Precarga de HSTS.</strong> Pospuesta por la misma razón que en el portafolio: es prácticamente permanente.</li>
+        <li><strong>Errores 404 reales.</strong> Hacer que las URL desconocidas devuelvan un estado 404 en lugar de 200.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+    </article>
+  </main>
+
+  <div id="site-footer"></div>
+
+</body>
+</html>
