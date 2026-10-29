@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Security: Content Security Policy (defense-in-depth) + referrer policy -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src 'self' data:; manifest-src 'self'; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'; require-trusted-types-for 'script'; trusted-types 'none'; upgrade-insecure-requests">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="robots" content="index, follow">
+
+<title>Hardening Judah Security — Antonio E. del Toro</title>
+<meta name="description" content="Case study: taking a full-stack MERN lead-generation site from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory — server-side admin auth, API hardening, a deny-by-default CSP with Trusted Types, and email and certificate DNS controls.">
+<meta name="author" content="Antonio E. del Toro">
+<link rel="canonical" href="https://www.antonioedeltoro.com/judah-security-hardening.html">
+<link rel="icon" type="image/png" href="favicon.png">
+<meta name="theme-color" content="#FF5F00">
+
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://www.antonioedeltoro.com/judah-security-hardening.html">
+<meta property="og:title" content="Hardening Judah Security">
+<meta property="og:description" content="A full-stack site with an admin area, user accounts and lead forms, taken from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory.">
+<meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
+<meta property="og:site_name" content="Antonio E. del Toro">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:creator" content="@antonioedeltoro">
+
+<link rel="preload" href="fonts/dm-sans-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+
+<!-- Shared nav + footer -->
+<link rel="stylesheet" href="chrome.css">
+<script defer src="chrome.js"></script>
+
+<!-- Set theme + language before paint to avoid a flash of the wrong state -->
+<script src="theme-init.js"></script>
+
+<link rel="stylesheet" href="writeup.css">
+</head>
+<body>
+
+  <div id="site-nav"></div>
+
+  <main>
+    <!-- ENGLISH -->
+    <article data-l="en">
+      <div class="eyebrow">Security · Write-up</div>
+      <h1>Hardening Judah Security</h1>
+      <div class="meta-row">
+        <span class="updated">October 29, 2026</span>
+        <span class="pill">Auth</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">XSS</span><span class="pill">API security</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
+      </div>
+
+      <p class="intro"><strong>Judah Security</strong> is a lead-generation site for a Los Angeles physical security company: a React/Vite front end and an Express/MongoDB API, with a quote request form, a course inquiry form, news posts managed through an admin editor, and client reviews with reviewer accounts. Unlike my <a href="site-hardening.html">static portfolio</a>, it has a backend, an admin area and user accounts, so I audited and hardened it end to end. <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">See the live portfolio copy</a>.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 on Mozilla&rsquo;s HTTP Observatory, 12 of 12 tests passed</strong>, on both the client&rsquo;s domain and the portfolio copy (baseline before this work: D, 35/100, 3 tests failed). <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=judah-security.deltoro.codes" target="_blank" rel="noopener">View the live report</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Threat model</h2>
+      <p>The forms collect sensitive operational details &mdash; site addresses, schedules, number of guards, armed or unarmed &mdash; so this site has more to protect than a brochure:</p>
+      <ul>
+        <li><strong>Account takeover</strong> of the admin area or reviewer accounts.</li>
+        <li><strong>Content tampering and stored XSS</strong> &mdash; a malicious news post running script for every visitor.</li>
+        <li><strong>Spam and abuse</strong> of the public endpoints.</li>
+        <li><strong>Lead data exposure.</strong></li>
+        <li><strong>The usual web risks:</strong> clickjacking, protocol downgrade, email spoofing and mis-issued certificates.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Starting point</h2>
+      <p>The baseline scan was a <strong>D, 35/100</strong>, with 3 tests failed: no Content Security Policy, no HSTS and no <code>X-Frame-Options</code>. The only security header present was <code>X-Content-Type-Options</code>.</p>
+
+      <h2><span class="num">03</span>What the audit found</h2>
+      <p>Most severe first:</p>
+      <ol>
+        <li><strong>The admin credential was in the public JavaScript.</strong> It lived in a build variable with Vite&rsquo;s <code>VITE_</code> prefix, and Vite inlines those into the bundle at build time. The API accepted that same static token, and the admin &ldquo;login&rdquo; was a string comparison in the browser. Anyone reading the bundle could create, edit or delete news posts and upload any file type &mdash; and because posts were rendered with <code>dangerouslySetInnerHTML</code>, a tampered post could have run script for every visitor. I contained it before fixing it: I removed the variables from the hosting environment so the API rejected the token before the code fix shipped, confirmed the old token was refused, and checked the content for tampering. None was found.</li>
+        <li><strong>Every lead was bouncing.</strong> Both forms opened a <code>mailto:</code> link to an address on a domain with no mail server (no MX record), so quote requests and course inquiries never arrived. I pointed both forms at the client&rsquo;s real inbox.</li>
+        <li><strong>The portfolio copy was the production site.</strong> The portfolio subdomain was just a second hostname on the production front end, dependent on the client&rsquo;s API &mdash; and its News page was empty because the API&rsquo;s CORS policy rejected that origin. I rebuilt it as a self-contained copy (section 09).</li>
+        <li><strong>CORS was reopened by configuration.</strong> A CORS setting in the API&rsquo;s hosting environment re-allowed <code>http://localhost:5173</code> in production, undoing the allowlist in the code.</li>
+        <li><strong>A data-integrity bug.</strong> Invalid review ratings were silently saved as five stars.</li>
+      </ol>
+
+      <h2><span class="num">04</span>Authentication</h2>
+      <ul>
+        <li><strong>Admin auth moved to the server.</strong> The admin password is stored only as a bcrypt hash on the server. Logging in returns a short-lived JWT (two hours), signed with a secret separate from the reviewer tokens and scoped by audience, so a reviewer token can never act as admin.</li>
+        <li><strong>Brute-force protection.</strong> Login attempts are tightly rate-limited per IP.</li>
+        <li><strong>Token storage.</strong> Old tokens are purged from browser storage, and admin and reviewer tokens moved from <code>localStorage</code> to <code>sessionStorage</code>, so they don&rsquo;t outlive the tab.</li>
+      </ul>
+
+      <h2><span class="num">05</span>The API</h2>
+      <ul>
+        <li><strong>Abuse limits.</strong> Rate limits on every route, with tighter limits on authentication and review writes, and a small request-body limit.</li>
+        <li><strong>Validation.</strong> Input validation and length caps on every write; invalid ratings are now rejected instead of saved.</li>
+        <li><strong>Lead data stays out of logs.</strong> Request bodies are no longer logged.</li>
+        <li><strong>Uploads.</strong> Limited to JPEG, PNG and WebP up to 5&nbsp;MB, saved under random filenames, and served with <code>nosniff</code> and a sandboxed CSP.</li>
+        <li><strong>CORS.</strong> An exact-match allowlist with no credentials.</li>
+        <li><strong>Headers.</strong> Helmet with a deny-all CSP (the API only returns JSON) and two-year HSTS.</li>
+        <li><strong>No configuration leaks.</strong> The health endpoint no longer exposes the CORS allowlist.</li>
+        <li><strong>Dependencies.</strong> <code>npm audit</code> reports zero vulnerabilities on the backend.</li>
+      </ul>
+
+      <h2><span class="num">06</span>Front end: deny-by-default CSP and Trusted Types</h2>
+      <p>The core of the policy, with the API&rsquo;s origin replaced by a placeholder:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+connect-src &lt;api-origin&gt;;
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
+      <p>Enforcing Trusted Types with no policies at all means the browser refuses to turn any string into HTML or script. Getting there took four changes:</p>
+      <ul>
+        <li><strong>No more <code>dangerouslySetInnerHTML</code>.</strong> News bodies are stored as HTML, so I wrote a small whitelist renderer that turns paragraphs, bold text and lists into React elements. No HTML string ever reaches the DOM.</li>
+        <li><strong>Inline styles moved into CSS</strong>, so <code>style-src</code> needs nothing beyond <code>'self'</code>.</li>
+        <li><strong>Four unused dependencies removed:</strong> axios, EmailJS, Font Awesome and react-helmet.</li>
+        <li><strong>No third-party asset origins</strong> &mdash; every script, style and font is served by the site itself.</li>
+      </ul>
+
+      <h2><span class="num">07</span>HTTP response headers</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Header</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><code>Content-Security-Policy</code></td><td>The deny-by-default policy above, including <code>frame-ancestors 'none'</code>, which only works as a header.</td></tr>
+            <tr><td><code>Strict-Transport-Security</code></td><td>Two years with <code>includeSubDomains</code>.</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Clickjacking protection for older browsers.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code> (the one header that was already there).</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code>.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Camera, microphone, location, payment, USB, motion sensors and ad-topics APIs disabled.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td><code>same-origin</code>.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td><code>same-origin</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">08</span>Domain and accounts</h2>
+      <p>The domain sends and receives no mail, so the records say exactly that:</p>
+      <pre><code>@        TXT  "v=spf1 -all"
+_dmarc   TXT  "v=DMARC1; p=none;"
+@        CAA  0 issue "letsencrypt.org"
+@        CAA  0 issue "pki.goog"</code></pre>
+      <ul>
+        <li><strong>DMARC</strong> starts at <code>p=none</code> to watch the reports before tightening.</li>
+        <li><strong>CAA</strong> is limited to the host&rsquo;s two certificate authorities, Let&rsquo;s Encrypt and Google Trust Services. Listing only one would break a future renewal through the other.</li>
+        <li><strong>DNSSEC</strong> is enabled and validating.</li>
+        <li><strong>Accounts:</strong> multi-factor authentication on the hosting, Git and registrar accounts.</li>
+      </ul>
+
+      <h2><span class="num">09</span>The portfolio copy</h2>
+      <p>The <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">portfolio copy</a> is a separate build mode of the same codebase, so it inherits every fix above. It:</p>
+      <ul>
+        <li><strong>Makes zero API calls.</strong> It snapshots the live content into the bundle, checksum-verified.</li>
+        <li><strong>Has no admin area</strong>, and shows the forms and reviews read-only, with a &ldquo;portfolio copy&rdquo; banner.</li>
+        <li><strong>Stays out of search.</strong> It&rsquo;s <code>noindex</code> with its own canonical, so it never competes with the client&rsquo;s site.</li>
+        <li><strong>Has an even tighter CSP.</strong> The API origin is gone entirely: <code>connect-src 'self'</code>.</li>
+        <li><strong>Runs on its own,</strong> as a separate static site on the portfolio subdomain, independent of the client&rsquo;s API and database.</li>
+      </ul>
+
+      <h2><span class="num">10</span>Rollout and verification</h2>
+      <p>Same rule as on my portfolio: <strong>never tighten a header before the code that needs it is live.</strong> The code shipped first with a strict <code>&lt;meta&gt;</code> CSP; the header CSP and Trusted Types came only after that code was in production.</p>
+      <ul>
+        <li><strong>Before deploying:</strong> headless Chromium crawled every route of both builds on desktop and mobile and asserted zero CSP or Trusted Types violations, zero JavaScript errors and zero third-party requests. Injected <code>&lt;img onerror&gt;</code> and <code>&lt;script&gt;</code> payloads rendered as plain text, framing was blocked, and the admin login flow worked.</li>
+        <li><strong>After deploying:</strong> the live bundle&rsquo;s hash matched the tested build, the headers were checked live, Observatory re-scanned every hostname, and every DNS record was confirmed through a public DNSSEC-validating resolver.</li>
+      </ul>
+
+      <h2><span class="num">11</span>What&rsquo;s next</h2>
+      <ul>
+        <li><strong>DMARC enforcement:</strong> move to <code>p=reject</code> once the reports are clean.</li>
+        <li><strong>Dependency upgrades:</strong> move the front-end tooling across major versions; the remaining advisories are mostly in development-only tooling.</li>
+        <li><strong>Account security</strong> stays the main ongoing control.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Back to security work</a>
+    </article>
+
+    <!-- ESPAÑOL -->
+    <article data-l="es">
+      <div class="eyebrow">Seguridad · Informe</div>
+      <h1>Protección de Judah Security</h1>
+      <div class="meta-row">
+        <span class="updated">29 de octubre de 2026</span>
+        <span class="pill">Autenticación</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">XSS</span><span class="pill">Seguridad de API</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
+      </div>
+
+      <p class="intro"><strong>Judah Security</strong> es un sitio de captación de clientes para una empresa de seguridad física en Los Ángeles: un front end en React/Vite y una API en Express/MongoDB, con un formulario de solicitud de cotización, otro de consulta sobre cursos, noticias que se administran desde un editor privado y reseñas de clientes con cuentas de usuario. A diferencia de mi <a href="site-hardening.html">portafolio estático</a>, tiene backend, un área de administración y cuentas de usuario, así que lo audité y lo protegí de principio a fin. <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">Ver la copia en vivo del portafolio</a>.</p>
+
+      <div class="result">
+        <div class="grade">A+</div>
+        <p><strong>140 / 100 en el HTTP Observatory de Mozilla, 12 de 12 pruebas superadas</strong>, tanto en el dominio del cliente como en la copia del portafolio (punto de partida antes de este trabajo: D, 35/100, 3 pruebas reprobadas). <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=judah-security.deltoro.codes" target="_blank" rel="noopener">Ver el informe en vivo</a>.</p>
+      </div>
+
+      <h2><span class="num">01</span>Modelo de amenazas</h2>
+      <p>Los formularios recogen datos operativos delicados (direcciones de los sitios, horarios, número de guardias, si van armados o no), así que este sitio tiene más que proteger que un simple folleto:</p>
+      <ul>
+        <li><strong>Toma de control de cuentas</strong>: el área de administración o las cuentas de quienes dejan reseñas.</li>
+        <li><strong>Alteración de contenido y XSS almacenado</strong>: una noticia maliciosa que ejecute código en el navegador de cada visitante.</li>
+        <li><strong>Spam y abuso</strong> de los endpoints públicos.</li>
+        <li><strong>Exposición de los datos de los clientes potenciales.</strong></li>
+        <li><strong>Los riesgos web de siempre:</strong> clickjacking, degradación de protocolo, suplantación de correo y certificados emitidos indebidamente.</li>
+      </ul>
+
+      <h2><span class="num">02</span>Punto de partida</h2>
+      <p>El análisis de referencia dio una <strong>D, 35/100</strong>, con 3 pruebas reprobadas: sin Política de Seguridad de Contenido, sin HSTS y sin <code>X-Frame-Options</code>. El único encabezado de seguridad presente era <code>X-Content-Type-Options</code>.</p>
+
+      <h2><span class="num">03</span>Lo que encontró la auditoría</h2>
+      <p>De mayor a menor gravedad:</p>
+      <ol>
+        <li><strong>La credencial de administrador estaba en el JavaScript público.</strong> Estaba en una variable de compilación con el prefijo <code>VITE_</code>, y Vite incrusta esas variables en el paquete público al compilar. La API aceptaba ese mismo token fijo, y el &laquo;inicio de sesión&raquo; de administrador era una simple comparación de cadenas en el navegador. Cualquiera que leyera el paquete podía crear, editar o borrar noticias y subir archivos de cualquier tipo; y como las noticias se mostraban con <code>dangerouslySetInnerHTML</code>, una noticia alterada podía ejecutar código para todos los visitantes. Primero contuve el problema y después lo corregí: eliminé las variables del entorno de alojamiento para que la API rechazara el token antes de publicar la corrección, confirmé que el token anterior ya no funcionaba y revisé el contenido en busca de alteraciones. No había ninguna.</li>
+        <li><strong>Todas las solicitudes rebotaban.</strong> Los dos formularios abrían un enlace <code>mailto:</code> hacia una dirección de un dominio sin servidor de correo (sin registro MX), así que ni las cotizaciones ni las consultas sobre cursos llegaban a su destino. Redirigí ambos formularios al buzón real del cliente.</li>
+        <li><strong>La copia del portafolio era el sitio de producción.</strong> El subdominio del portafolio era solo un segundo nombre del front end de producción, dependiente de la API del cliente, y su página de noticias aparecía vacía porque la política CORS de la API rechazaba ese origen. La reconstruí como una copia independiente (sección 09).</li>
+        <li><strong>La configuración volvía a abrir CORS.</strong> Un ajuste de CORS en el entorno de alojamiento de la API volvía a permitir <code>http://localhost:5173</code> en producción, lo que anulaba la lista de orígenes permitidos definida en el código.</li>
+        <li><strong>Un error de integridad de datos.</strong> Las calificaciones no válidas de las reseñas se guardaban, sin aviso, como cinco estrellas.</li>
+      </ol>
+
+      <h2><span class="num">04</span>Autenticación</h2>
+      <ul>
+        <li><strong>La autenticación de administrador pasó al servidor.</strong> La contraseña de administrador solo se guarda como un hash bcrypt en el servidor. Al iniciar sesión se emite un JWT de corta duración (dos horas), firmado con un secreto distinto del de las reseñas y limitado por audiencia, de modo que un token de reseña nunca puede actuar como administrador.</li>
+        <li><strong>Protección contra fuerza bruta.</strong> Los intentos de inicio de sesión tienen un límite estricto por IP.</li>
+        <li><strong>Almacenamiento de tokens.</strong> Se eliminan los tokens antiguos del navegador, y los de administrador y de reseñas pasaron de <code>localStorage</code> a <code>sessionStorage</code>, así que no sobreviven al cerrar la pestaña.</li>
+      </ul>
+
+      <h2><span class="num">05</span>La API</h2>
+      <ul>
+        <li><strong>Límites contra el abuso.</strong> Límites de solicitudes en todas las rutas, más estrictos en la autenticación y en la escritura de reseñas, y un tamaño máximo reducido para el cuerpo de las solicitudes.</li>
+        <li><strong>Validación.</strong> Validación de datos y longitudes máximas en todas las escrituras; las calificaciones no válidas ahora se rechazan en lugar de guardarse.</li>
+        <li><strong>Los datos de los clientes no llegan a los registros.</strong> Ya no se registra el cuerpo de las solicitudes.</li>
+        <li><strong>Archivos subidos.</strong> Solo JPEG, PNG y WebP de hasta 5&nbsp;MB, guardados con nombres aleatorios y servidos con <code>nosniff</code> y una CSP aislada (sandbox).</li>
+        <li><strong>CORS.</strong> Una lista de orígenes con coincidencia exacta y sin credenciales.</li>
+        <li><strong>Encabezados.</strong> Helmet con una CSP que lo deniega todo (la API solo devuelve JSON) y HSTS de dos años.</li>
+        <li><strong>Sin filtrar la configuración.</strong> El endpoint de estado ya no expone la lista de orígenes de CORS.</li>
+        <li><strong>Dependencias.</strong> <code>npm audit</code> no reporta ninguna vulnerabilidad en el backend.</li>
+      </ul>
+
+      <h2><span class="num">06</span>Front end: CSP que deniega por defecto y Trusted Types</h2>
+      <p>El núcleo de la política, con el origen de la API sustituido por un marcador de posición:</p>
+      <pre><code>default-src 'none';
+script-src 'self'; style-src 'self'; font-src 'self';
+connect-src &lt;api-origin&gt;;
+frame-ancestors 'none';
+require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
+      <p>Aplicar Trusted Types sin ninguna política significa que el navegador se niega a convertir cualquier cadena de texto en HTML o en script. Para llegar ahí hicieron falta cuatro cambios:</p>
+      <ul>
+        <li><strong>Adiós a <code>dangerouslySetInnerHTML</code>.</strong> El cuerpo de las noticias se guarda como HTML, así que escribí un pequeño renderizador con lista blanca que convierte párrafos, negritas y listas en elementos de React. Ninguna cadena HTML llega nunca al DOM.</li>
+        <li><strong>Los estilos en línea pasaron a CSS</strong>, así que <code>style-src</code> no necesita nada más que <code>'self'</code>.</li>
+        <li><strong>Se eliminaron cuatro dependencias sin uso:</strong> axios, EmailJS, Font Awesome y react-helmet.</li>
+        <li><strong>Ningún recurso de terceros:</strong> el propio sitio sirve todos los scripts, estilos y fuentes.</li>
+      </ul>
+
+      <h2><span class="num">07</span>Encabezados de respuesta HTTP</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Encabezado</th><th>Propósito</th></tr></thead>
+          <tbody>
+            <tr><td><code>Content-Security-Policy</code></td><td>La política anterior, que deniega por defecto, incluida <code>frame-ancestors 'none'</code>, que solo funciona como encabezado.</td></tr>
+            <tr><td><code>Strict-Transport-Security</code></td><td>Dos años con <code>includeSubDomains</code>.</td></tr>
+            <tr><td><code>X-Frame-Options: DENY</code></td><td>Protección contra clickjacking para navegadores antiguos.</td></tr>
+            <tr><td><code>X-Content-Type-Options</code></td><td><code>nosniff</code> (el único encabezado que ya estaba).</td></tr>
+            <tr><td><code>Referrer-Policy</code></td><td><code>strict-origin-when-cross-origin</code>.</td></tr>
+            <tr><td><code>Permissions-Policy</code></td><td>Cámara, micrófono, ubicación, pagos, USB, sensores de movimiento y temas publicitarios desactivados.</td></tr>
+            <tr><td><code>Cross-Origin-Opener-Policy</code></td><td><code>same-origin</code>.</td></tr>
+            <tr><td><code>Cross-Origin-Resource-Policy</code></td><td><code>same-origin</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2><span class="num">08</span>Dominio y cuentas</h2>
+      <p>El dominio no envía ni recibe correo, y los registros lo declaran así:</p>
+      <pre><code>@        TXT  "v=spf1 -all"
+_dmarc   TXT  "v=DMARC1; p=none;"
+@        CAA  0 issue "letsencrypt.org"
+@        CAA  0 issue "pki.goog"</code></pre>
+      <ul>
+        <li><strong>DMARC</strong> empieza en <code>p=none</code> para revisar los informes antes de endurecer la política.</li>
+        <li><strong>CAA</strong> se limita a las dos autoridades de certificación que usa el proveedor: Let&rsquo;s Encrypt y Google Trust Services. Incluir solo una haría fallar una renovación futura a través de la otra.</li>
+        <li><strong>DNSSEC</strong> está activado y validando.</li>
+        <li><strong>Cuentas:</strong> autenticación multifactor en las cuentas de alojamiento, Git y el registrador.</li>
+      </ul>
+
+      <h2><span class="num">09</span>La copia del portafolio</h2>
+      <p>La <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">copia del portafolio</a> es un modo de compilación aparte del mismo código, así que hereda todas las correcciones anteriores. Esta copia:</p>
+      <ul>
+        <li><strong>No hace ninguna llamada a la API.</strong> Incluye en el paquete una instantánea del contenido en vivo, verificada con suma de comprobación.</li>
+        <li><strong>No tiene área de administración</strong>, y muestra los formularios y las reseñas en modo de solo lectura, con un aviso de &laquo;copia del portafolio&raquo;.</li>
+        <li><strong>No aparece en los buscadores.</strong> Lleva <code>noindex</code> y su propia URL canónica, para no competir nunca con el sitio del cliente.</li>
+        <li><strong>Tiene una CSP todavía más estricta.</strong> El origen de la API desaparece por completo: <code>connect-src 'self'</code>.</li>
+        <li><strong>Funciona por su cuenta,</strong> como un sitio estático independiente en el subdominio del portafolio, sin depender de la API ni de la base de datos del cliente.</li>
+      </ul>
+
+      <h2><span class="num">10</span>Implementación y verificación</h2>
+      <p>La misma regla que en mi portafolio: <strong>nunca endurecer un encabezado antes de que esté en producción el código que lo necesita.</strong> Primero se publicó el código con una CSP estricta en la etiqueta <code>&lt;meta&gt;</code>; la CSP del encabezado y Trusted Types llegaron solo cuando ese código ya estaba en producción.</p>
+      <ul>
+        <li><strong>Antes del despliegue:</strong> Chromium sin interfaz recorrió todas las rutas de ambas compilaciones, en escritorio y en móvil, y verificó que no hubiera ninguna violación de la CSP ni de Trusted Types, ningún error de JavaScript ni ninguna solicitud a terceros. Las cargas inyectadas con <code>&lt;img onerror&gt;</code> y <code>&lt;script&gt;</code> se mostraron como texto plano, el sitio no se pudo incrustar en otro y el inicio de sesión de administrador funcionó.</li>
+        <li><strong>Después del despliegue:</strong> el hash del paquete en vivo coincidió con el de la compilación probada, se revisaron los encabezados en vivo, Observatory volvió a analizar cada nombre de dominio y cada registro DNS se confirmó mediante un resolutor público que valida DNSSEC.</li>
+      </ul>
+
+      <h2><span class="num">11</span>Próximos pasos</h2>
+      <ul>
+        <li><strong>Aplicación de DMARC:</strong> pasar a <code>p=reject</code> cuando los informes estén limpios.</li>
+        <li><strong>Actualización de dependencias:</strong> llevar las herramientas del front end a sus nuevas versiones mayores; los avisos que quedan son, en su mayoría, de herramientas de desarrollo.</li>
+        <li><strong>La seguridad de las cuentas</strong> sigue siendo el principal control de aquí en adelante.</li>
+      </ul>
+
+      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+    </article>
+  </main>
+
+  <div id="site-footer"></div>
+
+</body>
+</html>
