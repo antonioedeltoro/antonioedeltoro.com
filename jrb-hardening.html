@@ -88,10 +88,7 @@
       <ul>
         <li>Google Fonts was allowed in the CSP, and the policy started from <code>default-src 'self'</code> rather than denying by default. No Trusted Types.</li>
         <li>HSTS was set for one year.</li>
-        <li>Error responses could carry internal error text.</li>
-        <li>Booking, contact and checkout had no write-specific rate limits, and vehicle and ID fields were loosely validated.</li>
-        <li>The paid-booking notification email interpolated rider-supplied text into HTML <strong>unescaped</strong>.</li>
-        <li>An unused <code>mapbox-gl</code> dependency, and dependency advisories in the API, including one critical.</li>
+        <li>An unused <code>mapbox-gl</code> dependency.</li>
         <li>No SPF on the apex or on the email provider&rsquo;s bounce subdomain, and no CAA record.</li>
       </ul>
 
@@ -143,7 +140,7 @@ upgrade-insecure-requests</code></pre>
         <li><strong>Validation.</strong> Zod on every write endpoint: vehicle restricted to priced vehicles, ObjectId format on quote and booking IDs, phone format, length caps, control-character stripping. Unknown fields are dropped, so a client can never set status or payment fields.</li>
         <li><strong>Rate limits per IP.</strong> Tight limits on quotes (each one triggers billed Mapbox calls) and on bookings, contact and checkout (each creates database records or a Stripe session), sized to the cost of each call, plus an overall cap. The JSON body size limit was cut sharply.</li>
         <li><strong>Errors.</strong> A central error handler never returns stack traces or internal error text: server errors are a generic 500, malformed JSON is &ldquo;Bad request&rdquo;, and database cast or validation errors are a generic 400.</li>
-        <li><strong>Email output.</strong> The paid-booking notification email now HTML-escapes every rider-supplied field.</li>
+        <li><strong>Email output.</strong> The paid-booking notification email HTML-escapes every rider-supplied field.</li>
         <li><strong>Dependencies.</strong> The API is at zero vulnerabilities after upgrading Zod (3&nbsp;&rarr;&nbsp;4) and Express. The remaining front-end advisories are limited to development-only tooling that is never deployed, or to code paths that user input can&rsquo;t reach.</li>
       </ul>
 
@@ -228,10 +225,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       <ul>
         <li>La CSP permitía Google Fonts y partía de <code>default-src 'self'</code> en lugar de denegar todo por defecto. Sin Trusted Types.</li>
         <li>HSTS estaba configurado a un año.</li>
-        <li>Las respuestas de error podían incluir texto interno del error.</li>
-        <li>Las reservas, el contacto y el pago no tenían límites de solicitudes propios para escrituras, y los campos de vehículo e identificadores se validaban de forma laxa.</li>
-        <li>El correo de notificación de reservas pagadas insertaba en el HTML el texto escrito por el pasajero <strong>sin escapar</strong>.</li>
-        <li>Una dependencia <code>mapbox-gl</code> sin usar, y avisos de seguridad en las dependencias de la API, uno de ellos crítico.</li>
+        <li>Una dependencia <code>mapbox-gl</code> sin usar.</li>
         <li>Sin SPF en el dominio raíz ni en el subdominio de rebotes del proveedor de correo, y sin registro CAA.</li>
       </ul>
 
@@ -283,7 +277,7 @@ upgrade-insecure-requests</code></pre>
         <li><strong>Validación.</strong> Zod en todos los endpoints de escritura: el vehículo se limita a los que tienen precio, formato de ObjectId en los identificadores de cotizaciones y reservas, formato de teléfono, longitudes máximas y eliminación de caracteres de control. Los campos desconocidos se descartan, así que un cliente nunca puede asignar campos de estado o de pago.</li>
         <li><strong>Límites de solicitudes por IP.</strong> Límites estrictos en las cotizaciones (cada una genera llamadas a Mapbox que se cobran) y en las reservas, el contacto y el pago (cada una crea registros en la base de datos o una sesión de Stripe), ajustados al costo de cada llamada, además de un límite general. El tamaño máximo del cuerpo JSON se redujo considerablemente.</li>
         <li><strong>Errores.</strong> Un gestor central de errores nunca devuelve trazas de pila ni texto interno: los errores del servidor son un 500 genérico, el JSON mal formado devuelve &laquo;Bad request&raquo; y los errores de conversión o validación de la base de datos son un 400 genérico.</li>
-        <li><strong>Correos salientes.</strong> El correo de notificación de reservas pagadas ahora escapa en HTML todos los campos escritos por el pasajero.</li>
+        <li><strong>Correos salientes.</strong> El correo de notificación de reservas pagadas escapa en HTML todos los campos escritos por el pasajero.</li>
         <li><strong>Dependencias.</strong> La API quedó sin vulnerabilidades tras actualizar Zod (3&nbsp;&rarr;&nbsp;4) y Express. Los avisos que quedan en el front end se limitan a herramientas de desarrollo que nunca se despliegan o a partes del código a las que no llega ninguna entrada del usuario.</li>
       </ul>
 

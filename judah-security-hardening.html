@@ -83,36 +83,27 @@
       <h2><span class="num">02</span>Starting point</h2>
       <p>The baseline scan was a <strong>D, 35/100</strong>, with 3 tests failed: no Content Security Policy, no HSTS and no <code>X-Frame-Options</code>. The only security header present was <code>X-Content-Type-Options</code>.</p>
 
-      <h2><span class="num">03</span>What the audit found</h2>
-      <p>Most severe first:</p>
-      <ol>
-        <li><strong>The admin credential was in the public JavaScript.</strong> It lived in a build variable with Vite&rsquo;s <code>VITE_</code> prefix, and Vite inlines those into the bundle at build time. The API accepted that same static token, and the admin &ldquo;login&rdquo; was a string comparison in the browser. Anyone reading the bundle could create, edit or delete news posts and upload any file type. And because posts were rendered with <code>dangerouslySetInnerHTML</code>, a tampered post could have run script for every visitor. I contained it before fixing it: I removed the variables from the hosting environment so the API rejected the token before the code fix shipped, confirmed the old token was refused, and checked the content for tampering. None was found.</li>
-        <li><strong>Every lead was bouncing.</strong> Both forms opened a <code>mailto:</code> link to an address on a domain with no mail server (no MX record), so quote requests and course inquiries never arrived. I pointed both forms at the client&rsquo;s real inbox.</li>
-        <li><strong>The portfolio copy was the production site.</strong> The portfolio subdomain was just a second hostname on the production front end, dependent on the client&rsquo;s API, and its News page was empty because the API&rsquo;s CORS policy rejected that origin. I rebuilt it as a self-contained copy (section 09).</li>
-        <li><strong>CORS was reopened by configuration.</strong> A CORS setting in the API&rsquo;s hosting environment re-allowed <code>http://localhost:5173</code> in production, undoing the allowlist in the code.</li>
-        <li><strong>A data-integrity bug.</strong> Invalid review ratings were silently saved as five stars.</li>
-      </ol>
 
-      <h2><span class="num">04</span>Authentication</h2>
+      <h2><span class="num">03</span>Authentication</h2>
       <ul>
-        <li><strong>Admin auth moved to the server.</strong> The admin password is stored only as a bcrypt hash on the server. Logging in returns a short-lived JWT (two hours), signed with a secret separate from the reviewer tokens and scoped by audience, so a reviewer token can never act as admin.</li>
+        <li><strong>Server-side admin auth.</strong> The admin password is stored only as a bcrypt hash on the server. Logging in returns a short-lived JWT (two hours), signed with a secret separate from the reviewer tokens and scoped by audience, so a reviewer token can never act as admin.</li>
         <li><strong>Brute-force protection.</strong> Login attempts are tightly rate-limited per IP.</li>
-        <li><strong>Token storage.</strong> Old tokens are purged from browser storage, and admin and reviewer tokens moved from <code>localStorage</code> to <code>sessionStorage</code>, so they don&rsquo;t outlive the tab.</li>
+        <li><strong>Token storage.</strong> Admin and reviewer tokens live in <code>sessionStorage</code>, not <code>localStorage</code>, so they don&rsquo;t outlive the tab.</li>
       </ul>
 
-      <h2><span class="num">05</span>The API</h2>
+      <h2><span class="num">04</span>The API</h2>
       <ul>
         <li><strong>Abuse limits.</strong> Rate limits on every route, with tighter limits on authentication and review writes, and a small request-body limit.</li>
-        <li><strong>Validation.</strong> Input validation and length caps on every write; invalid ratings are now rejected instead of saved.</li>
-        <li><strong>Lead data stays out of logs.</strong> Request bodies are no longer logged.</li>
+        <li><strong>Validation.</strong> Input validation and length caps on every write; invalid ratings are rejected.</li>
+        <li><strong>Lead data stays out of logs.</strong> Request bodies are never logged.</li>
         <li><strong>Uploads.</strong> Limited to JPEG, PNG and WebP up to 5&nbsp;MB, saved under random filenames, and served with <code>nosniff</code> and a sandboxed CSP.</li>
         <li><strong>CORS.</strong> An exact-match allowlist with no credentials.</li>
         <li><strong>Headers.</strong> Helmet with a deny-all CSP (the API only returns JSON) and two-year HSTS.</li>
-        <li><strong>No configuration leaks.</strong> The health endpoint no longer exposes the CORS allowlist.</li>
+        <li><strong>No configuration leaks.</strong> The health endpoint doesn&rsquo;t expose the CORS allowlist.</li>
         <li><strong>Dependencies.</strong> <code>npm audit</code> reports zero vulnerabilities on the backend.</li>
       </ul>
 
-      <h2><span class="num">06</span>Front end: deny-by-default CSP and Trusted Types</h2>
+      <h2><span class="num">05</span>Front end: deny-by-default CSP and Trusted Types</h2>
       <p>The core of the policy, with the API&rsquo;s origin replaced by a placeholder:</p>
       <pre><code>default-src 'none';
 script-src 'self'; style-src 'self'; font-src 'self';
@@ -121,13 +112,13 @@ frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
       <p>Enforcing Trusted Types with no policies at all means the browser refuses to turn any string into HTML or script. Getting there took four changes:</p>
       <ul>
-        <li><strong>No more <code>dangerouslySetInnerHTML</code>.</strong> News bodies are stored as HTML, so I wrote a small whitelist renderer that turns paragraphs, bold text and lists into React elements. No HTML string ever reaches the DOM.</li>
+        <li><strong>No <code>dangerouslySetInnerHTML</code>.</strong> News bodies are stored as HTML, so I wrote a small whitelist renderer that turns paragraphs, bold text and lists into React elements. No HTML string ever reaches the DOM.</li>
         <li><strong>Inline styles moved into CSS</strong>, so <code>style-src</code> needs nothing beyond <code>'self'</code>.</li>
         <li><strong>Four unused dependencies removed:</strong> axios, EmailJS, Font Awesome and react-helmet.</li>
         <li><strong>No third-party asset origins:</strong> every script, style and font is served by the site itself.</li>
       </ul>
 
-      <h2><span class="num">07</span>HTTP response headers</h2>
+      <h2><span class="num">06</span>HTTP response headers</h2>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Header</th><th>Why</th></tr></thead>
@@ -144,7 +135,7 @@ require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
         </table>
       </div>
 
-      <h2><span class="num">08</span>Domain and accounts</h2>
+      <h2><span class="num">07</span>Domain and accounts</h2>
       <p>The domain sends and receives no mail, so the records say exactly that:</p>
       <pre><code>@        TXT  "v=spf1 -all"
 _dmarc   TXT  "v=DMARC1; p=none;"
@@ -157,7 +148,7 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>Accounts:</strong> multi-factor authentication on the hosting, Git and registrar accounts.</li>
       </ul>
 
-      <h2><span class="num">09</span>The portfolio copy</h2>
+      <h2><span class="num">08</span>The portfolio copy</h2>
       <p>The <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">portfolio copy</a> is a separate build mode of the same codebase, so it inherits every fix above. It:</p>
       <ul>
         <li><strong>Makes zero API calls.</strong> It snapshots the live content into the bundle, checksum-verified.</li>
@@ -167,14 +158,14 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>Runs on its own,</strong> as a separate static site on the portfolio subdomain, independent of the client&rsquo;s API and database.</li>
       </ul>
 
-      <h2><span class="num">10</span>Rollout and verification</h2>
+      <h2><span class="num">09</span>Rollout and verification</h2>
       <p>The rule throughout: <strong>never tighten a header before the code that needs it is live.</strong> The code shipped first with a strict <code>&lt;meta&gt;</code> CSP; the header CSP and Trusted Types came only after that code was in production.</p>
       <ul>
         <li><strong>Before deploying:</strong> headless Chromium crawled every route of both builds on desktop and mobile and asserted zero CSP or Trusted Types violations, zero JavaScript errors and zero third-party requests. Injected <code>&lt;img onerror&gt;</code> and <code>&lt;script&gt;</code> payloads rendered as plain text, framing was blocked, and the admin login flow worked.</li>
         <li><strong>After deploying:</strong> the live bundle&rsquo;s hash matched the tested build, the headers were checked live, Observatory re-scanned every hostname, and every DNS record was confirmed through a public DNSSEC-validating resolver.</li>
       </ul>
 
-      <h2><span class="num">11</span>What&rsquo;s next</h2>
+      <h2><span class="num">10</span>What&rsquo;s next</h2>
       <ul>
         <li><strong>DMARC enforcement:</strong> move to <code>p=reject</code> once the reports are clean.</li>
         <li><strong>Dependency upgrades:</strong> move the front-end tooling across major versions; the remaining advisories are mostly in development-only tooling.</li>
@@ -225,36 +216,27 @@ _dmarc   TXT  "v=DMARC1; p=none;"
       <h2><span class="num">02</span>Punto de partida</h2>
       <p>El análisis de referencia dio una <strong>D, 35/100</strong>, con 3 pruebas reprobadas: sin Política de Seguridad de Contenido, sin HSTS y sin <code>X-Frame-Options</code>. El único encabezado de seguridad presente era <code>X-Content-Type-Options</code>.</p>
 
-      <h2><span class="num">03</span>Lo que encontró la auditoría</h2>
-      <p>De mayor a menor gravedad:</p>
-      <ol>
-        <li><strong>La credencial de administrador estaba en el JavaScript público.</strong> Estaba en una variable de compilación con el prefijo <code>VITE_</code>, y Vite incrusta esas variables en el paquete público al compilar. La API aceptaba ese mismo token fijo, y el &laquo;inicio de sesión&raquo; de administrador era una simple comparación de cadenas en el navegador. Cualquiera que leyera el paquete podía crear, editar o borrar noticias y subir archivos de cualquier tipo; y como las noticias se mostraban con <code>dangerouslySetInnerHTML</code>, una noticia alterada podía ejecutar código para todos los visitantes. Primero contuve el problema y después lo corregí: eliminé las variables del entorno de alojamiento para que la API rechazara el token antes de publicar la corrección, confirmé que el token anterior ya no funcionaba y revisé el contenido en busca de alteraciones. No había ninguna.</li>
-        <li><strong>Todas las solicitudes rebotaban.</strong> Los dos formularios abrían un enlace <code>mailto:</code> hacia una dirección de un dominio sin servidor de correo (sin registro MX), así que ni las cotizaciones ni las consultas sobre cursos llegaban a su destino. Redirigí ambos formularios al buzón real del cliente.</li>
-        <li><strong>La copia del portafolio era el sitio de producción.</strong> El subdominio del portafolio era solo un segundo nombre del front end de producción, dependiente de la API del cliente, y su página de noticias aparecía vacía porque la política CORS de la API rechazaba ese origen. La reconstruí como una copia independiente (sección 09).</li>
-        <li><strong>La configuración volvía a abrir CORS.</strong> Un ajuste de CORS en el entorno de alojamiento de la API volvía a permitir <code>http://localhost:5173</code> en producción, lo que anulaba la lista de orígenes permitidos definida en el código.</li>
-        <li><strong>Un error de integridad de datos.</strong> Las calificaciones no válidas de las reseñas se guardaban, sin aviso, como cinco estrellas.</li>
-      </ol>
 
-      <h2><span class="num">04</span>Autenticación</h2>
+      <h2><span class="num">03</span>Autenticación</h2>
       <ul>
-        <li><strong>La autenticación de administrador pasó al servidor.</strong> La contraseña de administrador solo se guarda como un hash bcrypt en el servidor. Al iniciar sesión se emite un JWT de corta duración (dos horas), firmado con un secreto distinto del de las reseñas y limitado por audiencia, de modo que un token de reseña nunca puede actuar como administrador.</li>
+        <li><strong>Autenticación de administrador en el servidor.</strong> La contraseña de administrador solo se guarda como un hash bcrypt en el servidor. Al iniciar sesión se emite un JWT de corta duración (dos horas), firmado con un secreto distinto del de las reseñas y limitado por audiencia, de modo que un token de reseña nunca puede actuar como administrador.</li>
         <li><strong>Protección contra fuerza bruta.</strong> Los intentos de inicio de sesión tienen un límite estricto por IP.</li>
-        <li><strong>Almacenamiento de tokens.</strong> Se eliminan los tokens antiguos del navegador, y los de administrador y de reseñas pasaron de <code>localStorage</code> a <code>sessionStorage</code>, así que no sobreviven al cerrar la pestaña.</li>
+        <li><strong>Almacenamiento de tokens.</strong> Los tokens de administrador y de reseñas se guardan en <code>sessionStorage</code>, no en <code>localStorage</code>, así que no sobreviven al cerrar la pestaña.</li>
       </ul>
 
-      <h2><span class="num">05</span>La API</h2>
+      <h2><span class="num">04</span>La API</h2>
       <ul>
         <li><strong>Límites contra el abuso.</strong> Límites de solicitudes en todas las rutas, más estrictos en la autenticación y en la escritura de reseñas, y un tamaño máximo reducido para el cuerpo de las solicitudes.</li>
-        <li><strong>Validación.</strong> Validación de datos y longitudes máximas en todas las escrituras; las calificaciones no válidas ahora se rechazan en lugar de guardarse.</li>
-        <li><strong>Los datos de los clientes no llegan a los registros.</strong> Ya no se registra el cuerpo de las solicitudes.</li>
+        <li><strong>Validación.</strong> Validación de datos y longitudes máximas en todas las escrituras; las calificaciones no válidas se rechazan.</li>
+        <li><strong>Los datos de los clientes no llegan a los registros.</strong> El cuerpo de las solicitudes nunca se registra.</li>
         <li><strong>Archivos subidos.</strong> Solo JPEG, PNG y WebP de hasta 5&nbsp;MB, guardados con nombres aleatorios y servidos con <code>nosniff</code> y una CSP aislada (sandbox).</li>
         <li><strong>CORS.</strong> Una lista de orígenes con coincidencia exacta y sin credenciales.</li>
         <li><strong>Encabezados.</strong> Helmet con una CSP que lo deniega todo (la API solo devuelve JSON) y HSTS de dos años.</li>
-        <li><strong>Sin filtrar la configuración.</strong> El endpoint de estado ya no expone la lista de orígenes de CORS.</li>
+        <li><strong>Sin filtrar la configuración.</strong> El endpoint de estado no expone la lista de orígenes de CORS.</li>
         <li><strong>Dependencias.</strong> <code>npm audit</code> no reporta ninguna vulnerabilidad en el backend.</li>
       </ul>
 
-      <h2><span class="num">06</span>Front end: CSP que deniega por defecto y Trusted Types</h2>
+      <h2><span class="num">05</span>Front end: CSP que deniega por defecto y Trusted Types</h2>
       <p>El núcleo de la política, con el origen de la API sustituido por un marcador de posición:</p>
       <pre><code>default-src 'none';
 script-src 'self'; style-src 'self'; font-src 'self';
@@ -263,13 +245,13 @@ frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
       <p>Aplicar Trusted Types sin ninguna política significa que el navegador se niega a convertir cualquier cadena de texto en HTML o en script. Para llegar ahí hicieron falta cuatro cambios:</p>
       <ul>
-        <li><strong>Adiós a <code>dangerouslySetInnerHTML</code>.</strong> El cuerpo de las noticias se guarda como HTML, así que escribí un pequeño renderizador con lista blanca que convierte párrafos, negritas y listas en elementos de React. Ninguna cadena HTML llega nunca al DOM.</li>
+        <li><strong>Sin <code>dangerouslySetInnerHTML</code>.</strong> El cuerpo de las noticias se guarda como HTML, así que escribí un pequeño renderizador con lista blanca que convierte párrafos, negritas y listas en elementos de React. Ninguna cadena HTML llega nunca al DOM.</li>
         <li><strong>Los estilos en línea pasaron a CSS</strong>, así que <code>style-src</code> no necesita nada más que <code>'self'</code>.</li>
         <li><strong>Se eliminaron cuatro dependencias sin uso:</strong> axios, EmailJS, Font Awesome y react-helmet.</li>
         <li><strong>Ningún recurso de terceros:</strong> el propio sitio sirve todos los scripts, estilos y fuentes.</li>
       </ul>
 
-      <h2><span class="num">07</span>Encabezados de respuesta HTTP</h2>
+      <h2><span class="num">06</span>Encabezados de respuesta HTTP</h2>
       <div class="table-wrap">
         <table>
           <thead><tr><th>Encabezado</th><th>Propósito</th></tr></thead>
@@ -286,7 +268,7 @@ require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
         </table>
       </div>
 
-      <h2><span class="num">08</span>Dominio y cuentas</h2>
+      <h2><span class="num">07</span>Dominio y cuentas</h2>
       <p>El dominio no envía ni recibe correo, y los registros lo declaran así:</p>
       <pre><code>@        TXT  "v=spf1 -all"
 _dmarc   TXT  "v=DMARC1; p=none;"
@@ -299,7 +281,7 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>Cuentas:</strong> autenticación multifactor en las cuentas de alojamiento, Git y el registrador.</li>
       </ul>
 
-      <h2><span class="num">09</span>La copia del portafolio</h2>
+      <h2><span class="num">08</span>La copia del portafolio</h2>
       <p>La <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">copia del portafolio</a> es un modo de compilación aparte del mismo código, así que hereda todas las correcciones anteriores. Esta copia:</p>
       <ul>
         <li><strong>No hace ninguna llamada a la API.</strong> Incluye en el paquete una instantánea del contenido en vivo, verificada con suma de comprobación.</li>
@@ -309,14 +291,14 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>Funciona por su cuenta,</strong> como un sitio estático independiente en el subdominio del portafolio, sin depender de la API ni de la base de datos del cliente.</li>
       </ul>
 
-      <h2><span class="num">10</span>Implementación y verificación</h2>
+      <h2><span class="num">09</span>Implementación y verificación</h2>
       <p>La regla en todo momento: <strong>nunca endurecer un encabezado antes de que esté en producción el código que lo necesita.</strong> Primero se publicó el código con una CSP estricta en la etiqueta <code>&lt;meta&gt;</code>; la CSP del encabezado y Trusted Types llegaron solo cuando ese código ya estaba en producción.</p>
       <ul>
         <li><strong>Antes del despliegue:</strong> Chromium sin interfaz recorrió todas las rutas de ambas compilaciones, en escritorio y en móvil, y verificó que no hubiera ninguna violación de la CSP ni de Trusted Types, ningún error de JavaScript ni ninguna solicitud a terceros. Las cargas inyectadas con <code>&lt;img onerror&gt;</code> y <code>&lt;script&gt;</code> se mostraron como texto plano, el sitio no se pudo incrustar en otro y el inicio de sesión de administrador funcionó.</li>
         <li><strong>Después del despliegue:</strong> el hash del paquete en vivo coincidió con el de la compilación probada, se revisaron los encabezados en vivo, Observatory volvió a analizar cada nombre de dominio y cada registro DNS se confirmó mediante un resolutor público que valida DNSSEC.</li>
       </ul>
 
-      <h2><span class="num">11</span>Próximos pasos</h2>
+      <h2><span class="num">10</span>Próximos pasos</h2>
       <ul>
         <li><strong>Aplicación de DMARC:</strong> pasar a <code>p=reject</code> cuando los informes estén limpios.</li>
         <li><strong>Actualización de dependencias:</strong> llevar las herramientas del front end a sus nuevas versiones mayores; los avisos que quedan son, en su mayoría, de herramientas de desarrollo.</li>

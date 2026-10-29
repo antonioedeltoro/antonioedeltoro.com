@@ -10,7 +10,7 @@
 <meta name="robots" content="index, follow">
 
 <title>Faby Services: Case Study | Antonio E. del Toro</title>
-<meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and the response to exposed database credentials on fabyservices.com.">
+<meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and secrets rotation with locked-down database access on fabyservices.com.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/client-site-hardening.html">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -19,7 +19,7 @@
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/client-site-hardening.html">
 <meta property="og:title" content="Faby Services: Case Study">
-<meta property="og:description" content="The domain, email, accounts and database behind a site whose headers already scored A+, including a credential exposure found and closed.">
+<meta property="og:description" content="The domain, email, accounts and database behind a site whose headers already scored A+, including secrets rotation and locked-down database access.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
 <meta name="twitter:card" content="summary_large_image">
@@ -63,7 +63,7 @@
       </ul>
 
       <h2>Security</h2>
-      <p>Its HTTP headers already scored A+, so this pass went after everything a header scanner can&rsquo;t see: the domain, email, the accounts behind the site, and the database. That&rsquo;s also where the most serious finding turned up.</p>
+      <p>Its HTTP headers already scored A+, so this pass went after everything a header scanner can&rsquo;t see: the domain, email, the accounts behind the site, and the database.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -72,7 +72,7 @@
 
       <h2><span class="num">01</span>Context</h2>
       <p>The site is a static React/Vite front end on a managed host behind a CDN, a small Node/Express API, and a hosted MongoDB database. An earlier pass had already taken the front end&rsquo;s HTTP security headers to an A+. This pass covered what Observatory doesn&rsquo;t measure: the domain, email, the accounts behind the site, and the database.</p>
-      <p>One detail shaped the rest of the work: the business&rsquo;s email runs on a personal webmail account, not on the domain. <strong>The domain itself sends no mail.</strong></p>
+      <p><strong>The domain itself sends no mail.</strong></p>
 
       <h2><span class="num">02</span>Threat model</h2>
       <p>A tax and insurance brand is a prime phishing target, so the domain and the accounts matter as much as the pages:</p>
@@ -81,7 +81,7 @@
         <li><strong>Mis-issued TLS certificates</strong> for the domain.</li>
         <li><strong>DNS tampering:</strong> forged answers that send visitors somewhere else.</li>
         <li><strong>Account takeover</strong> of the code host, the hosting provider or the registrar, any of which means full control of the site.</li>
-        <li><strong>Exposed database credentials.</strong></li>
+        <li><strong>Database access:</strong> a leaked or guessed credential reaching the data.</li>
       </ul>
 
       <h2><span class="num">03</span>Starting point</h2>
@@ -110,26 +110,22 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Code host:</strong> authenticator app, mobile app and a passkey, with recovery codes stored offline. This one came first: the host deploys automatically from the repository, so whoever controls the repo controls the live site.</li>
         <li><strong>Hosting provider.</strong></li>
-        <li><strong>Registrar</strong>, with account recovery configured. Its two-factor currently uses SMS; the plan is to move it to an authenticator app.</li>
+        <li><strong>Registrar</strong>, with account recovery configured.</li>
         <li><strong>Database provider.</strong></li>
       </ul>
-      <p><strong>The client&rsquo;s own mailbox.</strong> The business&rsquo;s email lives on a personal webmail account, not on the domain, so it&rsquo;s the account that matters most to the business. It&rsquo;s also the client&rsquo;s to secure, not mine. I sent the client a written request, in Spanish, to turn on 2-Step Verification with an authenticator app or a passkey rather than SMS. Everything I control is hardened, and the one account I don&rsquo;t is covered by a documented request.</p>
 
-      <h2><span class="num">06</span>The finding: exposed database credentials</h2>
-      <p>While auditing, I found an old automated alert from the database provider: <strong>live database credentials</strong> had at one point been committed to the repository. They were no longer in the Git history, but the values themselves were still valid, and the database accepted connections from any IP address (<code>0.0.0.0/0</code>). Rotating them came first.</p>
-      <p>The response, in order:</p>
+      <h2><span class="num">06</span>Secrets and database access</h2>
       <ol>
-        <li><strong>Rotate the database password.</strong> I changed the database user&rsquo;s password and updated it on the host, so the leaked value stopped working.</li>
-        <li><strong>Rotate the other secrets in the same change.</strong> Every other secret the app uses was rotated too, which signed out all existing sessions, by design. I also removed unused credentials left over from an abandoned image-hosting experiment that was never deployed, so the local configuration now matches exactly what production uses.</li>
-        <li><strong>Close network access.</strong> I replaced the open-to-all rule with an allow-list of the host&rsquo;s two published outbound IP ranges plus a single developer IP. Both ranges went in before the open-to-all rule came out, so the API never lost database access.</li>
-        <li><strong>Scan the entire history.</strong> I searched every commit for secret patterns (credentials embedded in connection strings, private keys, and common cloud, payment and API token formats), printing only where a match was, never its value. The only matches were placeholder values, not real secrets.</li>
-        <li><strong>Verify after every step.</strong> The API logs showed a clean database connection, the public endpoints returned their data, sign-in worked with the new credentials, and no data was lost.</li>
+        <li><strong>Every secret rotated in one change.</strong> The database user&rsquo;s password and every other secret the app uses were rotated together and updated on the host, which signed out all existing sessions, by design. The local configuration now matches exactly what production uses.</li>
+        <li><strong>Network access on an allow-list.</strong> The database accepts connections only from the host&rsquo;s two published outbound IP ranges plus a single developer IP. The ranges went in first, so the API never lost database access during the change.</li>
+        <li><strong>Full history scan.</strong> I searched every commit for secret patterns (credentials embedded in connection strings, private keys, and common cloud, payment and API token formats), printing only where a match was, never its value. The only matches were placeholder values, not real secrets.</li>
+        <li><strong>Verified after every step.</strong> The API logs showed a clean database connection, the public endpoints returned their data, sign-in worked with the new credentials, and no data was lost.</li>
       </ol>
-      <p>What this taught me:</p>
+      <p>Why these three together:</p>
       <ul>
-        <li><strong>Rotation is what makes an exposed secret harmless.</strong> Removing it from the repository doesn&rsquo;t invalidate it; changing it does.</li>
+        <li><strong>Rotation is what invalidates a secret.</strong> Deleting it from a repository doesn&rsquo;t; changing it does.</li>
         <li><strong>Prevention beats detection.</strong> Push protection stops a secret before it ever reaches the repository.</li>
-        <li><strong>Network restrictions are a second lock.</strong> With access limited to known addresses, a leaked password alone isn&rsquo;t enough to get in.</li>
+        <li><strong>Network restrictions are a second lock.</strong> With access limited to known addresses, a password alone isn&rsquo;t enough to get in.</li>
       </ul>
 
       <h2><span class="num">07</span>Verification</h2>
@@ -142,9 +138,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
 
       <h2><span class="num">08</span>What I&rsquo;d do next</h2>
       <ul>
-        <li><strong>Registrar two-factor:</strong> move it from SMS to an authenticator app.</li>
-        <li><strong>Network access:</strong> prune the legacy entries from the database&rsquo;s IP allow-list.</li>
-        <li><strong>Push protection and secret scanning</strong> on the repository, so a secret committed by mistake is blocked at push time instead of caught afterward.</li>
+        <li><strong>Push protection and secret scanning</strong> on the repository, so a secret committed by mistake is blocked at push time.</li>
         <li><strong>Optional: a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
       </ul>
 
@@ -172,7 +166,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       </ul>
 
       <h2>Seguridad</h2>
-      <p>Sus encabezados HTTP ya tenían A+, así que esta vez el trabajo se centró en todo lo que un escáner de encabezados no ve: el dominio, el correo, las cuentas detrás del sitio y la base de datos. Ahí fue también donde apareció el hallazgo más serio.</p>
+      <p>Sus encabezados HTTP ya tenían A+, así que esta vez el trabajo se centró en todo lo que un escáner de encabezados no ve: el dominio, el correo, las cuentas detrás del sitio y la base de datos.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -181,7 +175,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
 
       <h2><span class="num">01</span>Contexto</h2>
       <p>El sitio consta de un front end estático en React/Vite, alojado en un servicio administrado detrás de una CDN; una pequeña API en Node/Express, y una base de datos MongoDB en la nube. En una etapa anterior, los encabezados de seguridad HTTP del front end ya habían alcanzado una calificación A+. Esta etapa abarcó lo que Observatory no mide: el dominio, el correo, las cuentas detrás del sitio y la base de datos.</p>
-      <p>Un detalle definió el resto del trabajo: el correo del negocio funciona en una cuenta de correo web personal, no en el dominio. <strong>El dominio en sí no envía correo.</strong></p>
+      <p><strong>El dominio en sí no envía correo.</strong></p>
 
       <h2><span class="num">02</span>Modelo de amenazas</h2>
       <p>Una marca de impuestos y seguros es un blanco ideal para el phishing, así que el dominio y las cuentas importan tanto como las páginas:</p>
@@ -190,7 +184,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Certificados TLS emitidos indebidamente</strong> para el dominio.</li>
         <li><strong>Manipulación del DNS</strong>: respuestas falsificadas que desvían a los visitantes a otro lugar.</li>
         <li><strong>Toma de control de cuentas</strong>: el alojamiento del código, el proveedor de alojamiento o el registrador; cualquiera de ellas da control total sobre el sitio.</li>
-        <li><strong>Credenciales de la base de datos expuestas.</strong></li>
+        <li><strong>Acceso a la base de datos</strong>: una credencial filtrada o adivinada que llegue a los datos.</li>
       </ul>
 
       <h2><span class="num">03</span>Punto de partida</h2>
@@ -219,26 +213,22 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Alojamiento del código</strong>: aplicación de autenticación, aplicación móvil y una llave de acceso (passkey), con los códigos de recuperación guardados fuera de línea. Esta fue la primera: el proveedor despliega automáticamente desde el repositorio, así que quien controle el repositorio controla el sitio en vivo.</li>
         <li><strong>Proveedor de alojamiento.</strong></li>
-        <li><strong>Registrador</strong>, con la recuperación de la cuenta configurada. Por ahora su segundo factor usa SMS; el plan es cambiarlo a una aplicación de autenticación.</li>
+        <li><strong>Registrador</strong>, con la recuperación de la cuenta configurada.</li>
         <li><strong>Proveedor de la base de datos.</strong></li>
       </ul>
-      <p><strong>El buzón del propio cliente.</strong> El correo del negocio está en una cuenta de correo web personal, no en el dominio, así que es la cuenta más importante para el negocio, y protegerla le corresponde al cliente, no a mí. Le envié una solicitud por escrito, en español, para que active la verificación en dos pasos con una aplicación de autenticación o una llave de acceso (passkey) en lugar de SMS. Todo lo que está bajo mi control quedó reforzado, y la única cuenta que no lo está queda cubierta por una solicitud documentada.</p>
 
-      <h2><span class="num">06</span>El hallazgo: credenciales de la base de datos expuestas</h2>
-      <p>Durante la auditoría encontré una alerta automática antigua del proveedor de la base de datos: en algún momento, unas <strong>credenciales reales de la base de datos</strong> se habían subido al repositorio. Ya no estaban en el historial de Git, pero los valores seguían siendo válidos, y la base de datos aceptaba conexiones desde cualquier dirección IP (<code>0.0.0.0/0</code>). Lo primero fue rotarlas.</p>
-      <p>La respuesta, en este orden:</p>
+      <h2><span class="num">06</span>Secretos y acceso a la base de datos</h2>
       <ol>
-        <li><strong>Cambiar la contraseña de la base de datos.</strong> Cambié la contraseña del usuario de la base de datos y la actualicé en el proveedor de alojamiento, de modo que el valor filtrado dejó de funcionar.</li>
-        <li><strong>Rotar los demás secretos en el mismo cambio.</strong> También se rotaron todos los demás secretos de la aplicación, lo que cerró todas las sesiones abiertas, a propósito. Además, eliminé unas credenciales sin uso que quedaban de un experimento de alojamiento de imágenes que nunca se desplegó, así que la configuración local ahora coincide exactamente con la de producción.</li>
-        <li><strong>Cerrar el acceso de red.</strong> Sustituí la regla abierta a todos por una lista que solo permite los dos rangos de IP de salida que publica el proveedor de alojamiento, más una sola IP de desarrollo. Ambos rangos se agregaron antes de quitar la regla abierta a todos, así que la API nunca perdió el acceso a la base de datos.</li>
-        <li><strong>Revisar todo el historial.</strong> Busqué patrones de secretos en cada commit (credenciales incrustadas en cadenas de conexión, claves privadas y formatos comunes de tokens de servicios en la nube, de pago y de API), mostrando solo dónde había una coincidencia, nunca su valor. Las únicas coincidencias fueron valores de ejemplo, no secretos reales.</li>
-        <li><strong>Verificar después de cada paso.</strong> Los registros de la API mostraron una conexión limpia con la base de datos, los endpoints públicos devolvieron sus datos, el inicio de sesión funcionó con las nuevas credenciales y no se perdieron datos.</li>
+        <li><strong>Todos los secretos rotados en un solo cambio.</strong> La contraseña del usuario de la base de datos y todos los demás secretos de la aplicación se rotaron juntos y se actualizaron en el proveedor de alojamiento, lo que cerró todas las sesiones abiertas, a propósito. La configuración local ahora coincide exactamente con la de producción.</li>
+        <li><strong>Acceso de red con lista de permitidos.</strong> La base de datos solo acepta conexiones desde los dos rangos de IP de salida que publica el proveedor de alojamiento, más una sola IP de desarrollo. Los rangos se agregaron primero, así que la API nunca perdió el acceso a la base de datos durante el cambio.</li>
+        <li><strong>Revisión de todo el historial.</strong> Busqué patrones de secretos en cada commit (credenciales incrustadas en cadenas de conexión, claves privadas y formatos comunes de tokens de servicios en la nube, de pago y de API), mostrando solo dónde había una coincidencia, nunca su valor. Las únicas coincidencias fueron valores de ejemplo, no secretos reales.</li>
+        <li><strong>Verificación después de cada paso.</strong> Los registros de la API mostraron una conexión limpia con la base de datos, los endpoints públicos devolvieron sus datos, el inicio de sesión funcionó con las nuevas credenciales y no se perdieron datos.</li>
       </ol>
-      <p>Lo que aprendí:</p>
+      <p>Por qué estas tres medidas juntas:</p>
       <ul>
-        <li><strong>Lo que vuelve inofensivo un secreto expuesto es rotarlo.</strong> Quitarlo del repositorio no lo invalida; cambiarlo, sí.</li>
+        <li><strong>Lo que invalida un secreto es rotarlo.</strong> Borrarlo de un repositorio no lo invalida; cambiarlo, sí.</li>
         <li><strong>Más vale prevenir que detectar.</strong> La protección de push detiene un secreto antes de que llegue al repositorio.</li>
-        <li><strong>Restringir la red es un segundo candado.</strong> Con el acceso limitado a direcciones conocidas, una contraseña filtrada por sí sola no basta para entrar.</li>
+        <li><strong>Restringir la red es un segundo candado.</strong> Con el acceso limitado a direcciones conocidas, una contraseña por sí sola no basta para entrar.</li>
       </ul>
 
       <h2><span class="num">07</span>Verificación</h2>
@@ -251,9 +241,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
 
       <h2><span class="num">08</span>Próximos pasos</h2>
       <ul>
-        <li><strong>Segundo factor del registrador:</strong> pasarlo de SMS a una aplicación de autenticación.</li>
-        <li><strong>Acceso de red:</strong> depurar las entradas antiguas de la lista de IP permitidas de la base de datos.</li>
-        <li><strong>Protección de push y escaneo de secretos</strong> en el repositorio, para que un secreto subido por error se bloquee al hacer push en lugar de detectarse después.</li>
+        <li><strong>Protección de push y escaneo de secretos</strong> en el repositorio, para que un secreto subido por error se bloquee al hacer push.</li>
         <li><strong>Opcional: una CSP que deniegue por defecto</strong> (<code>default-src 'none'</code>) para obtener los últimos puntos adicionales de Observatory.</li>
       </ul>
 
