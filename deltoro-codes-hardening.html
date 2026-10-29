@@ -51,7 +51,7 @@
         <span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">HTTP headers</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> is my bilingual web development business. It builds MERN applications for clients, but its own marketing site is static: React 19 and Vite, prerendered to static HTML at build time, hosted as a Render static site, with DNS at Squarespace and mail on Google Workspace. It has a contact form that delivers to the business inbox through Formspree, and <strong>the domain sends real email</strong> &mdash; the main difference from <a href="site-hardening.html">my portfolio</a>, whose domain sends none.</p>
+      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> is my bilingual web development business. It builds MERN applications for clients, but its own marketing site is static: React 19 and Vite, prerendered to static HTML at build time, hosted as a Render static site, with DNS at Squarespace and mail on Google Workspace. It has a contact form that delivers to the business inbox through Formspree, and <strong>the domain sends real email</strong>.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -120,7 +120,7 @@ require-trusted-types-for 'script'; trusted-types 'none'</code></pre>
       <p>One platform detail: Render&rsquo;s static-site headers don&rsquo;t honor per-path overrides &mdash; a narrower rule for one folder lost to the <code>/*</code> rule &mdash; so CORP is <code>same-origin</code> across the whole site.</p>
 
       <h2><span class="num">06</span>Domain: email and certificates</h2>
-      <p>Unlike my portfolio&rsquo;s &ldquo;sends no mail&rdquo; records, this domain needs an authentication setup for real mail:</p>
+      <p>Because the domain sends real mail, it needs full email authentication:</p>
       <pre><code>@                  TXT  "v=spf1 include:_spf.google.com ~all"
 google._domainkey  TXT  (2048-bit DKIM key from Google Admin)
 _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; aspf=r"
@@ -162,7 +162,7 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">Encabezados HTTP</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> es mi negocio bilingüe de desarrollo web. Desarrolla aplicaciones MERN para clientes, pero su propio sitio comercial es estático: React 19 y Vite, prerrenderizado a HTML estático al compilar, alojado como sitio estático en Render, con el DNS en Squarespace y el correo en Google Workspace. Tiene un formulario de contacto que llega al buzón del negocio a través de Formspree, y <strong>el dominio envía correo real</strong>: esa es la diferencia principal con <a href="site-hardening.html">mi portafolio</a>, cuyo dominio no envía ninguno.</p>
+      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> es mi negocio bilingüe de desarrollo web. Desarrolla aplicaciones MERN para clientes, pero su propio sitio comercial es estático: React 19 y Vite, prerrenderizado a HTML estático al compilar, alojado como sitio estático en Render, con el DNS en Squarespace y el correo en Google Workspace. Tiene un formulario de contacto que llega al buzón del negocio a través de Formspree, y <strong>el dominio envía correo real</strong>.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -231,7 +231,7 @@ require-trusted-types-for 'script'; trusted-types 'none'</code></pre>
       <p>Un detalle de la plataforma: los encabezados de los sitios estáticos de Render no respetan las excepciones por ruta (una regla más específica para una carpeta perdió frente a la regla <code>/*</code>), así que CORP es <code>same-origin</code> en todo el sitio.</p>
 
       <h2><span class="num">06</span>Dominio: correo y certificados</h2>
-      <p>A diferencia de los registros de &laquo;sin correo&raquo; de mi portafolio, este dominio necesita una autenticación completa para su correo real:</p>
+      <p>Como el dominio envía correo real, necesita una autenticación de correo completa:</p>
       <pre><code>@                  TXT  "v=spf1 include:_spf.google.com ~all"
 google._domainkey  TXT  (2048-bit DKIM key from Google Admin)
 _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; aspf=r"

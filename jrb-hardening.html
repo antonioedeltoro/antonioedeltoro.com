@@ -51,7 +51,7 @@
         <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">API security</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> is a client site I built and maintain through deltoro.codes: a React/Vite front end (prerendered to static HTML), an Express/MongoDB API, Mapbox address search, and Stripe payments for a Los Angeles black-car service. Unlike my <a href="site-hardening.html">static portfolio</a>, it takes bookings and money, so the attack surface is the browser, the API, the payment flow, and the domain. I hardened it end to end using the same approach and rolled it out in stages so nothing broke in production.</p>
+      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> is a client site I built and maintain through deltoro.codes: a React/Vite front end (prerendered to static HTML), an Express/MongoDB API, Mapbox address search, and Stripe payments for a Los Angeles black-car service. It takes bookings and money, so the attack surface is the browser, the API, the payment flow, and the domain. I hardened it end to end using the same approach and rolled it out in stages so nothing broke in production.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -105,7 +105,7 @@ object-src 'none'; frame-src 'none'; worker-src 'none';
 frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types default;
 upgrade-insecure-requests</code></pre>
-      <p><strong>Trusted Types with React.</strong> Unlike the portfolio (<code>trusted-types 'none'</code>), this app has one legitimate sink: the head manager writes each page&rsquo;s JSON-LD structured data with <code>innerHTML</code> during client-side navigation. The solution is a single <code>default</code> policy, loaded as the first script, whose <code>createHTML</code> accepts a string only if it contains no <code>&lt;</code> &mdash; text without <code>&lt;</code> can&rsquo;t create elements, attributes, or event handlers. There is deliberately no <code>createScript</code> or <code>createScriptURL</code>, so string-to-script stays blocked outright. I verified in the browser that markup injection through HTML sinks throws, and that a script whose text is set from a string never executes.</p>
+      <p><strong>Trusted Types with React.</strong> This app can&rsquo;t use <code>trusted-types 'none'</code>: it has one legitimate sink: the head manager writes each page&rsquo;s JSON-LD structured data with <code>innerHTML</code> during client-side navigation. The solution is a single <code>default</code> policy, loaded as the first script, whose <code>createHTML</code> accepts a string only if it contains no <code>&lt;</code> &mdash; text without <code>&lt;</code> can&rsquo;t create elements, attributes, or event handlers. There is deliberately no <code>createScript</code> or <code>createScriptURL</code>, so string-to-script stays blocked outright. I verified in the browser that markup injection through HTML sinks throws, and that a script whose text is set from a string never executes.</p>
 
       <h2><span class="num">05</span>HTTP response headers</h2>
       <div class="table-wrap">
@@ -151,7 +151,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       </ul>
 
       <h2><span class="num">08</span>Rollout and verification</h2>
-      <p>Same rule as the portfolio: <strong>never tighten a header before the code that needs it is live.</strong></p>
+      <p>The rule throughout: <strong>never tighten a header before the code that needs it is live.</strong></p>
       <ul>
         <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures &mdash; forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
         <li><strong>Stage 1</strong> shipped the code plus the strict policy as <code>Content-Security-Policy-Report-Only</code>. On the live site every page reported zero would-be violations, address autocomplete and quotes worked against real Mapbox and the live API, and a real Book &amp; Pay went through Stripe end to end.</li>
@@ -163,7 +163,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       <ul>
         <li><strong>Done &mdash; real 404s.</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
         <li><strong>In progress &mdash; DMARC enforcement:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
-        <li><strong>Deferred &mdash; HSTS preload</strong>, for the same reason as on my portfolio: it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
+        <li><strong>Deferred &mdash; HSTS preload</strong>: it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
         <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments &mdash; that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
@@ -179,7 +179,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">Seguridad de API</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> es un sitio de un cliente que desarrollé y mantengo a través de deltoro.codes: un front end en React/Vite (prerrenderizado a HTML estático), una API en Express/MongoDB, búsqueda de direcciones con Mapbox y pagos con Stripe para un servicio de autos ejecutivos en Los Ángeles. A diferencia de mi <a href="site-hardening.html">portafolio estático</a>, este sitio recibe reservas y dinero, así que la superficie de ataque abarca el navegador, la API, el flujo de pago y el dominio. Lo protegí de principio a fin con el mismo enfoque y lo implementé por etapas para que nada fallara en producción.</p>
+      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> es un sitio de un cliente que desarrollé y mantengo a través de deltoro.codes: un front end en React/Vite (prerrenderizado a HTML estático), una API en Express/MongoDB, búsqueda de direcciones con Mapbox y pagos con Stripe para un servicio de autos ejecutivos en Los Ángeles. Este sitio recibe reservas y dinero, así que la superficie de ataque abarca el navegador, la API, el flujo de pago y el dominio. Lo protegí de principio a fin con el mismo enfoque y lo implementé por etapas para que nada fallara en producción.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -233,7 +233,7 @@ object-src 'none'; frame-src 'none'; worker-src 'none';
 frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types default;
 upgrade-insecure-requests</code></pre>
-      <p><strong>Trusted Types con React.</strong> A diferencia del portafolio (<code>trusted-types 'none'</code>), esta aplicación tiene un punto de inserción legítimo: el gestor del <code>&lt;head&gt;</code> escribe los datos estructurados JSON-LD de cada página con <code>innerHTML</code> durante la navegación del lado del cliente. La solución es una única política <code>default</code>, cargada como el primer script, cuyo <code>createHTML</code> solo acepta una cadena si no contiene <code>&lt;</code>: un texto sin <code>&lt;</code> no puede crear elementos, atributos ni manejadores de eventos. A propósito no tiene <code>createScript</code> ni <code>createScriptURL</code>, así que convertir una cadena en script sigue bloqueado por completo. Comprobé en el navegador que inyectar marcado a través de los puntos de inserción de HTML genera un error, y que un script cuyo texto se asigna desde una cadena nunca se ejecuta.</p>
+      <p><strong>Trusted Types con React.</strong> Esta aplicación no puede usar <code>trusted-types 'none'</code>: tiene un punto de inserción legítimo: el gestor del <code>&lt;head&gt;</code> escribe los datos estructurados JSON-LD de cada página con <code>innerHTML</code> durante la navegación del lado del cliente. La solución es una única política <code>default</code>, cargada como el primer script, cuyo <code>createHTML</code> solo acepta una cadena si no contiene <code>&lt;</code>: un texto sin <code>&lt;</code> no puede crear elementos, atributos ni manejadores de eventos. A propósito no tiene <code>createScript</code> ni <code>createScriptURL</code>, así que convertir una cadena en script sigue bloqueado por completo. Comprobé en el navegador que inyectar marcado a través de los puntos de inserción de HTML genera un error, y que un script cuyo texto se asigna desde una cadena nunca se ejecuta.</p>
 
       <h2><span class="num">05</span>Encabezados de respuesta HTTP</h2>
       <div class="table-wrap">
@@ -279,7 +279,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       </ul>
 
       <h2><span class="num">08</span>Implementación y verificación</h2>
-      <p>La misma regla que en el portafolio: <strong>nunca endurecer un encabezado antes de que esté en producción el código que lo necesita.</strong></p>
+      <p>La regla en todo momento: <strong>nunca endurecer un encabezado antes de que esté en producción el código que lo necesita.</strong></p>
       <ul>
         <li><strong>Antes del despliegue:</strong> 23 pruebas automatizadas de la API (validación, cuerpos de error, CORS, límites de solicitudes y firmas de webhook falsificadas, ausentes y válidas), además de un navegador sin interfaz que recorrió cada página en escritorio y en móvil bajo la política final aplicada, incluido un paso simulado de cotización a pago en Stripe, y verificó que no hubiera ninguna violación de la CSP y que las fuentes fueran propias. Esa prueba es la que me permitió descubrir el punto de inserción de Trusted Types en el JSON-LD y diseñar la política <code>default</code>.</li>
         <li><strong>Etapa 1:</strong> se publicó el código junto con la política estricta como <code>Content-Security-Policy-Report-Only</code>. En el sitio en vivo, ninguna página reportó posibles violaciones, el autocompletado de direcciones y las cotizaciones funcionaron con Mapbox real y la API en producción, y una reserva real con pago completó el recorrido por Stripe de principio a fin.</li>
@@ -291,7 +291,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       <ul>
         <li><strong>Hecho: errores 404 reales.</strong> La antigua regla de reescritura general enviaba cualquier URL desconocida a la página de &laquo;no encontrado&raquo; con un estado HTTP 200, así que los buscadores podían indexar enlaces rotos. La eliminé; ahora el proveedor sirve la página 404 prerrenderizada con un estado 404 real. Verificado en vivo: las URL desconocidas devuelven 404, mientras que todas las páginas reales, los recursos y las URL de retorno de Stripe siguen devolviendo 200.</li>
         <li><strong>En curso: aplicación de DMARC:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (hecho) &rarr; <code>p=reject</code> (programado tras dos semanas de entregas sin problemas).</li>
-        <li><strong>Pospuesto: precarga de HSTS</strong>, por la misma razón que en mi portafolio: es prácticamente permanente y aporta poco frente a una política HSTS de dos años.</li>
+        <li><strong>Pospuesto: precarga de HSTS</strong>: es prácticamente permanente y aporta poco frente a una política HSTS de dos años.</li>
         <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en todas las cuentas que pueden modificar el sitio, sus datos o sus pagos; ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
