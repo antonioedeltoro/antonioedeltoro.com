@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Hardening a Static Portfolio Site — Antonio E. del Toro</title>
+<title>antonioedeltoro.com: Case Study — Antonio E. del Toro</title>
 <meta name="description" content="How I took antonioedeltoro.com to an A+ (140/100) on Mozilla's HTTP Observatory: removing third-party dependencies, a strict CSP, security headers, and email/certificate DNS controls.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/site-hardening.html">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/site-hardening.html">
-<meta property="og:title" content="Hardening a Static Portfolio Site">
+<meta property="og:title" content="antonioedeltoro.com: Case Study">
 <meta property="og:description" content="From third-party fonts and a permissive CSP to an A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
@@ -44,14 +44,26 @@
   <main>
     <!-- ENGLISH -->
     <article data-l="en">
-      <div class="eyebrow">Security · Write-up</div>
-      <h1>Hardening a static portfolio site</h1>
+      <div class="eyebrow">Case study</div>
+      <h1>antonioedeltoro.com</h1>
       <div class="meta-row">
         <span class="updated">October 28, 2026</span>
         <span class="pill">CSP</span><span class="pill">HTTP headers</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">Trusted Types</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.antonioedeltoro.com/" target="_blank" rel="noopener">antonioedeltoro.com</a></strong> is a static portfolio: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end &mdash; the page, the server responses, and the domain itself.</p>
+      <p class="intro"><strong><a href="https://www.antonioedeltoro.com/" target="_blank" rel="noopener">antonioedeltoro.com</a></strong> is my personal portfolio, the site you&rsquo;re reading now.</p>
+
+      <h2>The project</h2>
+      <ul>
+        <li><strong>Hand-written HTML, CSS and JavaScript</strong>, with no framework and no build step.</li>
+        <li><strong>Bilingual</strong> (English and Spanish), with light and dark themes applied before the page paints.</li>
+        <li><strong>Shared navigation and footer</strong>, built by one script for every page.</li>
+        <li><strong>Self-hosted fonts and icons.</strong></li>
+        <li><strong>Hosting:</strong> a Render static site, with DNS at Squarespace.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>It&rsquo;s a static site: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end &mdash; the page, the server responses, and the domain itself.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -141,19 +153,31 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site. All three are behind multi-factor authentication, and that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Back to security work</a>
+      <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
 
     <!-- ESPAÑOL -->
     <article data-l="es">
-      <div class="eyebrow">Seguridad · Informe</div>
-      <h1>Protección de un sitio de portafolio estático</h1>
+      <div class="eyebrow">Caso de estudio</div>
+      <h1>antonioedeltoro.com</h1>
       <div class="meta-row">
         <span class="updated">28 de octubre de 2026</span>
         <span class="pill">CSP</span><span class="pill">Encabezados HTTP</span><span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">Trusted Types</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.antonioedeltoro.com/" target="_blank" rel="noopener">antonioedeltoro.com</a></strong> es un portafolio estático: sin backend, sin base de datos, sin inicios de sesión. Eso lo convierte en un objetivo pequeño, pero no nulo. Lo traté como un activo de producción y lo protegí de principio a fin: la página, las respuestas del servidor y el propio dominio.</p>
+      <p class="intro"><strong><a href="https://www.antonioedeltoro.com/" target="_blank" rel="noopener">antonioedeltoro.com</a></strong> es mi portafolio personal, el sitio que estás leyendo.</p>
+
+      <h2>El proyecto</h2>
+      <ul>
+        <li><strong>HTML, CSS y JavaScript escritos a mano</strong>, sin framework y sin paso de compilación.</li>
+        <li><strong>Bilingüe</strong> (inglés y español), con temas claro y oscuro que se aplican antes de que se pinte la página.</li>
+        <li><strong>Navegación y pie de página compartidos</strong>, generados por un solo script para todas las páginas.</li>
+        <li><strong>Fuentes e íconos alojados en el propio sitio.</strong></li>
+        <li><strong>Alojamiento:</strong> sitio estático en Render, con el DNS en Squarespace.</li>
+      </ul>
+
+      <h2>Seguridad</h2>
+      <p>Es un sitio estático: sin backend, sin base de datos, sin inicios de sesión. Eso lo convierte en un objetivo pequeño, pero no nulo. Lo traté como un activo de producción y lo protegí de principio a fin: la página, las respuestas del servidor y el propio dominio.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -243,7 +267,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Seguridad de las cuentas.</strong> Tras este trabajo, el eslabón más débil ya no es el sitio, sino las cuentas detrás de él. Quien controle el repositorio Git, el proveedor de alojamiento o el registrador controla el sitio. Las tres cuentas están protegidas con autenticación multifactor, y ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+      <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
   </main>
 

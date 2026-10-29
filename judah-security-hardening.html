@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Hardening Judah Security — Antonio E. del Toro</title>
+<title>Judah Security: Case Study — Antonio E. del Toro</title>
 <meta name="description" content="Case study: taking a full-stack MERN lead-generation site from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory — server-side admin auth, API hardening, a deny-by-default CSP with Trusted Types, and email and certificate DNS controls.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/judah-security-hardening.html">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/judah-security-hardening.html">
-<meta property="og:title" content="Hardening Judah Security">
+<meta property="og:title" content="Judah Security: Case Study">
 <meta property="og:description" content="A full-stack site with an admin area, user accounts and lead forms, taken from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
@@ -44,14 +44,26 @@
   <main>
     <!-- ENGLISH -->
     <article data-l="en">
-      <div class="eyebrow">Security · Write-up</div>
-      <h1>Hardening Judah Security</h1>
+      <div class="eyebrow">Case study</div>
+      <h1>Judah Security</h1>
       <div class="meta-row">
         <span class="updated">October 29, 2026</span>
         <span class="pill">Auth</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">XSS</span><span class="pill">API security</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://judah-security.deltoro.codes/" target="_blank" rel="noopener">Judah Security</a></strong> is a lead-generation site for a Los Angeles physical security company: a React/Vite front end and an Express/MongoDB API, with a quote request form, a course inquiry form, news posts managed through an admin editor, and client reviews with reviewer accounts. It has a backend, an admin area and user accounts, so I audited and hardened it end to end. <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">See the live portfolio copy</a>.</p>
+      <p class="intro"><strong><a href="https://judah-security.deltoro.codes/" target="_blank" rel="noopener">Judah Security</a></strong> is a lead-generation site I built for a Los Angeles security guard and firearms training company. The link opens my portfolio copy of the site.</p>
+
+      <h2>The project</h2>
+      <ul>
+        <li><strong>Quote requests</strong> for guard services: site address, schedule, number of guards, armed or unarmed.</li>
+        <li><strong>Course inquiries</strong> for training classes.</li>
+        <li><strong>News posts</strong> managed through an admin editor.</li>
+        <li><strong>Client reviews</strong> with reviewer accounts.</li>
+        <li><strong>Stack:</strong> a React and Vite front end, and a Node, Express and MongoDB API, hosted on Render.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>It has a backend, an admin area and user accounts, so I audited and hardened it end to end.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -169,19 +181,31 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>Account security</strong> stays the main ongoing control.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Back to security work</a>
+      <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
 
     <!-- ESPAÑOL -->
     <article data-l="es">
-      <div class="eyebrow">Seguridad · Informe</div>
-      <h1>Protección de Judah Security</h1>
+      <div class="eyebrow">Caso de estudio</div>
+      <h1>Judah Security</h1>
       <div class="meta-row">
         <span class="updated">29 de octubre de 2026</span>
         <span class="pill">Autenticación</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">XSS</span><span class="pill">Seguridad de API</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://judah-security.deltoro.codes/" target="_blank" rel="noopener">Judah Security</a></strong> es un sitio de captación de clientes para una empresa de seguridad física en Los Ángeles: un front end en React/Vite y una API en Express/MongoDB, con un formulario de solicitud de cotización, otro de consulta sobre cursos, noticias que se administran desde un editor privado y reseñas de clientes con cuentas de usuario. Tiene backend, un área de administración y cuentas de usuario, así que lo audité y lo protegí de principio a fin. <a href="https://judah-security.deltoro.codes" target="_blank" rel="noopener">Ver la copia en vivo del portafolio</a>.</p>
+      <p class="intro"><strong><a href="https://judah-security.deltoro.codes/" target="_blank" rel="noopener">Judah Security</a></strong> es un sitio de captación de clientes que desarrollé para una empresa de guardias de seguridad y capacitación en armas de fuego en Los Ángeles. El enlace abre mi copia del sitio para el portafolio.</p>
+
+      <h2>El proyecto</h2>
+      <ul>
+        <li><strong>Solicitudes de cotización</strong> de servicios de guardias: dirección del lugar, horarios, número de guardias, armados o desarmados.</li>
+        <li><strong>Consultas sobre cursos</strong> de capacitación.</li>
+        <li><strong>Noticias</strong> administradas desde un editor privado.</li>
+        <li><strong>Reseñas de clientes</strong> con cuentas de usuario.</li>
+        <li><strong>Stack:</strong> un front end en React y Vite, y una API en Node, Express y MongoDB, alojados en Render.</li>
+      </ul>
+
+      <h2>Seguridad</h2>
+      <p>Tiene backend, un área de administración y cuentas de usuario, así que lo audité y lo protegí de principio a fin.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -299,7 +323,7 @@ _dmarc   TXT  "v=DMARC1; p=none;"
         <li><strong>La seguridad de las cuentas</strong> sigue siendo el principal control de aquí en adelante.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+      <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
   </main>
 

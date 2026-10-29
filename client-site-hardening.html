@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Hardening Faby Services — Antonio E. del Toro</title>
+<title>Faby Services: Case Study — Antonio E. del Toro</title>
 <meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and the response to exposed database credentials on fabyservices.com.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/client-site-hardening.html">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/client-site-hardening.html">
-<meta property="og:title" content="Hardening Faby Services">
+<meta property="og:title" content="Faby Services: Case Study">
 <meta property="og:description" content="The domain, email, accounts and database behind a site whose headers already scored A+, including a credential exposure found and closed.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
@@ -44,14 +44,26 @@
   <main>
     <!-- ENGLISH -->
     <article data-l="en">
-      <div class="eyebrow">Security · Write-up</div>
-      <h1>Hardening Faby Services</h1>
+      <div class="eyebrow">Case study</div>
+      <h1>Faby Services</h1>
       <div class="meta-row">
         <span class="updated">October 29, 2026</span>
         <span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">MFA</span><span class="pill">Secrets rotation</span><span class="pill">Network access</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.fabyservices.com/" target="_blank" rel="noopener">fabyservices.com</a></strong> is the site for Faby Services, a bilingual tax and insurance small business and a client of mine through deltoro.codes. Its HTTP headers already scored A+, so this pass went after everything a header scanner can&rsquo;t see: the domain, email, the accounts behind the site, and the database. That&rsquo;s also where the most serious finding turned up.</p>
+      <p class="intro"><strong><a href="https://www.fabyservices.com/" target="_blank" rel="noopener">fabyservices.com</a></strong> is the site for Faby Services, a bilingual tax, insurance, bookkeeping and notary office in Moreno Valley, California, and a client of mine through deltoro.codes.</p>
+
+      <h2>The project</h2>
+      <ul>
+        <li><strong>Service pages</strong> for taxes, insurance, bookkeeping and notary work, plus seasonal pages for tax season and health-insurance open enrollment.</li>
+        <li><strong>Appointment requests</strong> through a form, and a contact page with an interactive Mapbox map.</li>
+        <li><strong>News posts</strong> managed through an admin editor, and <strong>client reviews</strong> from signed-in users.</li>
+        <li><strong>Bilingual</strong> in English and Spanish, with light and dark themes.</li>
+        <li><strong>Stack:</strong> a React and Vite front end, and a Node, Express and MongoDB API.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>Its HTTP headers already scored A+, so this pass went after everything a header scanner can&rsquo;t see: the domain, email, the accounts behind the site, and the database. That&rsquo;s also where the most serious finding turned up.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -136,19 +148,31 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Optional &mdash; a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Back to security work</a>
+      <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
 
     <!-- ESPAÑOL -->
     <article data-l="es">
-      <div class="eyebrow">Seguridad · Informe</div>
-      <h1>Protección de Faby Services</h1>
+      <div class="eyebrow">Caso de estudio</div>
+      <h1>Faby Services</h1>
       <div class="meta-row">
         <span class="updated">29 de octubre de 2026</span>
         <span class="pill">DNSSEC</span><span class="pill">SPF / DMARC</span><span class="pill">CAA</span><span class="pill">MFA</span><span class="pill">Rotación de secretos</span><span class="pill">Acceso de red</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.fabyservices.com/" target="_blank" rel="noopener">fabyservices.com</a></strong> es el sitio de Faby Services, un pequeño negocio bilingüe de impuestos y seguros y cliente mío a través de deltoro.codes. Sus encabezados HTTP ya tenían A+, así que esta vez el trabajo se centró en todo lo que un escáner de encabezados no ve: el dominio, el correo, las cuentas detrás del sitio y la base de datos. Ahí fue también donde apareció el hallazgo más serio.</p>
+      <p class="intro"><strong><a href="https://www.fabyservices.com/" target="_blank" rel="noopener">fabyservices.com</a></strong> es el sitio de Faby Services, una oficina bilingüe de impuestos, seguros, contabilidad y notaría en Moreno Valley, California, y cliente mío a través de deltoro.codes.</p>
+
+      <h2>El proyecto</h2>
+      <ul>
+        <li><strong>Páginas de servicios</strong> de impuestos, seguros, contabilidad y notaría, además de páginas de temporada para la declaración de impuestos y la inscripción abierta de seguros médicos.</li>
+        <li><strong>Solicitudes de cita</strong> mediante un formulario, y una página de contacto con un mapa interactivo de Mapbox.</li>
+        <li><strong>Noticias</strong> administradas desde un editor privado, y <strong>reseñas de clientes</strong> de usuarios registrados.</li>
+        <li><strong>Bilingüe</strong> en inglés y español, con temas claro y oscuro.</li>
+        <li><strong>Stack:</strong> un front end en React y Vite, y una API en Node, Express y MongoDB.</li>
+      </ul>
+
+      <h2>Seguridad</h2>
+      <p>Sus encabezados HTTP ya tenían A+, así que esta vez el trabajo se centró en todo lo que un escáner de encabezados no ve: el dominio, el correo, las cuentas detrás del sitio y la base de datos. Ahí fue también donde apareció el hallazgo más serio.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -233,7 +257,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Opcional: una CSP que deniegue por defecto</strong> (<code>default-src 'none'</code>) para obtener los últimos puntos adicionales de Observatory.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+      <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
   </main>
 

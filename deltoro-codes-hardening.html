@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Hardening deltoro.codes — Antonio E. del Toro</title>
+<title>deltoro.codes: Case Study — Antonio E. del Toro</title>
 <meta name="description" content="How I hardened deltoro.codes, my web development business's site: removing Google Analytics, a deny-by-default CSP with Trusted Types, full security headers, and SPF, DKIM, DMARC, CAA and DNSSEC for a domain that sends real email. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/deltoro-codes-hardening.html">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/deltoro-codes-hardening.html">
-<meta property="og:title" content="Hardening deltoro.codes">
+<meta property="og:title" content="deltoro.codes: Case Study">
 <meta property="og:description" content="A static business site whose domain sends real email, hardened end to end: Trusted Types, full security headers, SPF, DKIM, DMARC, CAA and DNSSEC. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
@@ -44,14 +44,25 @@
   <main>
     <!-- ENGLISH -->
     <article data-l="en">
-      <div class="eyebrow">Security · Write-up</div>
-      <h1>Hardening deltoro.codes</h1>
+      <div class="eyebrow">Case study</div>
+      <h1>deltoro.codes</h1>
       <div class="meta-row">
         <span class="updated">October 29, 2026</span>
         <span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">HTTP headers</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> is my bilingual web development business. It builds MERN applications for clients, but its own marketing site is static: React 19 and Vite, prerendered to static HTML at build time, hosted as a Render static site, with DNS at Squarespace and mail on Google Workspace. It has a contact form that delivers to the business inbox through Formspree, and <strong>the domain sends real email</strong>.</p>
+      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> is the site for my bilingual web development business, which builds MERN applications for clients.</p>
+
+      <h2>The project</h2>
+      <ul>
+        <li><strong>Pages</strong> for services, packages and pricing, portfolio, about and contact, in English and Spanish.</li>
+        <li><strong>A contact form</strong> that delivers to the business inbox through Formspree; &ldquo;Book a call&rdquo; links to Google Calendar.</li>
+        <li><strong>React 19 and Vite</strong>, prerendered to static HTML at build time: 22 pages and no backend.</li>
+        <li><strong>Hosting:</strong> a Render static site, with DNS at Squarespace and mail on Google Workspace.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>The site is static, but <strong>the domain sends real email</strong>, so the work covered the pages, the server responses and the mail setup.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -150,19 +161,30 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>Account security:</strong> keep multi-factor authentication on the registrar, host and email accounts.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Back to security work</a>
+      <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
 
     <!-- ESPAÑOL -->
     <article data-l="es">
-      <div class="eyebrow">Seguridad · Informe</div>
-      <h1>Protección de deltoro.codes</h1>
+      <div class="eyebrow">Caso de estudio</div>
+      <h1>deltoro.codes</h1>
       <div class="meta-row">
         <span class="updated">29 de octubre de 2026</span>
         <span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">Encabezados HTTP</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> es mi negocio bilingüe de desarrollo web. Desarrolla aplicaciones MERN para clientes, pero su propio sitio comercial es estático: React 19 y Vite, prerrenderizado a HTML estático al compilar, alojado como sitio estático en Render, con el DNS en Squarespace y el correo en Google Workspace. Tiene un formulario de contacto que llega al buzón del negocio a través de Formspree, y <strong>el dominio envía correo real</strong>.</p>
+      <p class="intro"><strong><a href="https://www.deltoro.codes/" target="_blank" rel="noopener">deltoro.codes</a></strong> es el sitio de mi negocio bilingüe de desarrollo web, que desarrolla aplicaciones MERN para clientes.</p>
+
+      <h2>El proyecto</h2>
+      <ul>
+        <li><strong>Páginas</strong> de servicios, paquetes y precios, portafolio, acerca de y contacto, en inglés y en español.</li>
+        <li><strong>Un formulario de contacto</strong> que llega al buzón del negocio a través de Formspree; &laquo;Agendar una llamada&raquo; enlaza a Google Calendar.</li>
+        <li><strong>React 19 y Vite</strong>, prerrenderizado a HTML estático al compilar: 22 páginas y ningún backend.</li>
+        <li><strong>Alojamiento:</strong> sitio estático en Render, con el DNS en Squarespace y el correo en Google Workspace.</li>
+      </ul>
+
+      <h2>Seguridad</h2>
+      <p>El sitio es estático, pero <strong>el dominio envía correo real</strong>, así que el trabajo abarcó las páginas, las respuestas del servidor y la configuración del correo.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -261,7 +283,7 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>Seguridad de las cuentas:</strong> mantener la autenticación multifactor en las cuentas del registrador, del alojamiento y del correo.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+      <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
   </main>
 

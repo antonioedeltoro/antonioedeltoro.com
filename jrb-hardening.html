@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Hardening a MERN Booking App with Stripe Payments — Antonio E. del Toro</title>
+<title>JRB Premier Ride: Case Study — Antonio E. del Toro</title>
 <meta name="description" content="How I hardened jrbpremierride.com, a MERN booking app with Stripe payments: PCI DSS SAQ A scope, a deny-by-default CSP with Trusted Types, API hardening, and email/certificate DNS controls. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/jrb-hardening.html">
@@ -18,7 +18,7 @@
 
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://www.antonioedeltoro.com/jrb-hardening.html">
-<meta property="og:title" content="Hardening a MERN Booking App with Stripe Payments">
+<meta property="og:title" content="JRB Premier Ride: Case Study">
 <meta property="og:description" content="The browser, the API, the payment flow, and the domain, hardened end to end and rolled out in stages. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta property="og:image" content="https://www.antonioedeltoro.com/og-image.jpg">
 <meta property="og:site_name" content="Antonio E. del Toro">
@@ -44,14 +44,26 @@
   <main>
     <!-- ENGLISH -->
     <article data-l="en">
-      <div class="eyebrow">Security · Write-up</div>
-      <h1>Hardening a MERN booking app with Stripe payments</h1>
+      <div class="eyebrow">Case study</div>
+      <h1>JRB Premier Ride</h1>
       <div class="meta-row">
         <span class="updated">October 28, 2026</span>
         <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">API security</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> is a client site I built and maintain through deltoro.codes: a React/Vite front end (prerendered to static HTML), an Express/MongoDB API, Mapbox address search, and Stripe payments for a Los Angeles black-car service. It takes bookings and money, so the attack surface is the browser, the API, the payment flow, and the domain. I hardened it end to end using the same approach and rolled it out in stages so nothing broke in production.</p>
+      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> is the booking site for JRB Premier Ride, a Los Angeles black-car service. I built it and maintain it through deltoro.codes.</p>
+
+      <h2>The project</h2>
+      <ul>
+        <li><strong>Instant quotes.</strong> A rider enters a pickup and a drop-off; the server geocodes both through Mapbox, works out distance and drive time, and runs the fare formula.</li>
+        <li><strong>Online booking and payment</strong> through Stripe Checkout, with a booking confirmation page.</li>
+        <li><strong>One-tap ride requests</strong> by WhatsApp or text message.</li>
+        <li><strong>Bilingual</strong> in English and Spanish, and mobile-first.</li>
+        <li><strong>Stack:</strong> a React and Vite front end prerendered to static HTML, and a Node, Express and MongoDB API, hosted on Render.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>It takes bookings and money, so the attack surface is the browser, the API, the payment flow, and the domain. I hardened it end to end and rolled it out in stages so nothing broke in production.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -167,19 +179,31 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments &mdash; that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Back to security work</a>
+      <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
 
     <!-- ESPAÑOL -->
     <article data-l="es">
-      <div class="eyebrow">Seguridad · Informe</div>
-      <h1>Protección de una aplicación de reservas MERN con pagos de Stripe</h1>
+      <div class="eyebrow">Caso de estudio</div>
+      <h1>JRB Premier Ride</h1>
       <div class="meta-row">
         <span class="updated">28 de octubre de 2026</span>
         <span class="pill">PCI DSS</span><span class="pill">Stripe</span><span class="pill">CSP</span><span class="pill">Trusted Types</span><span class="pill">Seguridad de API</span><span class="pill">SPF / DKIM / DMARC</span><span class="pill">CAA</span><span class="pill">DNSSEC</span>
       </div>
 
-      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> es un sitio de un cliente que desarrollé y mantengo a través de deltoro.codes: un front end en React/Vite (prerrenderizado a HTML estático), una API en Express/MongoDB, búsqueda de direcciones con Mapbox y pagos con Stripe para un servicio de autos ejecutivos en Los Ángeles. Este sitio recibe reservas y dinero, así que la superficie de ataque abarca el navegador, la API, el flujo de pago y el dominio. Lo protegí de principio a fin con el mismo enfoque y lo implementé por etapas para que nada fallara en producción.</p>
+      <p class="intro"><strong><a href="https://jrbpremierride.com/" target="_blank" rel="noopener">jrbpremierride.com</a></strong> es el sitio de reservas de JRB Premier Ride, un servicio de autos ejecutivos en Los Ángeles. Lo desarrollé y lo mantengo a través de deltoro.codes.</p>
+
+      <h2>El proyecto</h2>
+      <ul>
+        <li><strong>Cotizaciones instantáneas.</strong> El pasajero indica el punto de recogida y el destino; el servidor geocodifica ambos con Mapbox, calcula la distancia y el tiempo de viaje, y aplica la fórmula de tarifas.</li>
+        <li><strong>Reservas y pagos en línea</strong> con Stripe Checkout, con una página de confirmación de la reserva.</li>
+        <li><strong>Solicitudes de viaje con un toque</strong> por WhatsApp o mensaje de texto.</li>
+        <li><strong>Bilingüe</strong> en inglés y español, y diseñado primero para móviles.</li>
+        <li><strong>Stack:</strong> un front end en React y Vite prerrenderizado a HTML estático, y una API en Node, Express y MongoDB, alojados en Render.</li>
+      </ul>
+
+      <h2>Seguridad</h2>
+      <p>Este sitio recibe reservas y dinero, así que la superficie de ataque abarca el navegador, la API, el flujo de pago y el dominio. Lo protegí de principio a fin y lo implementé por etapas para que nada fallara en producción.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -295,7 +319,7 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en todas las cuentas que pueden modificar el sitio, sus datos o sus pagos; ahí es donde debe centrarse la atención de aquí en adelante.</li>
       </ul>
 
-      <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
+      <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
   </main>
 

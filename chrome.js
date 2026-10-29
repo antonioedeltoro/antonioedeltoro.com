@@ -16,8 +16,7 @@
   var LINKS = [
     { frag: 'about',          en: 'about',          es: 'perfil' },
     { frag: 'certifications', en: 'certifications', es: 'certificaciones' },
-    { frag: 'security',       en: 'security',       es: 'seguridad' },
-    { frag: 'work',           en: 'work',           es: 'trabajo' },
+    { frag: 'projects',       en: 'projects',       es: 'proyectos' },
     { frag: 'experience',     en: 'experience',     es: 'experiencia' },
     { frag: 'education',      en: 'education',      es: 'educación' },
     { frag: 'contact',        en: 'contact',        es: 'contacto' }
@@ -91,7 +90,7 @@
         h('div', { class: 'footer-links' },
           h('a', newTab('https://www.deltoro.codes'), 'deltoro.codes'),
           h('a', { href: home + '#about' }, label(link('about'))),
-          h('a', { href: home + '#work' }, label(link('work'))),
+          h('a', { href: home + '#projects' }, label(link('projects'))),
           h('a', { href: home + '#contact' }, label(link('contact'))),
           h('a', { href: 'terms.html' }, label({ en: 'terms', es: 'términos' })),
           h('a', { href: 'privacy.html' }, label({ en: 'privacy', es: 'privacidad' }))
