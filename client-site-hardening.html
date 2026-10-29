@@ -10,7 +10,7 @@
 <meta name="robots" content="index, follow">
 
 <title>Hardening Faby Services — Antonio E. del Toro</title>
-<meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and the response to a months-old database credential exposure on fabyservices.com.">
+<meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and the response to exposed database credentials on fabyservices.com.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/client-site-hardening.html">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -77,8 +77,7 @@
       <ul>
         <li>No SPF, DKIM, DMARC or CAA records, and DNSSEC was off.</li>
         <li>A stray IPv6 (<code>AAAA</code>) record that wasn&rsquo;t part of the host&rsquo;s setup.</li>
-        <li>Leftover <code>MX</code> records from a registrar migration, for a mail service that was never used.</li>
-        <li>Two-factor authentication off on the code host, the hosting provider and the registrar.</li>
+        <li>Leftover <code>MX</code> records from a registrar migration, pointing to a hosted mail service the client never signed up for.</li>
       </ul>
 
       <h2><span class="num">04</span>Domain: declaring &ldquo;this domain sends no mail&rdquo;</h2>
@@ -91,32 +90,33 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>The policy changed along the way.</strong> SPF started out authorizing a mail provider with a softfail, with DMARC in a monitoring phase. Once I confirmed the domain sends nothing at all, I switched to the strict no-mail posture: SPF <code>-all</code> and DMARC <code>p=reject</code>. Lesson: find out who actually sends mail before you design the policy.</li>
         <li><strong>CAA</strong> lists both certificate authorities the host issues from, so a renewal through either one won&rsquo;t fail without warning. The <code>www</code> hostname is a CNAME into the host, so the apex CAA record covers it too.</li>
         <li><strong>DNSSEC</strong> is now on at the registrar, which also hosts DNS, and was confirmed through a public validating resolver.</li>
-        <li><strong>Cleanup.</strong> I removed the stray <code>AAAA</code> record and the unused <code>MX</code> records. A null MX (<code>0 .</code>) to declare that the domain accepts no mail was rejected by the DNS provider&rsquo;s interface; SPF and DMARC already cover the spoofing risk, so the gap is documented rather than worked around.</li>
+        <li><strong>Cleanup.</strong> I removed the stray <code>AAAA</code> record and all of the leftover <code>MX</code> records, so the domain now neither sends nor receives mail. A null MX (<code>0 .</code>) to declare that formally was rejected by the DNS provider&rsquo;s interface; SPF <code>-all</code> and DMARC <code>p=reject</code> already cover the spoofing risk, so the gap is documented rather than worked around.</li>
       </ul>
 
       <h2><span class="num">05</span>Accounts</h2>
-      <p>Two-factor authentication is now on for every account that controls the site:</p>
+      <p>Two-factor authentication is on for every account that controls the site:</p>
       <ul>
         <li><strong>Code host</strong> &mdash; authenticator app, mobile app and a passkey, with recovery codes stored offline. This one came first: the host deploys automatically from the repository, so whoever controls the repo controls the live site.</li>
         <li><strong>Hosting provider.</strong></li>
         <li><strong>Registrar</strong>, with account recovery configured. Its two-factor currently uses SMS; the plan is to move it to an authenticator app.</li>
         <li><strong>Database provider.</strong></li>
       </ul>
+      <p><strong>The client&rsquo;s own mailbox.</strong> The business&rsquo;s email lives on a personal webmail account, not on the domain, so it&rsquo;s the account that matters most to the business &mdash; and it&rsquo;s the client&rsquo;s to secure, not mine. I sent the client a written request, in Spanish, to turn on 2-Step Verification with an authenticator app or a passkey rather than SMS. Everything I control is hardened, and the one account I don&rsquo;t is covered by a documented request.</p>
 
-      <h2><span class="num">06</span>The finding: a months-old credential exposure</h2>
-      <p>While auditing, I found an old automated alert from the database provider: <strong>live database credentials</strong> had been committed to the repository and were publicly visible. They had since been removed from the Git history, but they had never been rotated &mdash; and the database accepted connections from any IP address (<code>0.0.0.0/0</code>). Anyone who copied them while they were public could still have connected.</p>
+      <h2><span class="num">06</span>The finding: exposed database credentials</h2>
+      <p>While auditing, I found an old automated alert from the database provider: <strong>live database credentials</strong> had at one point been committed to the repository. They were no longer in the Git history, but the values themselves were still valid, and the database accepted connections from any IP address (<code>0.0.0.0/0</code>). Rotating them came first.</p>
       <p>The response, in order:</p>
       <ol>
         <li><strong>Rotate the database password.</strong> I changed the database user&rsquo;s password and updated it on the host, so the leaked value stopped working.</li>
-        <li><strong>Rotate the other secrets in the same change.</strong> Every other secret the app uses was rotated too, which signed out all existing sessions &mdash; by design.</li>
-        <li><strong>Close network access.</strong> I replaced the open-to-all rule with an allow-list of known addresses, adding the new entries before removing the old rule, so the API never lost database access.</li>
+        <li><strong>Rotate the other secrets in the same change.</strong> Every other secret the app uses was rotated too, which signed out all existing sessions &mdash; by design. I also removed unused credentials left over from an abandoned image-hosting experiment that was never deployed, so the local configuration now matches exactly what production uses.</li>
+        <li><strong>Close network access.</strong> I replaced the open-to-all rule with an allow-list of the host&rsquo;s two published outbound IP ranges plus a single developer IP. Both ranges went in before the open-to-all rule came out, so the API never lost database access.</li>
         <li><strong>Scan the entire history.</strong> I searched every commit for secret patterns &mdash; credentials embedded in connection strings, private keys, and common cloud, payment and API token formats &mdash; printing only where a match was, never its value. The only matches were placeholder values, not real secrets.</li>
         <li><strong>Verify after every step.</strong> The API logs showed a clean database connection, the public endpoints returned their data, sign-in worked with the new credentials, and no data was lost.</li>
       </ol>
       <p>What this taught me:</p>
       <ul>
-        <li><strong>Rotating a secret is what makes a leak harmless; deleting the file doesn&rsquo;t.</strong> Once a value has been public, assume it was copied.</li>
-        <li><strong>Secret-scanning alerts need an owner.</strong> An alert nobody acts on protects nothing.</li>
+        <li><strong>Rotation is what makes an exposed secret harmless.</strong> Removing it from the repository doesn&rsquo;t invalidate it; changing it does.</li>
+        <li><strong>Prevention beats detection.</strong> Push protection stops a secret before it ever reaches the repository.</li>
         <li><strong>Network restrictions are a second lock.</strong> With access limited to known addresses, a leaked password alone isn&rsquo;t enough to get in.</li>
       </ul>
 
@@ -132,8 +132,8 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Registrar two-factor:</strong> move it from SMS to an authenticator app.</li>
         <li><strong>Network access:</strong> prune the legacy entries from the database&rsquo;s IP allow-list.</li>
+        <li><strong>Push protection and secret scanning</strong> on the repository, so a secret committed by mistake is blocked at push time instead of caught afterward.</li>
         <li><strong>Optional &mdash; a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
-        <li><strong>Automated secret scanning</strong> &mdash; a pre-commit hook or push protection on the repository &mdash; so a committed secret can&rsquo;t go unnoticed again.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Back to security work</a>
@@ -174,8 +174,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li>Sin registros SPF, DKIM, DMARC ni CAA, y con DNSSEC desactivado.</li>
         <li>Un registro IPv6 (<code>AAAA</code>) suelto que no formaba parte de la configuración del proveedor.</li>
-        <li>Registros <code>MX</code> sobrantes de una migración de registrador, para un servicio de correo que nunca se usó.</li>
-        <li>La autenticación de dos factores desactivada en el alojamiento del código, el proveedor de alojamiento y el registrador.</li>
+        <li>Registros <code>MX</code> sobrantes de una migración de registrador, que apuntaban a un servicio de correo alojado que el cliente nunca contrató.</li>
       </ul>
 
       <h2><span class="num">04</span>Dominio: declarar que &laquo;este dominio no envía correo&raquo;</h2>
@@ -188,32 +187,33 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>La política cambió sobre la marcha.</strong> Al principio, el SPF autorizaba a un proveedor de correo con un fallo suave (softfail), y DMARC estaba en fase de monitoreo. Cuando confirmé que el dominio no envía absolutamente nada, pasé a la postura estricta de &laquo;sin correo&raquo;: SPF <code>-all</code> y DMARC <code>p=reject</code>. Lección: primero hay que averiguar quién envía correo realmente y después diseñar la política.</li>
         <li><strong>CAA</strong> incluye las dos autoridades de certificación que usa el proveedor, para que una renovación a través de cualquiera de ellas no falle sin aviso. El nombre <code>www</code> es un CNAME que apunta al proveedor, así que el registro CAA del dominio raíz también lo cubre.</li>
         <li><strong>DNSSEC</strong> quedó activado en el registrador, que también aloja el DNS, y se confirmó mediante un resolutor público que valida DNSSEC.</li>
-        <li><strong>Limpieza.</strong> Eliminé el registro <code>AAAA</code> suelto y los registros <code>MX</code> que no se usaban. La interfaz del proveedor de DNS rechazó un MX nulo (<code>0 .</code>) para declarar que el dominio no acepta correo; como SPF y DMARC ya cubren el riesgo de suplantación, dejé documentada esa limitación en lugar de buscarle un rodeo.</li>
+        <li><strong>Limpieza.</strong> Eliminé el registro <code>AAAA</code> suelto y todos los registros <code>MX</code> sobrantes, así que ahora el dominio no envía ni recibe correo. La interfaz del proveedor de DNS rechazó un MX nulo (<code>0 .</code>) para declararlo formalmente; como SPF <code>-all</code> y DMARC <code>p=reject</code> ya cubren el riesgo de suplantación, dejé documentada esa limitación en lugar de buscarle un rodeo.</li>
       </ul>
 
       <h2><span class="num">05</span>Cuentas</h2>
-      <p>La autenticación de dos factores está activada ahora en todas las cuentas que controlan el sitio:</p>
+      <p>La autenticación de dos factores está activada en todas las cuentas que controlan el sitio:</p>
       <ul>
         <li><strong>Alojamiento del código</strong>: aplicación de autenticación, aplicación móvil y una llave de acceso (passkey), con los códigos de recuperación guardados fuera de línea. Esta fue la primera: el proveedor despliega automáticamente desde el repositorio, así que quien controle el repositorio controla el sitio en vivo.</li>
         <li><strong>Proveedor de alojamiento.</strong></li>
         <li><strong>Registrador</strong>, con la recuperación de la cuenta configurada. Por ahora su segundo factor usa SMS; el plan es cambiarlo a una aplicación de autenticación.</li>
         <li><strong>Proveedor de la base de datos.</strong></li>
       </ul>
+      <p><strong>El buzón del propio cliente.</strong> El correo del negocio está en una cuenta de correo web personal, no en el dominio, así que es la cuenta más importante para el negocio, y protegerla le corresponde al cliente, no a mí. Le envié una solicitud por escrito, en español, para que active la verificación en dos pasos con una aplicación de autenticación o una llave de acceso (passkey) en lugar de SMS. Todo lo que está bajo mi control quedó reforzado, y la única cuenta que no lo está queda cubierta por una solicitud documentada.</p>
 
-      <h2><span class="num">06</span>El hallazgo: credenciales expuestas durante meses</h2>
-      <p>Durante la auditoría encontré una alerta automática antigua del proveedor de la base de datos: unas <strong>credenciales reales de la base de datos</strong> se habían subido al repositorio y habían quedado visibles públicamente. Ya se habían eliminado del historial de Git, pero nunca se habían cambiado, y además la base de datos aceptaba conexiones desde cualquier dirección IP (<code>0.0.0.0/0</code>). Cualquiera que las hubiera copiado mientras estuvieron públicas todavía podía conectarse.</p>
+      <h2><span class="num">06</span>El hallazgo: credenciales de la base de datos expuestas</h2>
+      <p>Durante la auditoría encontré una alerta automática antigua del proveedor de la base de datos: en algún momento, unas <strong>credenciales reales de la base de datos</strong> se habían subido al repositorio. Ya no estaban en el historial de Git, pero los valores seguían siendo válidos, y la base de datos aceptaba conexiones desde cualquier dirección IP (<code>0.0.0.0/0</code>). Lo primero fue rotarlas.</p>
       <p>La respuesta, en este orden:</p>
       <ol>
         <li><strong>Cambiar la contraseña de la base de datos.</strong> Cambié la contraseña del usuario de la base de datos y la actualicé en el proveedor de alojamiento, de modo que el valor filtrado dejó de funcionar.</li>
-        <li><strong>Rotar los demás secretos en el mismo cambio.</strong> También se rotaron todos los demás secretos de la aplicación, lo que cerró todas las sesiones abiertas, a propósito.</li>
-        <li><strong>Cerrar el acceso de red.</strong> Sustituí la regla abierta a todos por una lista de direcciones conocidas; agregué las nuevas entradas antes de quitar la regla anterior, así que la API nunca perdió el acceso a la base de datos.</li>
+        <li><strong>Rotar los demás secretos en el mismo cambio.</strong> También se rotaron todos los demás secretos de la aplicación, lo que cerró todas las sesiones abiertas, a propósito. Además, eliminé unas credenciales sin uso que quedaban de un experimento de alojamiento de imágenes que nunca se desplegó, así que la configuración local ahora coincide exactamente con la de producción.</li>
+        <li><strong>Cerrar el acceso de red.</strong> Sustituí la regla abierta a todos por una lista que solo permite los dos rangos de IP de salida que publica el proveedor de alojamiento, más una sola IP de desarrollo. Ambos rangos se agregaron antes de quitar la regla abierta a todos, así que la API nunca perdió el acceso a la base de datos.</li>
         <li><strong>Revisar todo el historial.</strong> Busqué patrones de secretos en cada commit (credenciales incrustadas en cadenas de conexión, claves privadas y formatos comunes de tokens de servicios en la nube, de pago y de API), mostrando solo dónde había una coincidencia, nunca su valor. Las únicas coincidencias fueron valores de ejemplo, no secretos reales.</li>
         <li><strong>Verificar después de cada paso.</strong> Los registros de la API mostraron una conexión limpia con la base de datos, los endpoints públicos devolvieron sus datos, el inicio de sesión funcionó con las nuevas credenciales y no se perdieron datos.</li>
       </ol>
       <p>Lo que aprendí:</p>
       <ul>
-        <li><strong>Lo que vuelve inofensiva una filtración es rotar el secreto, no borrar el archivo.</strong> Si un valor estuvo público, hay que dar por hecho que alguien lo copió.</li>
-        <li><strong>Las alertas de escaneo de secretos necesitan un responsable.</strong> Una alerta que nadie atiende no protege nada.</li>
+        <li><strong>Lo que vuelve inofensivo un secreto expuesto es rotarlo.</strong> Quitarlo del repositorio no lo invalida; cambiarlo, sí.</li>
+        <li><strong>Más vale prevenir que detectar.</strong> La protección de push detiene un secreto antes de que llegue al repositorio.</li>
         <li><strong>Restringir la red es un segundo candado.</strong> Con el acceso limitado a direcciones conocidas, una contraseña filtrada por sí sola no basta para entrar.</li>
       </ul>
 
@@ -229,8 +229,8 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <ul>
         <li><strong>Segundo factor del registrador:</strong> pasarlo de SMS a una aplicación de autenticación.</li>
         <li><strong>Acceso de red:</strong> depurar las entradas antiguas de la lista de IP permitidas de la base de datos.</li>
+        <li><strong>Protección de push y escaneo de secretos</strong> en el repositorio, para que un secreto subido por error se bloquee al hacer push en lugar de detectarse después.</li>
         <li><strong>Opcional: una CSP que deniegue por defecto</strong> (<code>default-src 'none'</code>) para obtener los últimos puntos adicionales de Observatory.</li>
-        <li><strong>Escaneo automático de secretos</strong> (un hook de pre-commit o la protección de push en el repositorio), para que un secreto subido por error no vuelva a pasar desapercibido.</li>
       </ul>
 
       <a class="back" href="index.html#security">&larr; Volver a trabajo de seguridad</a>
