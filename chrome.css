@@ -5,6 +5,9 @@
    and loading the Tabler icon font.
    ============================================================ */
 
+/* Stop iOS Safari from enlarging text in landscape */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+
 /* Language visibility — only ever hide the inactive language */
 html:not(.lang-es) [data-l="es"] { display: none; }
 html.lang-es [data-l="en"] { display: none; }
@@ -38,6 +41,7 @@ nav {
   color: var(--text);
   text-decoration: none;
   letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 .nav-logo span { color: var(--orange); }
 .nav-links {
@@ -185,10 +189,14 @@ nav {
 .footer-links a:hover { color: var(--text); }
 
 /* ── RESPONSIVE ── */
-@media (max-width: 720px) {
-  nav { padding: 0 20px; }
+/* Below this width the full link row no longer fits beside the name and buttons
+   (tablets, phones in landscape), so switch to the menu button */
+@media (max-width: 960px) {
   .nav-links { display: none; }
   .hamburger { display: flex; }
+}
+@media (max-width: 720px) {
+  nav { padding: 0 20px; }
   .site-footer-inner { flex-direction: column; text-align: center; padding: 28px 20px; }
   .site-footer-inner > div { justify-content: center; }
   .footer-social { flex-wrap: wrap; }

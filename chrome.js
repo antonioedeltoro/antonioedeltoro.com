@@ -163,7 +163,18 @@
     // ── Mobile menu ──
     var hamburger = document.getElementById('hamburger-btn');
     var menu = document.getElementById('mobile-menu');
+    var navBar = document.querySelector('nav');
+    // Pin the menu to the nav's real bottom edge: on the homepage the
+    // availability bar sits above the nav until the page scrolls
+    function placeMenu() {
+      var bottom = Math.max(0, navBar.getBoundingClientRect().bottom);
+      menu.style.top = bottom + 'px';
+      menu.style.maxHeight = (window.innerHeight - bottom) + 'px';
+    }
+    window.addEventListener('scroll', function () { if (menu.classList.contains('open')) placeMenu(); }, { passive: true });
+    window.addEventListener('resize', function () { if (menu.classList.contains('open')) placeMenu(); });
     function setMenu(open) {
+      if (open) placeMenu();
       menu.classList.toggle('open', open);
       hamburger.replaceChildren(icon(open ? 'ti-x' : 'ti-menu-2'));
     }
@@ -172,7 +183,12 @@
     // Close the open menu when clicking/tapping outside it (nav buttons handle themselves)
     document.addEventListener('click', function (e) {
       if (!menu.classList.contains('open')) return;
-      if (menu.contains(e.target) || e.target.closest('nav')) return;
+      // Use the path recorded at dispatch: nav buttons swap their icon on click,
+      // so e.target can already be detached from the page by the time this runs
+      var path = e.composedPath ? e.composedPath() : [e.target];
+      for (var i = 0; i < path.length; i++) {
+        if (path[i] === menu || path[i].nodeName === 'NAV') return;
+      }
       setMenu(false);
     });
 
