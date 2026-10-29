@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>deltoro.codes: Case Study — Antonio E. del Toro</title>
+<title>deltoro.codes: Case Study | Antonio E. del Toro</title>
 <meta name="description" content="How I hardened deltoro.codes, my web development business's site: removing Google Analytics, a deny-by-default CSP with Trusted Types, full security headers, and SPF, DKIM, DMARC, CAA and DNSSEC for a domain that sends real email. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/deltoro-codes-hardening.html">
@@ -73,11 +73,11 @@
       <p>A small-business site that collects leads and sends mail:</p>
       <ul>
         <li><strong>Script injection</strong> into the pages or the contact form.</li>
-        <li><strong>Clickjacking</strong> &mdash; the site framed inside a hostile page.</li>
-        <li><strong>Third-party script compromise</strong> &mdash; any outside script runs with full access to the page.</li>
+        <li><strong>Clickjacking:</strong> the site framed inside a hostile page.</li>
+        <li><strong>Third-party script compromise:</strong> any outside script runs with full access to the page.</li>
         <li><strong>Email spoofing</strong> of the business domain, which clients and prospects receive real mail from.</li>
         <li><strong>Mis-issued certificates</strong> for the domain.</li>
-        <li><strong>DNS tampering</strong> &mdash; forged answers that send visitors or mail somewhere else.</li>
+        <li><strong>DNS tampering:</strong> forged answers that send visitors or mail somewhere else.</li>
       </ul>
 
       <h2><span class="num">02</span>Starting point</h2>
@@ -128,7 +128,7 @@ require-trusted-types-for 'script'; trusted-types 'none'</code></pre>
           </tbody>
         </table>
       </div>
-      <p>One platform detail: Render&rsquo;s static-site headers don&rsquo;t honor per-path overrides &mdash; a narrower rule for one folder lost to the <code>/*</code> rule &mdash; so CORP is <code>same-origin</code> across the whole site.</p>
+      <p>One platform detail: Render&rsquo;s static-site headers don&rsquo;t honor per-path overrides (a narrower rule for one folder lost to the <code>/*</code> rule), so CORP is <code>same-origin</code> across the whole site.</p>
 
       <h2><span class="num">06</span>Domain: email and certificates</h2>
       <p>Because the domain sends real mail, it needs full email authentication:</p>

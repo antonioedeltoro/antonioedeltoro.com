@@ -1,10 +1,10 @@
 /* ============================================================
-   Shared site chrome — renders the nav + footer into
+   Shared site chrome - renders the nav + footer into
    <div id="site-nav"></div> and <div id="site-footer"></div>,
    and wires up theme, language, mobile menu, and active-nav.
    Loaded (deferred) by every page. Single source of truth.
 
-   Builds everything with DOM APIs — no innerHTML/outerHTML — so the
+   Builds everything with DOM APIs - no innerHTML/outerHTML - so the
    site can enforce Trusted Types (require-trusted-types-for 'script').
 
    Uses RELATIVE links so it works both when served from a web
@@ -35,7 +35,7 @@
     ['https://www.youtube.com/@antonioedeltoro',     'YouTube',     'ti-brand-youtube']
   ];
 
-  // h('a', {href: '#', class: 'x'}, child, 'text', ...) — children may be nodes, strings, or arrays
+  // h('a', {href: '#', class: 'x'}, child, 'text', ...) - children may be nodes, strings, or arrays
   function h(tag, attrs) {
     var el = document.createElement(tag);
     if (attrs) Object.keys(attrs).forEach(function (k) { el.setAttribute(k, attrs[k]); });
@@ -192,7 +192,7 @@
       setMenu(false);
     });
 
-    // ── Active nav (scroll-spy) — only where in-page sections exist (homepage) ──
+    // ── Active nav (scroll-spy) - only where in-page sections exist (homepage) ──
     if (onHome) {
       var navLinks = document.querySelectorAll('.nav-links a, .mobile-menu a');
       var navObserver = new IntersectionObserver(function (entries) {

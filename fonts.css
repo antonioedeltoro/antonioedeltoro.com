@@ -1,7 +1,7 @@
 /* ============================================================
-   Self-hosted fonts — no third-party requests.
+   Self-hosted fonts - no third-party requests.
    Syne, DM Sans, DM Mono: SIL Open Font License 1.1 (via Fontsource)
-   Tabler Icons 3.46.0: MIT — subset to only the glyphs this site uses.
+   Tabler Icons 3.46.0: MIT - subset to only the glyphs this site uses.
    Adding a new ti-* icon? Re-run the subset (see fonts/README.md).
    ============================================================ */
 @font-face{font-family:'Syne';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/syne-latin-400-normal.woff2) format('woff2')}

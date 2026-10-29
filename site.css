@@ -172,7 +172,7 @@
     z-index: 2;
     border-radius: 50%;
   }
-  /* moving scanline sweep — stronger */
+  /* moving scanline sweep - stronger */
   .scanline {
     position: absolute;
     top: -60%;
@@ -198,7 +198,7 @@
     100% { top: 100%; }
   }
 
-  /* mobile image slot — hidden on desktop */
+  /* mobile image slot - hidden on desktop */
   .hero-image-mobile-wrap { display: none; }
   .hero-image-mobile-wrap .hero-image-wrap {
     width: 220px; height: 220px;
@@ -262,7 +262,7 @@
     padding: 64px 0;
     position: relative;
   }
-  /* Section dividers — centered and limited to the content column width */
+  /* Section dividers - centered and limited to the content column width */
   section::after,
   .hero::after {
     content: "";
@@ -446,7 +446,7 @@
     object-fit: contain;
     transition: filter 0.25s ease, opacity 0.25s ease;
   }
-  /* Grayscale at rest, full official color on hover/focus — gated to hover-capable devices so touch always shows full color */
+  /* Grayscale at rest, full official color on hover/focus - gated to hover-capable devices so touch always shows full color */
   @media (hover: hover) {
     .cert-badge { filter: grayscale(1); opacity: 0.9; }
     .cert-card:hover .cert-badge,
@@ -602,7 +602,7 @@
   }
   .fade-in.visible { opacity: 1; transform: none; }
 
-  /* Respect users who prefer reduced motion — show everything, skip animations */
+  /* Respect users who prefer reduced motion - show everything, skip animations */
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
       animation-duration: 0.01ms !important;

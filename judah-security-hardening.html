@@ -9,8 +9,8 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Judah Security: Case Study — Antonio E. del Toro</title>
-<meta name="description" content="Case study: taking a full-stack MERN lead-generation site from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory — server-side admin auth, API hardening, a deny-by-default CSP with Trusted Types, and email and certificate DNS controls.">
+<title>Judah Security: Case Study | Antonio E. del Toro</title>
+<meta name="description" content="Case study: taking a full-stack MERN lead-generation site from a D (35/100) to an A+ (140/100) on Mozilla's HTTP Observatory: server-side admin auth, API hardening, a deny-by-default CSP with Trusted Types, and email and certificate DNS controls.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/judah-security-hardening.html">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -71,10 +71,10 @@
       </div>
 
       <h2><span class="num">01</span>Threat model</h2>
-      <p>The forms collect sensitive operational details &mdash; site addresses, schedules, number of guards, armed or unarmed &mdash; so this site has more to protect than a brochure:</p>
+      <p>The forms collect sensitive operational details (site addresses, schedules, number of guards, armed or unarmed), so this site has more to protect than a brochure:</p>
       <ul>
         <li><strong>Account takeover</strong> of the admin area or reviewer accounts.</li>
-        <li><strong>Content tampering and stored XSS</strong> &mdash; a malicious news post running script for every visitor.</li>
+        <li><strong>Content tampering and stored XSS:</strong> a malicious news post running script for every visitor.</li>
         <li><strong>Spam and abuse</strong> of the public endpoints.</li>
         <li><strong>Lead data exposure.</strong></li>
         <li><strong>The usual web risks:</strong> clickjacking, protocol downgrade, email spoofing and mis-issued certificates.</li>
@@ -86,9 +86,9 @@
       <h2><span class="num">03</span>What the audit found</h2>
       <p>Most severe first:</p>
       <ol>
-        <li><strong>The admin credential was in the public JavaScript.</strong> It lived in a build variable with Vite&rsquo;s <code>VITE_</code> prefix, and Vite inlines those into the bundle at build time. The API accepted that same static token, and the admin &ldquo;login&rdquo; was a string comparison in the browser. Anyone reading the bundle could create, edit or delete news posts and upload any file type &mdash; and because posts were rendered with <code>dangerouslySetInnerHTML</code>, a tampered post could have run script for every visitor. I contained it before fixing it: I removed the variables from the hosting environment so the API rejected the token before the code fix shipped, confirmed the old token was refused, and checked the content for tampering. None was found.</li>
+        <li><strong>The admin credential was in the public JavaScript.</strong> It lived in a build variable with Vite&rsquo;s <code>VITE_</code> prefix, and Vite inlines those into the bundle at build time. The API accepted that same static token, and the admin &ldquo;login&rdquo; was a string comparison in the browser. Anyone reading the bundle could create, edit or delete news posts and upload any file type. And because posts were rendered with <code>dangerouslySetInnerHTML</code>, a tampered post could have run script for every visitor. I contained it before fixing it: I removed the variables from the hosting environment so the API rejected the token before the code fix shipped, confirmed the old token was refused, and checked the content for tampering. None was found.</li>
         <li><strong>Every lead was bouncing.</strong> Both forms opened a <code>mailto:</code> link to an address on a domain with no mail server (no MX record), so quote requests and course inquiries never arrived. I pointed both forms at the client&rsquo;s real inbox.</li>
-        <li><strong>The portfolio copy was the production site.</strong> The portfolio subdomain was just a second hostname on the production front end, dependent on the client&rsquo;s API &mdash; and its News page was empty because the API&rsquo;s CORS policy rejected that origin. I rebuilt it as a self-contained copy (section 09).</li>
+        <li><strong>The portfolio copy was the production site.</strong> The portfolio subdomain was just a second hostname on the production front end, dependent on the client&rsquo;s API, and its News page was empty because the API&rsquo;s CORS policy rejected that origin. I rebuilt it as a self-contained copy (section 09).</li>
         <li><strong>CORS was reopened by configuration.</strong> A CORS setting in the API&rsquo;s hosting environment re-allowed <code>http://localhost:5173</code> in production, undoing the allowlist in the code.</li>
         <li><strong>A data-integrity bug.</strong> Invalid review ratings were silently saved as five stars.</li>
       </ol>
@@ -124,7 +124,7 @@ require-trusted-types-for 'script'; trusted-types 'none';</code></pre>
         <li><strong>No more <code>dangerouslySetInnerHTML</code>.</strong> News bodies are stored as HTML, so I wrote a small whitelist renderer that turns paragraphs, bold text and lists into React elements. No HTML string ever reaches the DOM.</li>
         <li><strong>Inline styles moved into CSS</strong>, so <code>style-src</code> needs nothing beyond <code>'self'</code>.</li>
         <li><strong>Four unused dependencies removed:</strong> axios, EmailJS, Font Awesome and react-helmet.</li>
-        <li><strong>No third-party asset origins</strong> &mdash; every script, style and font is served by the site itself.</li>
+        <li><strong>No third-party asset origins:</strong> every script, style and font is served by the site itself.</li>
       </ul>
 
       <h2><span class="num">07</span>HTTP response headers</h2>

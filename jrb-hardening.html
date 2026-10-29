@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>JRB Premier Ride: Case Study — Antonio E. del Toro</title>
+<title>JRB Premier Ride: Case Study | Antonio E. del Toro</title>
 <meta name="description" content="How I hardened jrbpremierride.com, a MERN booking app with Stripe payments: PCI DSS SAQ A scope, a deny-by-default CSP with Trusted Types, API hardening, and email/certificate DNS controls. A+ (140/100) on Mozilla's HTTP Observatory.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/jrb-hardening.html">
@@ -73,9 +73,9 @@
       <h2><span class="num">01</span>Threat model</h2>
       <p>A booking app that takes payments has more to protect than a static site:</p>
       <ul>
-        <li><strong>Card-payment fraud and PCI scope</strong> &mdash; how much of the card flow the site is responsible for.</li>
+        <li><strong>Card-payment fraud and PCI scope:</strong> how much of the card flow the site is responsible for.</li>
         <li><strong>Script injection</strong> that could tamper with the handoff to checkout.</li>
-        <li><strong>API abuse</strong> &mdash; spam bookings, scraping the billed Mapbox endpoints, junk Stripe sessions.</li>
+        <li><strong>API abuse:</strong> spam bookings, scraping the billed Mapbox endpoints, junk Stripe sessions.</li>
         <li><strong>Information leakage</strong> through error messages.</li>
         <li><strong>Cross-site use of the API</strong> from origins that aren&rsquo;t the site.</li>
         <li><strong>Email spoofing</strong> from the business domain.</li>
@@ -91,7 +91,7 @@
         <li>Error responses could carry internal error text.</li>
         <li>Booking, contact and checkout had no write-specific rate limits, and vehicle and ID fields were loosely validated.</li>
         <li>The paid-booking notification email interpolated rider-supplied text into HTML <strong>unescaped</strong>.</li>
-        <li>An unused <code>mapbox-gl</code> dependency, and dependency advisories in the API &mdash; including one critical.</li>
+        <li>An unused <code>mapbox-gl</code> dependency, and dependency advisories in the API, including one critical.</li>
         <li>No SPF on the apex or on the email provider&rsquo;s bounce subdomain, and no CAA record.</li>
       </ul>
 
@@ -100,7 +100,7 @@
       <ul>
         <li>The charge amount always comes from the server-stored quote, never from the browser.</li>
         <li>The webhook verifies Stripe&rsquo;s signature against the raw request body and is the only thing that can mark a booking paid. Requests with no signature are rejected with a generic error.</li>
-        <li>Stripe secret keys exist only as host environment variables &mdash; not in the repo (full Git history scanned clean) and not in the client bundle.</li>
+        <li>Stripe secret keys exist only as host environment variables, not in the repo (full Git history scanned clean) and not in the client bundle.</li>
         <li>Defense in depth: the client refuses to redirect anywhere except <code>https://checkout.stripe.com</code>.</li>
       </ul>
       <p>Because Checkout is a full-page redirect, the CSP needs <strong>no Stripe origins at all</strong>. Adding <code>js.stripe.com</code> &ldquo;just in case&rdquo; would only widen the policy. If the site ever moves to Stripe Elements, it would need <code>js.stripe.com</code> in <code>script-src</code> and <code>frame-src</code>, and <code>api.stripe.com</code> in <code>connect-src</code>.</p>
@@ -117,7 +117,7 @@ object-src 'none'; frame-src 'none'; worker-src 'none';
 frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types default;
 upgrade-insecure-requests</code></pre>
-      <p><strong>Trusted Types with React.</strong> This app can&rsquo;t use <code>trusted-types 'none'</code>: it has one legitimate sink: the head manager writes each page&rsquo;s JSON-LD structured data with <code>innerHTML</code> during client-side navigation. The solution is a single <code>default</code> policy, loaded as the first script, whose <code>createHTML</code> accepts a string only if it contains no <code>&lt;</code> &mdash; text without <code>&lt;</code> can&rsquo;t create elements, attributes, or event handlers. There is deliberately no <code>createScript</code> or <code>createScriptURL</code>, so string-to-script stays blocked outright. I verified in the browser that markup injection through HTML sinks throws, and that a script whose text is set from a string never executes.</p>
+      <p><strong>Trusted Types with React.</strong> This app can&rsquo;t use <code>trusted-types 'none'</code>, because it has one legitimate sink: the head manager writes each page&rsquo;s JSON-LD structured data with <code>innerHTML</code> during client-side navigation. The solution is a single <code>default</code> policy, loaded as the first script, whose <code>createHTML</code> accepts a string only if it contains no <code>&lt;</code>, since text without <code>&lt;</code> can&rsquo;t create elements, attributes, or event handlers. There is deliberately no <code>createScript</code> or <code>createScriptURL</code>, so string-to-script stays blocked outright. I verified in the browser that markup injection through HTML sinks throws, and that a script whose text is set from a string never executes.</p>
 
       <h2><span class="num">05</span>HTTP response headers</h2>
       <div class="table-wrap">
@@ -139,7 +139,7 @@ upgrade-insecure-requests</code></pre>
       <h2><span class="num">06</span>The API</h2>
       <ul>
         <li><strong>Headers.</strong> Helmet with a deny-everything CSP (the API only returns JSON), two-year HSTS, and <code>no-referrer</code>.</li>
-        <li><strong>CORS.</strong> Limited to the custom domain (apex and www), <code>GET</code>/<code>POST</code> only, <code>Content-Type</code> only, no credentials. Even the host&rsquo;s own <code>onrender.com</code> copy of the site is refused &mdash; verified live.</li>
+        <li><strong>CORS.</strong> Limited to the custom domain (apex and www), <code>GET</code>/<code>POST</code> only, <code>Content-Type</code> only, no credentials. Even the host&rsquo;s own <code>onrender.com</code> copy of the site is refused, which I verified live.</li>
         <li><strong>Validation.</strong> Zod on every write endpoint: vehicle restricted to priced vehicles, ObjectId format on quote and booking IDs, phone format, length caps, control-character stripping. Unknown fields are dropped, so a client can never set status or payment fields.</li>
         <li><strong>Rate limits per IP.</strong> Tight limits on quotes (each one triggers billed Mapbox calls) and on bookings, contact and checkout (each creates database records or a Stripe session), sized to the cost of each call, plus an overall cap. The JSON body size limit was cut sharply.</li>
         <li><strong>Errors.</strong> A central error handler never returns stack traces or internal error text: server errors are a generic 500, malformed JSON is &ldquo;Bad request&rdquo;, and database cast or validation errors are a generic 400.</li>
@@ -151,7 +151,7 @@ upgrade-insecure-requests</code></pre>
       <p>I identified the providers before writing any records. DNS and the registrar are Squarespace Domains; the domain receives no mail (no MX); and the only sender is Resend (on Amazon SES) for booking notifications.</p>
       <pre><code>@                  TXT  "v=spf1 -all"
 send               TXT  "v=spf1 include:amazonses.com ~all"
-resend._domainkey  TXT  (Resend DKIM key — already present)
+resend._domainkey  TXT  (Resend DKIM key, already present)
 _dmarc             TXT  "v=DMARC1; p=quarantine;"
 @                  CAA  0 issue "pki.goog"
 @                  CAA  0 issue "letsencrypt.org"</code></pre>
@@ -165,18 +165,18 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       <h2><span class="num">08</span>Rollout and verification</h2>
       <p>The rule throughout: <strong>never tighten a header before the code that needs it is live.</strong></p>
       <ul>
-        <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures &mdash; forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
+        <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures: forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
         <li><strong>Stage 1</strong> shipped the code plus the strict policy as <code>Content-Security-Policy-Report-Only</code>. On the live site every page reported zero would-be violations, address autocomplete and quotes worked against real Mapbox and the live API, and a real Book &amp; Pay went through Stripe end to end.</li>
         <li><strong>Stage 2</strong> enforced the policy and tightened the remaining headers. I re-ran every check live and tested Book &amp; Pay again.</li>
-        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan. It happened again with routing: removing the catch-all rewrite from <code>render.yaml</code> (see below) didn&rsquo;t remove the live rule either, so I deleted it in the dashboard too. Lesson: on this host, removing something from the config file doesn&rsquo;t remove it from the live service &mdash; always re-verify after a removal.</li>
+        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan. It happened again with routing: removing the catch-all rewrite from <code>render.yaml</code> (see below) didn&rsquo;t remove the live rule either, so I deleted it in the dashboard too. Lesson: on this host, removing something from the config file doesn&rsquo;t remove it from the live service, so always re-verify after a removal.</li>
       </ul>
 
       <h2><span class="num">09</span>Follow-ups</h2>
       <ul>
-        <li><strong>Done &mdash; real 404s.</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
-        <li><strong>In progress &mdash; DMARC enforcement:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
-        <li><strong>Deferred &mdash; HSTS preload</strong>: it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
-        <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments &mdash; that&rsquo;s where ongoing attention belongs.</li>
+        <li><strong>Real 404s (done).</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
+        <li><strong>DMARC enforcement (in progress):</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
+        <li><strong>HSTS preload (deferred):</strong> it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
+        <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments. That&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>
@@ -257,7 +257,7 @@ object-src 'none'; frame-src 'none'; worker-src 'none';
 frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types default;
 upgrade-insecure-requests</code></pre>
-      <p><strong>Trusted Types con React.</strong> Esta aplicación no puede usar <code>trusted-types 'none'</code>: tiene un punto de inserción legítimo: el gestor del <code>&lt;head&gt;</code> escribe los datos estructurados JSON-LD de cada página con <code>innerHTML</code> durante la navegación del lado del cliente. La solución es una única política <code>default</code>, cargada como el primer script, cuyo <code>createHTML</code> solo acepta una cadena si no contiene <code>&lt;</code>: un texto sin <code>&lt;</code> no puede crear elementos, atributos ni manejadores de eventos. A propósito no tiene <code>createScript</code> ni <code>createScriptURL</code>, así que convertir una cadena en script sigue bloqueado por completo. Comprobé en el navegador que inyectar marcado a través de los puntos de inserción de HTML genera un error, y que un script cuyo texto se asigna desde una cadena nunca se ejecuta.</p>
+      <p><strong>Trusted Types con React.</strong> Esta aplicación no puede usar <code>trusted-types 'none'</code>, porque tiene un punto de inserción legítimo: el gestor del <code>&lt;head&gt;</code> escribe los datos estructurados JSON-LD de cada página con <code>innerHTML</code> durante la navegación del lado del cliente. La solución es una única política <code>default</code>, cargada como el primer script, cuyo <code>createHTML</code> solo acepta una cadena si no contiene <code>&lt;</code>: un texto sin <code>&lt;</code> no puede crear elementos, atributos ni manejadores de eventos. A propósito no tiene <code>createScript</code> ni <code>createScriptURL</code>, así que convertir una cadena en script sigue bloqueado por completo. Comprobé en el navegador que inyectar marcado a través de los puntos de inserción de HTML genera un error, y que un script cuyo texto se asigna desde una cadena nunca se ejecuta.</p>
 
       <h2><span class="num">05</span>Encabezados de respuesta HTTP</h2>
       <div class="table-wrap">
@@ -291,7 +291,7 @@ upgrade-insecure-requests</code></pre>
       <p>Identifiqué a los proveedores antes de escribir cualquier registro. El DNS y el registrador son Squarespace Domains; el dominio no recibe correo (sin MX); y el único remitente es Resend (sobre Amazon SES), para las notificaciones de reservas.</p>
       <pre><code>@                  TXT  "v=spf1 -all"
 send               TXT  "v=spf1 include:amazonses.com ~all"
-resend._domainkey  TXT  (Resend DKIM key — already present)
+resend._domainkey  TXT  (Resend DKIM key, already present)
 _dmarc             TXT  "v=DMARC1; p=quarantine;"
 @                  CAA  0 issue "pki.goog"
 @                  CAA  0 issue "letsencrypt.org"</code></pre>

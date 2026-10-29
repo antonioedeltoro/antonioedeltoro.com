@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>antonioedeltoro.com: Case Study — Antonio E. del Toro</title>
+<title>antonioedeltoro.com: Case Study | Antonio E. del Toro</title>
 <meta name="description" content="How I took antonioedeltoro.com to an A+ (140/100) on Mozilla's HTTP Observatory: removing third-party dependencies, a strict CSP, security headers, and email/certificate DNS controls.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/site-hardening.html">
@@ -63,7 +63,7 @@
       </ul>
 
       <h2>Security</h2>
-      <p>It&rsquo;s a static site: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end &mdash; the page, the server responses, and the domain itself.</p>
+      <p>It&rsquo;s a static site: no backend, no database, no logins. That makes it a small target, but not a zero one. I treated it like a production asset and hardened it end to end: the page, the server responses, and the domain itself.</p>
 
       <div class="result">
         <div class="grade">A+</div>
@@ -74,16 +74,16 @@
       <p>With no user data to steal, the realistic risks for a site like this are about <strong>integrity and reputation</strong>, not data breaches:</p>
       <ul>
         <li><strong>Script injection</strong> through a compromised third-party asset (a font or icon CDN).</li>
-        <li><strong>Clickjacking</strong> &mdash; the site framed inside a hostile page.</li>
-        <li><strong>Protocol downgrade</strong> &mdash; a visitor pushed from HTTPS to HTTP on an untrusted network.</li>
-        <li><strong>Email spoofing</strong> &mdash; phishing sent &ldquo;from&rdquo; this domain to recruiters who have seen it on my r&eacute;sum&eacute;.</li>
-        <li><strong>Mis-issued certificates</strong> &mdash; a certificate authority issuing a valid TLS certificate for this domain to someone else.</li>
+        <li><strong>Clickjacking:</strong> the site framed inside a hostile page.</li>
+        <li><strong>Protocol downgrade:</strong> a visitor pushed from HTTPS to HTTP on an untrusted network.</li>
+        <li><strong>Email spoofing:</strong> phishing sent &ldquo;from&rdquo; this domain to recruiters who have seen it on my r&eacute;sum&eacute;.</li>
+        <li><strong>Mis-issued certificates:</strong> a certificate authority issuing a valid TLS certificate for this domain to someone else.</li>
       </ul>
 
       <h2><span class="num">02</span>Starting point</h2>
       <p>The site already had a reasonable baseline: HTTPS, a <code>&lt;meta&gt;</code> Content Security Policy, Subresource Integrity on the icon stylesheet, a <code>security.txt</code>, DNSSEC on the domain, and a set of response headers configured at the host. The gaps:</p>
       <ul>
-        <li>Two third-party origins (Google Fonts and jsDelivr) were allowed to serve styles and fonts. Google Fonts serves CSS that varies by browser, so it <strong>cannot be pinned with SRI</strong> &mdash; that origin was trusted blindly.</li>
+        <li>Two third-party origins (Google Fonts and jsDelivr) were allowed to serve styles and fonts. Google Fonts serves CSS that varies by browser, so it <strong>cannot be pinned with SRI</strong>, so that origin was trusted blindly.</li>
         <li>Every visit disclosed the visitor&rsquo;s IP address to both providers, which the privacy policy had to call out.</li>
         <li>The CSP started from <code>default-src 'self'</code> rather than denying by default.</li>
         <li>The domain had no email authentication records and no CAA record.</li>
@@ -106,8 +106,8 @@ object-src 'none'; frame-src 'none'; worker-src 'none';
 frame-ancestors 'none';
 require-trusted-types-for 'script'; trusted-types 'none';
 upgrade-insecure-requests</code></pre>
-      <p>There are no <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> exceptions; inline styles had already been moved into stylesheets. The policy ships twice: as a <code>&lt;meta&gt;</code> tag in each page and as an HTTP header. That is deliberate &mdash; <strong>browsers ignore <code>frame-ancestors</code> in a meta tag</strong>, so clickjacking protection only works from the header.</p>
-      <p>The policy also enforces <strong>Trusted Types</strong> with no policies allowed (<code>trusted-types 'none'</code>). The browser now refuses to turn any string into HTML or script &mdash; assigning to <code>innerHTML</code>, <code>outerHTML</code> or a script&rsquo;s text throws an error &mdash; which shuts down DOM-based XSS as a class rather than one bug at a time. Getting there meant removing every such sink from the site&rsquo;s own code: the shared nav and footer are now built with DOM APIs, and the language toggle, which used to swap copy with <code>innerHTML</code>, now ships both languages as static markup and lets CSS show the active one.</p>
+      <p>There are no <code>'unsafe-inline'</code> or <code>'unsafe-eval'</code> exceptions; inline styles had already been moved into stylesheets. The policy ships twice: as a <code>&lt;meta&gt;</code> tag in each page and as an HTTP header. That is deliberate: <strong>browsers ignore <code>frame-ancestors</code> in a meta tag</strong>, so clickjacking protection only works from the header.</p>
+      <p>The policy also enforces <strong>Trusted Types</strong> with no policies allowed (<code>trusted-types 'none'</code>). The browser now refuses to turn any string into HTML or script (assigning to <code>innerHTML</code>, <code>outerHTML</code> or a script&rsquo;s text throws an error), which shuts down DOM-based XSS as a class rather than one bug at a time. Getting there meant removing every such sink from the site&rsquo;s own code: the shared nav and footer are now built with DOM APIs, and the language toggle, which used to swap copy with <code>innerHTML</code>, now ships both languages as static markup and lets CSS show the active one.</p>
 
       <h2><span class="num">05</span>HTTP response headers</h2>
       <div class="table-wrap">
@@ -142,7 +142,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <h2><span class="num">07</span>Rollout and verification</h2>
       <p>Order mattered. Tightening the CSP <em>header</em> before the self-hosted assets were deployed would have blocked the old Google Fonts and jsDelivr requests on the live site and broken every font and icon. So the sequence was: ship the code with the strict <code>&lt;meta&gt;</code> CSP, confirm the deploy, then tighten the header. The Trusted Types change followed the same order: the old language toggle relied on <code>innerHTML</code>, so enforcing it in the header before the rewritten code was live would have broken the page.</p>
       <ul>
-        <li><strong>Before deploying:</strong> a headless browser loaded every page in light and dark mode, English and Spanish, desktop and mobile, and asserted zero CSP violations, zero JavaScript errors, zero third-party requests, and that every font and icon actually loaded. For the Trusted Types rewrite it also compared the old and new versions side by side &mdash; identical visible text, identical toggle behavior &mdash; and confirmed the browser now blocks <code>innerHTML</code> outright.</li>
+        <li><strong>Before deploying:</strong> a headless browser loaded every page in light and dark mode, English and Spanish, desktop and mobile, and asserted zero CSP violations, zero JavaScript errors, zero third-party requests, and that every font and icon actually loaded. For the Trusted Types rewrite it also compared the old and new versions side by side (identical visible text, identical toggle behavior) and confirmed the browser now blocks <code>innerHTML</code> outright.</li>
         <li><strong>After deploying:</strong> the live response headers were checked directly, then scored by Mozilla&rsquo;s HTTP Observatory.</li>
         <li><strong>DNS:</strong> each record was confirmed through a public DNSSEC-validating resolver.</li>
       </ul>
@@ -150,7 +150,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <h2><span class="num">08</span>What I&rsquo;d do next</h2>
       <ul>
         <li><strong>HSTS preload.</strong> Considered and deferred. Preloading is effectively permanent and gains little over a two-year HSTS policy on a site with no logins.</li>
-        <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site &mdash; it&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site. All three are behind multi-factor authentication, and that&rsquo;s where ongoing attention belongs.</li>
+        <li><strong>Account security.</strong> After this work, the weakest link isn&rsquo;t the site. It&rsquo;s the accounts behind it. Anyone who controls the Git repository, the host, or the registrar controls the site. All three are behind multi-factor authentication, and that&rsquo;s where ongoing attention belongs.</li>
       </ul>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>

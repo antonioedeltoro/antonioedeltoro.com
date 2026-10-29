@@ -9,7 +9,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="robots" content="index, follow">
 
-<title>Faby Services: Case Study — Antonio E. del Toro</title>
+<title>Faby Services: Case Study | Antonio E. del Toro</title>
 <meta name="description" content="Beyond the HTTP headers: DNSSEC, a strict no-mail SPF/DMARC policy, CAA, two-factor on every account, and the response to exposed database credentials on fabyservices.com.">
 <meta name="author" content="Antonio E. del Toro">
 <link rel="canonical" href="https://www.antonioedeltoro.com/client-site-hardening.html">
@@ -67,7 +67,7 @@
 
       <div class="result">
         <div class="grade">A+</div>
-        <p><strong>125 / 100 on Mozilla&rsquo;s HTTP Observatory, 12 of 12 tests passed &mdash; before and after this pass.</strong> The score didn&rsquo;t move, by design: this work hardened layers Observatory doesn&rsquo;t score. <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=www.fabyservices.com" target="_blank" rel="noopener">View the live report</a>.</p>
+        <p><strong>125 / 100 on Mozilla&rsquo;s HTTP Observatory, 12 of 12 tests passed, before and after this pass.</strong> The score didn&rsquo;t move, by design: this work hardened layers Observatory doesn&rsquo;t score. <a href="https://developer.mozilla.org/en-US/observatory/analyze?host=www.fabyservices.com" target="_blank" rel="noopener">View the live report</a>.</p>
       </div>
 
       <h2><span class="num">01</span>Context</h2>
@@ -77,9 +77,9 @@
       <h2><span class="num">02</span>Threat model</h2>
       <p>A tax and insurance brand is a prime phishing target, so the domain and the accounts matter as much as the pages:</p>
       <ul>
-        <li><strong>Email spoofing</strong> &mdash; phishing sent &ldquo;from&rdquo; the business&rsquo;s domain.</li>
+        <li><strong>Email spoofing:</strong> phishing sent &ldquo;from&rdquo; the business&rsquo;s domain.</li>
         <li><strong>Mis-issued TLS certificates</strong> for the domain.</li>
-        <li><strong>DNS tampering</strong> &mdash; forged answers that send visitors somewhere else.</li>
+        <li><strong>DNS tampering:</strong> forged answers that send visitors somewhere else.</li>
         <li><strong>Account takeover</strong> of the code host, the hosting provider or the registrar, any of which means full control of the site.</li>
         <li><strong>Exposed database credentials.</strong></li>
       </ul>
@@ -108,21 +108,21 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
       <h2><span class="num">05</span>Accounts</h2>
       <p>Two-factor authentication is on for every account that controls the site:</p>
       <ul>
-        <li><strong>Code host</strong> &mdash; authenticator app, mobile app and a passkey, with recovery codes stored offline. This one came first: the host deploys automatically from the repository, so whoever controls the repo controls the live site.</li>
+        <li><strong>Code host:</strong> authenticator app, mobile app and a passkey, with recovery codes stored offline. This one came first: the host deploys automatically from the repository, so whoever controls the repo controls the live site.</li>
         <li><strong>Hosting provider.</strong></li>
         <li><strong>Registrar</strong>, with account recovery configured. Its two-factor currently uses SMS; the plan is to move it to an authenticator app.</li>
         <li><strong>Database provider.</strong></li>
       </ul>
-      <p><strong>The client&rsquo;s own mailbox.</strong> The business&rsquo;s email lives on a personal webmail account, not on the domain, so it&rsquo;s the account that matters most to the business &mdash; and it&rsquo;s the client&rsquo;s to secure, not mine. I sent the client a written request, in Spanish, to turn on 2-Step Verification with an authenticator app or a passkey rather than SMS. Everything I control is hardened, and the one account I don&rsquo;t is covered by a documented request.</p>
+      <p><strong>The client&rsquo;s own mailbox.</strong> The business&rsquo;s email lives on a personal webmail account, not on the domain, so it&rsquo;s the account that matters most to the business. It&rsquo;s also the client&rsquo;s to secure, not mine. I sent the client a written request, in Spanish, to turn on 2-Step Verification with an authenticator app or a passkey rather than SMS. Everything I control is hardened, and the one account I don&rsquo;t is covered by a documented request.</p>
 
       <h2><span class="num">06</span>The finding: exposed database credentials</h2>
       <p>While auditing, I found an old automated alert from the database provider: <strong>live database credentials</strong> had at one point been committed to the repository. They were no longer in the Git history, but the values themselves were still valid, and the database accepted connections from any IP address (<code>0.0.0.0/0</code>). Rotating them came first.</p>
       <p>The response, in order:</p>
       <ol>
         <li><strong>Rotate the database password.</strong> I changed the database user&rsquo;s password and updated it on the host, so the leaked value stopped working.</li>
-        <li><strong>Rotate the other secrets in the same change.</strong> Every other secret the app uses was rotated too, which signed out all existing sessions &mdash; by design. I also removed unused credentials left over from an abandoned image-hosting experiment that was never deployed, so the local configuration now matches exactly what production uses.</li>
+        <li><strong>Rotate the other secrets in the same change.</strong> Every other secret the app uses was rotated too, which signed out all existing sessions, by design. I also removed unused credentials left over from an abandoned image-hosting experiment that was never deployed, so the local configuration now matches exactly what production uses.</li>
         <li><strong>Close network access.</strong> I replaced the open-to-all rule with an allow-list of the host&rsquo;s two published outbound IP ranges plus a single developer IP. Both ranges went in before the open-to-all rule came out, so the API never lost database access.</li>
-        <li><strong>Scan the entire history.</strong> I searched every commit for secret patterns &mdash; credentials embedded in connection strings, private keys, and common cloud, payment and API token formats &mdash; printing only where a match was, never its value. The only matches were placeholder values, not real secrets.</li>
+        <li><strong>Scan the entire history.</strong> I searched every commit for secret patterns (credentials embedded in connection strings, private keys, and common cloud, payment and API token formats), printing only where a match was, never its value. The only matches were placeholder values, not real secrets.</li>
         <li><strong>Verify after every step.</strong> The API logs showed a clean database connection, the public endpoints returned their data, sign-in worked with the new credentials, and no data was lost.</li>
       </ol>
       <p>What this taught me:</p>
@@ -145,7 +145,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Registrar two-factor:</strong> move it from SMS to an authenticator app.</li>
         <li><strong>Network access:</strong> prune the legacy entries from the database&rsquo;s IP allow-list.</li>
         <li><strong>Push protection and secret scanning</strong> on the repository, so a secret committed by mistake is blocked at push time instead of caught afterward.</li>
-        <li><strong>Optional &mdash; a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
+        <li><strong>Optional: a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
       </ul>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>

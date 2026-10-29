@@ -1,5 +1,5 @@
 /* ============================================================
-   Shared site chrome — navigation bar + footer.
+   Shared site chrome - navigation bar + footer.
    Single source of truth loaded by every page (index, terms, privacy).
    Depends on each page defining the color tokens (--bg, --text, etc.)
    and loading the Tabler icon font.
@@ -8,7 +8,7 @@
 /* Stop iOS Safari from enlarging text in landscape */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 
-/* Language visibility — only ever hide the inactive language */
+/* Language visibility - only ever hide the inactive language */
 html:not(.lang-es) [data-l="es"] { display: none; }
 html.lang-es [data-l="en"] { display: none; }
 /* Inline translation pairs: the active one is layout-transparent, so the
