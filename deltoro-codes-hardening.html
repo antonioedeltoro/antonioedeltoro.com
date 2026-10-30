@@ -84,7 +84,6 @@
       <p>The baseline on October 28, 2026:</p>
       <ul>
         <li><strong>Headers</strong> were already set in the Render dashboard: a CSP that allowed Google Tag Manager and Analytics with <code>style-src 'unsafe-inline'</code>, one-year HSTS, <code>X-Frame-Options: DENY</code>, <code>nosniff</code>, a Referrer-Policy and a five-item Permissions-Policy. There was no COOP, no CORP and no Trusted Types.</li>
-        <li><strong>DNS</strong> had Google Workspace MX records but no SPF, DKIM, DMARC, CAA or DNSSEC, and eight nameservers in a mixed delegation that Squarespace flagged as custom.</li>
         <li><strong>The old Express/MongoDB backend</strong> had been retired; its suspended service was deleted as part of this work.</li>
       </ul>
 
@@ -142,7 +141,7 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>DKIM</strong> uses a 2048-bit key generated in Google Admin and published at <code>google._domainkey</code>, with signing turned on.</li>
         <li><strong>DMARC</strong> starts at <code>p=none</code>, with aggregate reports to the business inbox and relaxed alignment. The plan: review the reports for two to four weeks, then move to quarantine, then reject.</li>
         <li><strong>CAA</strong> allows only the two certificate authorities Render uses.</li>
-        <li><strong>Nameservers</strong> are now Squarespace-only. The registry delegation moved to Squarespace&rsquo;s p01 and <code>squarespacedns.com</code> servers. The zone&rsquo;s own NS set still lists a different Squarespace pool (p06), and Squarespace support confirmed it&rsquo;s also theirs.</li>
+        <li><strong>Nameservers</strong> are Squarespace-only: the registry delegation points to Squarespace&rsquo;s p01 and <code>squarespacedns.com</code> servers.</li>
         <li><strong>DNSSEC</strong> is enabled in Squarespace with algorithm 13 (ECDSA P-256), and the registry shows the delegation as signed. All 30 uncached test lookups across the servers came back signed, and Google Public DNS validates the records (AD flag). The CNAMEs to Render are unsigned at Render&rsquo;s end, which is expected.</li>
       </ul>
 
@@ -160,6 +159,8 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>HSTS preload: deferred.</strong> <code>includeSubDomains</code> already covers the client subdomains, and preload is hard to undo.</li>
         <li><strong>Account security:</strong> keep multi-factor authentication on the registrar, host and email accounts.</li>
       </ul>
+
+      <p>My own business site is the first place clients see my work, so it gets the same treatment as theirs: no third-party scripts, strict policies, and authenticated email.</p>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
@@ -206,7 +207,6 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
       <p>La situación el 28 de octubre de 2026:</p>
       <ul>
         <li><strong>Los encabezados</strong> ya estaban configurados en el panel de Render: una CSP que permitía Google Tag Manager y Analytics con <code>style-src 'unsafe-inline'</code>, HSTS de un año, <code>X-Frame-Options: DENY</code>, <code>nosniff</code>, una Referrer-Policy y una Permissions-Policy de cinco elementos. No había COOP, ni CORP, ni Trusted Types.</li>
-        <li><strong>El DNS</strong> tenía los registros MX de Google Workspace, pero no tenía SPF, DKIM, DMARC, CAA ni DNSSEC, y usaba ocho servidores de nombres en una delegación mixta que Squarespace marcaba como personalizada.</li>
         <li><strong>El antiguo backend en Express/MongoDB</strong> ya estaba retirado; como parte de este trabajo se eliminó su servicio suspendido.</li>
       </ul>
 
@@ -264,7 +264,7 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>DKIM</strong> usa una clave de 2048 bits generada en Google Admin y publicada en <code>google._domainkey</code>, con la firma activada.</li>
         <li><strong>DMARC</strong> empieza en <code>p=none</code>, con informes agregados al buzón del negocio y alineación relajada. El plan: revisar los informes durante dos a cuatro semanas, luego pasar a cuarentena y después a rechazo.</li>
         <li><strong>CAA</strong> solo permite las dos autoridades de certificación que usa Render.</li>
-        <li><strong>Los servidores de nombres</strong> ahora son solo de Squarespace. La delegación en el registro pasó a los servidores p01 y <code>squarespacedns.com</code> de Squarespace. El conjunto NS de la propia zona todavía muestra otro grupo de Squarespace (p06), y el soporte de Squarespace confirmó que también es suyo.</li>
+        <li><strong>Los servidores de nombres</strong> son solo de Squarespace: la delegación en el registro apunta a los servidores p01 y <code>squarespacedns.com</code> de Squarespace.</li>
         <li><strong>DNSSEC</strong> está activado en Squarespace con el algoritmo 13 (ECDSA P-256), y el registro muestra la delegación como firmada. Las 30 consultas de prueba sin caché a los distintos servidores devolvieron respuestas firmadas, y Google Public DNS valida los registros (indicador AD). Los CNAME que apuntan a Render no están firmados del lado de Render, lo cual es normal.</li>
       </ul>
 
@@ -282,6 +282,8 @@ _dmarc             TXT  "v=DMARC1; p=none; rua=&lt;report-address&gt;; adkim=r; 
         <li><strong>Precarga de HSTS: pospuesta.</strong> <code>includeSubDomains</code> ya cubre los subdominios de los clientes, y la precarga es difícil de revertir.</li>
         <li><strong>Seguridad de las cuentas:</strong> mantener la autenticación multifactor en las cuentas del registrador, del alojamiento y del correo.</li>
       </ul>
+
+      <p>El sitio de mi negocio es el primer lugar donde los clientes ven mi trabajo, así que recibe el mismo trato que los suyos: sin scripts de terceros, políticas estrictas y correo autenticado.</p>
 
       <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>

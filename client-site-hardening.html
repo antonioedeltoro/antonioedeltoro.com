@@ -99,7 +99,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
 @        CAA  0 issue "letsencrypt.org"
 @        CAA  0 issue "pki.goog"</code></pre>
       <ul>
-        <li><strong>The policy changed along the way.</strong> SPF started out authorizing a mail provider with a softfail, with DMARC in a monitoring phase. Once I confirmed the domain sends nothing at all, I switched to the strict no-mail posture: SPF <code>-all</code> and DMARC <code>p=reject</code>. Lesson: find out who actually sends mail before you design the policy.</li>
+        <li><strong>A strict no-mail posture.</strong> The domain sends nothing, so SPF <code>-all</code> authorizes no sender and DMARC <code>p=reject</code> tells receiving providers to reject anything that claims to come from it.</li>
         <li><strong>CAA</strong> lists both certificate authorities the host issues from, so a renewal through either one won&rsquo;t fail without warning. The <code>www</code> hostname is a CNAME into the host, so the apex CAA record covers it too.</li>
         <li><strong>DNSSEC</strong> is now on at the registrar, which also hosts DNS, and was confirmed through a public validating resolver.</li>
         <li><strong>Cleanup.</strong> I removed the stray <code>AAAA</code> record and all of the leftover <code>MX</code> records, so the domain now neither sends nor receives mail. A null MX (<code>0 .</code>) to declare that formally was rejected by the DNS provider&rsquo;s interface; SPF <code>-all</code> and DMARC <code>p=reject</code> already cover the spoofing risk, so the gap is documented rather than worked around.</li>
@@ -141,6 +141,8 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Push protection and secret scanning</strong> on the repository, so a secret committed by mistake is blocked at push time.</li>
         <li><strong>Optional: a deny-by-default CSP</strong> (<code>default-src 'none'</code>) for Observatory&rsquo;s last bonus points.</li>
       </ul>
+
+      <p>None of this changes how the site looks, and that&rsquo;s the point. The protections live in the domain, the accounts and the database, where visitors never see them.</p>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
@@ -202,7 +204,7 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
 @        CAA  0 issue "letsencrypt.org"
 @        CAA  0 issue "pki.goog"</code></pre>
       <ul>
-        <li><strong>La política cambió sobre la marcha.</strong> Al principio, el SPF autorizaba a un proveedor de correo con un fallo suave (softfail), y DMARC estaba en fase de monitoreo. Cuando confirmé que el dominio no envía absolutamente nada, pasé a la postura estricta de &laquo;sin correo&raquo;: SPF <code>-all</code> y DMARC <code>p=reject</code>. Lección: primero hay que averiguar quién envía correo realmente y después diseñar la política.</li>
+        <li><strong>Una postura estricta de &laquo;sin correo&raquo;.</strong> El dominio no envía nada, así que SPF <code>-all</code> no autoriza a ningún remitente y DMARC <code>p=reject</code> indica a los proveedores que rechacen cualquier mensaje que diga provenir de él.</li>
         <li><strong>CAA</strong> incluye las dos autoridades de certificación que usa el proveedor, para que una renovación a través de cualquiera de ellas no falle sin aviso. El nombre <code>www</code> es un CNAME que apunta al proveedor, así que el registro CAA del dominio raíz también lo cubre.</li>
         <li><strong>DNSSEC</strong> quedó activado en el registrador, que también aloja el DNS, y se confirmó mediante un resolutor público que valida DNSSEC.</li>
         <li><strong>Limpieza.</strong> Eliminé el registro <code>AAAA</code> suelto y todos los registros <code>MX</code> sobrantes, así que ahora el dominio no envía ni recibe correo. La interfaz del proveedor de DNS rechazó un MX nulo (<code>0 .</code>) para declararlo formalmente; como SPF <code>-all</code> y DMARC <code>p=reject</code> ya cubren el riesgo de suplantación, dejé documentada esa limitación en lugar de buscarle un rodeo.</li>
@@ -244,6 +246,8 @@ _dmarc   TXT  "v=DMARC1; p=reject;"
         <li><strong>Protección de push y escaneo de secretos</strong> en el repositorio, para que un secreto subido por error se bloquee al hacer push.</li>
         <li><strong>Opcional: una CSP que deniegue por defecto</strong> (<code>default-src 'none'</code>) para obtener los últimos puntos adicionales de Observatory.</li>
       </ul>
+
+      <p>Nada de esto cambia el aspecto del sitio, y esa es la idea. Las protecciones están en el dominio, las cuentas y la base de datos, donde los visitantes nunca las ven.</p>
 
       <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>

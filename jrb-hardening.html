@@ -103,11 +103,11 @@
       <p>Because Checkout is a full-page redirect, the CSP needs <strong>no Stripe origins at all</strong>. Adding <code>js.stripe.com</code> &ldquo;just in case&rdquo; would only widen the policy. If the site ever moves to Stripe Elements, it would need <code>js.stripe.com</code> in <code>script-src</code> and <code>frame-src</code>, and <code>api.stripe.com</code> in <code>connect-src</code>.</p>
 
       <h2><span class="num">04</span>Front end: deny-by-default CSP and Trusted Types</h2>
-      <p>I self-hosted the Marcellus webfont via <code>@fontsource</code> (its Latin subset covers English and Spanish) and removed Google Fonts, so the site makes no requests to any origin except its own, the API, and Mapbox&rsquo;s search API. I also removed the unused <code>mapbox-gl</code> package. The final policy:</p>
+      <p>I self-hosted the Marcellus webfont via <code>@fontsource</code> (its Latin subset covers English and Spanish) and removed Google Fonts, so the site makes no requests to any origin except its own, the API, and Mapbox&rsquo;s search API. I also removed the unused <code>mapbox-gl</code> package. The final policy, with the API&rsquo;s origin replaced by a placeholder:</p>
       <pre><code>default-src 'none';
 script-src 'self'; style-src 'self'; font-src 'self';
 img-src 'self' data:;
-connect-src 'self' https://jrb-premiere-ride-api.onrender.com
+connect-src 'self' &lt;api-origin&gt;
             https://api.mapbox.com;
 manifest-src 'self'; form-action 'self'; base-uri 'none';
 object-src 'none'; frame-src 'none'; worker-src 'none';
@@ -165,16 +165,17 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Before deploying:</strong> 23 automated API tests (validation, error bodies, CORS, rate limits, and webhook signatures: forged, missing and valid), plus a headless browser run of every page on desktop and mobile under the final enforced policy, including a mocked quote-to-payment handoff to Stripe, asserting zero CSP violations and self-hosted fonts. That run is how I found the JSON-LD Trusted Types sink and designed the default policy.</li>
         <li><strong>Stage 1</strong> shipped the code plus the strict policy as <code>Content-Security-Policy-Report-Only</code>. On the live site every page reported zero would-be violations, address autocomplete and quotes worked against real Mapbox and the live API, and a real Book &amp; Pay went through Stripe end to end.</li>
         <li><strong>Stage 2</strong> enforced the policy and tightened the remaining headers. I re-ran every check live and tested Book &amp; Pay again.</li>
-        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan. It happened again with routing: removing the catch-all rewrite from <code>render.yaml</code> (see below) didn&rsquo;t remove the live rule either, so I deleted it in the dashboard too. Lesson: on this host, removing something from the config file doesn&rsquo;t remove it from the live service, so always re-verify after a removal.</li>
+        <li><strong>One gotcha:</strong> the host&rsquo;s infrastructure-as-code sync added the new headers but didn&rsquo;t remove the old report-only header, so I deleted it in the dashboard and confirmed with a re-scan. It happened again with routing: removing the catch-all rewrite from <code>render.yaml</code> didn&rsquo;t remove the live rule either, so I deleted it in the dashboard too. Lesson: on this host, removing something from the config file doesn&rsquo;t remove it from the live service, so always re-verify after a removal.</li>
       </ul>
 
       <h2><span class="num">09</span>Follow-ups</h2>
       <ul>
-        <li><strong>Real 404s (done).</strong> The old catch-all rewrite sent every unknown URL to the not-found page with HTTP 200, so search engines could index dead links. I removed it; the host now serves the prerendered 404 page with a real 404 status. Verified live: unknown URLs return 404, while every real page, asset, and the Stripe return URLs still return 200.</li>
         <li><strong>DMARC enforcement (in progress):</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (done) &rarr; <code>p=reject</code> (scheduled after two weeks of clean delivery).</li>
         <li><strong>HSTS preload (deferred):</strong> it&rsquo;s effectively permanent and adds little over a two-year HSTS policy.</li>
-        <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments. That&rsquo;s where ongoing attention belongs.</li>
+        <li><strong>Account security:</strong> multi-factor authentication is on for every account that can change the site, its data, or its payments.</li>
       </ul>
+
+      <p>For a small business that takes payments online, this is the standard I aim for: card data never touches the site, and every layer around checkout is locked down and verified in production.</p>
 
       <a class="back" href="index.html#projects">&larr; Back to projects</a>
     </article>
@@ -240,11 +241,11 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
       <p>Como Checkout es una redirección de página completa, la CSP <strong>no necesita ningún origen de Stripe</strong>. Agregar <code>js.stripe.com</code> &laquo;por si acaso&raquo; solo ampliaría la política. Si algún día el sitio pasa a Stripe Elements, necesitará <code>js.stripe.com</code> en <code>script-src</code> y <code>frame-src</code>, y <code>api.stripe.com</code> en <code>connect-src</code>.</p>
 
       <h2><span class="num">04</span>Front end: CSP que deniega por defecto y Trusted Types</h2>
-      <p>Alojé la tipografía Marcellus en el propio sitio mediante <code>@fontsource</code> (su subconjunto latino cubre el inglés y el español) y eliminé Google Fonts, de modo que el sitio no hace solicitudes a ningún origen salvo el propio, la API y la API de búsqueda de Mapbox. También eliminé el paquete <code>mapbox-gl</code>, que no se usaba. La política final:</p>
+      <p>Alojé la tipografía Marcellus en el propio sitio mediante <code>@fontsource</code> (su subconjunto latino cubre el inglés y el español) y eliminé Google Fonts, de modo que el sitio no hace solicitudes a ningún origen salvo el propio, la API y la API de búsqueda de Mapbox. También eliminé el paquete <code>mapbox-gl</code>, que no se usaba. La política final, con el origen de la API sustituido por un marcador de posición:</p>
       <pre><code>default-src 'none';
 script-src 'self'; style-src 'self'; font-src 'self';
 img-src 'self' data:;
-connect-src 'self' https://jrb-premiere-ride-api.onrender.com
+connect-src 'self' &lt;api-origin&gt;
             https://api.mapbox.com;
 manifest-src 'self'; form-action 'self'; base-uri 'none';
 object-src 'none'; frame-src 'none'; worker-src 'none';
@@ -302,16 +303,17 @@ _dmarc             TXT  "v=DMARC1; p=quarantine;"
         <li><strong>Antes del despliegue:</strong> 23 pruebas automatizadas de la API (validación, cuerpos de error, CORS, límites de solicitudes y firmas de webhook falsificadas, ausentes y válidas), además de un navegador sin interfaz que recorrió cada página en escritorio y en móvil bajo la política final aplicada, incluido un paso simulado de cotización a pago en Stripe, y verificó que no hubiera ninguna violación de la CSP y que las fuentes fueran propias. Esa prueba es la que me permitió descubrir el punto de inserción de Trusted Types en el JSON-LD y diseñar la política <code>default</code>.</li>
         <li><strong>Etapa 1:</strong> se publicó el código junto con la política estricta como <code>Content-Security-Policy-Report-Only</code>. En el sitio en vivo, ninguna página reportó posibles violaciones, el autocompletado de direcciones y las cotizaciones funcionaron con Mapbox real y la API en producción, y una reserva real con pago completó el recorrido por Stripe de principio a fin.</li>
         <li><strong>Etapa 2:</strong> se aplicó la política y se endurecieron los demás encabezados. Repetí todas las verificaciones en vivo y volví a probar la reserva con pago.</li>
-        <li><strong>Un imprevisto:</strong> la sincronización de infraestructura como código del proveedor agregó los encabezados nuevos, pero no eliminó el antiguo encabezado de solo reporte, así que lo borré desde el panel y lo confirmé con un nuevo análisis. Volvió a ocurrir con el enrutamiento: quitar la regla de reescritura general de <code>render.yaml</code> (ver más abajo) tampoco eliminó la regla activa, así que también la borré desde el panel. Lección: en este proveedor, quitar algo del archivo de configuración no lo quita del servicio en vivo; siempre hay que volver a verificar después de eliminar algo.</li>
+        <li><strong>Un imprevisto:</strong> la sincronización de infraestructura como código del proveedor agregó los encabezados nuevos, pero no eliminó el antiguo encabezado de solo reporte, así que lo borré desde el panel y lo confirmé con un nuevo análisis. Volvió a ocurrir con el enrutamiento: quitar la regla de reescritura general de <code>render.yaml</code> tampoco eliminó la regla activa, así que también la borré desde el panel. Lección: en este proveedor, quitar algo del archivo de configuración no lo quita del servicio en vivo; siempre hay que volver a verificar después de eliminar algo.</li>
       </ul>
 
       <h2><span class="num">09</span>Seguimiento</h2>
       <ul>
-        <li><strong>Hecho: errores 404 reales.</strong> La antigua regla de reescritura general enviaba cualquier URL desconocida a la página de &laquo;no encontrado&raquo; con un estado HTTP 200, así que los buscadores podían indexar enlaces rotos. La eliminé; ahora el proveedor sirve la página 404 prerrenderizada con un estado 404 real. Verificado en vivo: las URL desconocidas devuelven 404, mientras que todas las páginas reales, los recursos y las URL de retorno de Stripe siguen devolviendo 200.</li>
         <li><strong>En curso: aplicación de DMARC:</strong> <code>p=none</code> &rarr; <code>p=quarantine</code> (hecho) &rarr; <code>p=reject</code> (programado tras dos semanas de entregas sin problemas).</li>
         <li><strong>Pospuesto: precarga de HSTS</strong>: es prácticamente permanente y aporta poco frente a una política HSTS de dos años.</li>
-        <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en todas las cuentas que pueden modificar el sitio, sus datos o sus pagos; ahí es donde debe centrarse la atención de aquí en adelante.</li>
+        <li><strong>Seguridad de las cuentas:</strong> la autenticación multifactor está activada en todas las cuentas que pueden modificar el sitio, sus datos o sus pagos.</li>
       </ul>
+
+      <p>Para una pequeña empresa que cobra en línea, este es el estándar que busco: los datos de la tarjeta nunca pasan por el sitio, y cada capa alrededor del pago está protegida y verificada en producción.</p>
 
       <a class="back" href="index.html#projects">&larr; Volver a proyectos</a>
     </article>
