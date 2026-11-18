@@ -15,9 +15,9 @@
 
   var LINKS = [
     { frag: 'about',          en: 'about',          es: 'perfil' },
+    { frag: 'experience',     en: 'experience',     es: 'experiencia' },
     { frag: 'certifications', en: 'certifications', es: 'certificaciones' },
     { frag: 'projects',       en: 'projects',       es: 'proyectos' },
-    { frag: 'experience',     en: 'experience',     es: 'experiencia' },
     { frag: 'education',      en: 'education',      es: 'educación' },
     { frag: 'contact',        en: 'contact',        es: 'contacto' }
   ];
